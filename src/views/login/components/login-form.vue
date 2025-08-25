@@ -46,6 +46,9 @@ import { useSystemStore } from "@/store/modules/system";
 let userStores = useUserInfoStore();
 const routeStore = useRouteConfigStore();
 const router = useRouter();
+
+import { useUserStoreHook } from "@/store/modules/user";
+
 const form = ref({
   username: "admin",
   password: "123456",
@@ -92,20 +95,22 @@ const onSubmit = async ({ errors }: any) => {
 
 // 登录
 const onLogin = async () => {
-  // 登录
-  let res = await loginAPI(form.value);
-  // 存储token
-  await userStores.setToken(res.data.token);
-  // 加载用户信息
-  await userStores.setAccount();
-  // 加载路由信息
-  await routeStore.initSetRouter();
+  let res = await useUserStoreHook().loginByUsername(form.value);
+  console.log(">>>>>", res);
+  // // 登录
+  // let res = await loginAPI(form.value);
+  // // 存储token
+  // await userStores.setToken(res.data.token);
+  // // 加载用户信息
+  // await userStores.setAccount();
+  // // 加载路由信息
+  // await routeStore.initSetRouter();
 
-  arcoMessage("success", "登录成功");
-  // 跳转首页
-  router.replace("/home");
-  // 设置字典
-  useSystemStore().setDictData();
+  // arcoMessage("success", "登录成功");
+  // // 跳转首页
+  // router.replace("/home");
+  // // 设置字典
+  // useSystemStore().setDictData();
 };
 </script>
 
