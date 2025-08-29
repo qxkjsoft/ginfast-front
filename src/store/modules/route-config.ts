@@ -1,10 +1,10 @@
 import { defineStore } from "pinia";
 import router from "@/router/index";
 import { staticRoutes } from "@/router/route";
-import { getRoutersAPI } from "@/api/modules/system/index";
+//import { getRoutersAPI } from "@/api/modules/system/index";
 import { moduleReplacement, linearArray } from "@/router/route-output";
 import { getUrlWithParams } from "@/utils/index";
-
+import { getRoutersAPI, convertMenuItemsToRoutes } from "@/api/system";
 /**
  * 路由列表
  * @method setTabsTitle 设置tabs标签页名称
@@ -127,7 +127,12 @@ export const routeConfigStore = () => {
    */
   async function initSetRouter() {
     // 1、获取过滤角色权限后的树，后端做排序处理
-    let { data } = await getRoutersAPI();
+    // let { data } = await getRoutersAPI();
+
+    // 后端数据转换成前端所需格式
+    let res = await getRoutersAPI();
+    let data = convertMenuItemsToRoutes(res.data);
+
     // 2、获取路由树转换的一维路由
     let flatRoute = linearArray(data);
     // 3、将模块设置为真实模块

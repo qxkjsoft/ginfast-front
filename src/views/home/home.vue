@@ -18,6 +18,9 @@ import Shortcut from "@/views/home/components/shortcut.vue";
 import TargetBox from "@/views/home/components/target-box.vue";
 import Finance from "@/views/home/components/finance.vue";
 import DataBox from "@/views/home/components/data-box.vue";
+
+// import { getToken } from "@/utils/auth"
+// console.log("getToken:", getToken())
 </script>
 
 <style lang="scss" scoped>

@@ -8,7 +8,7 @@
   "files.eol": "\n",
   "marscode.chatLanguage": "cn",
   "[vue]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "Vue.volar"
   },
   "[typescript]": {
     "editor.defaultFormatter": "vscode.typescript-language-features"

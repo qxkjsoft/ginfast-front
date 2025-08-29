@@ -4,9 +4,11 @@ import { createRouter, createWebHashHistory } from "vue-router";
 import { staticRoutes, notFoundAndNoPower } from "@/router/route.ts";
 import { currentlyRoute } from "@/router/route-output";
 import { storeToRefs } from "pinia";
-import { useUserInfoStore } from "@/store/modules/user-info";
+//import { useUserInfoStore } from "@/store/modules/user-info";
 import { useRouteConfigStore } from "@/store/modules/route-config";
 import { useRoutingMethod } from "@/hooks/useRoutingMethod";
+import { hasToken } from "@/utils/auth";
+import { useUserStoreHook } from "@/store/modules/user";
 /**
  * 创建vue的路由示例
  * @method createRouter(options: RouterOptions): Router
@@ -37,21 +39,34 @@ const router = createRouter({
  */
 router.beforeEach(async (to: any, _: any, next: any) => {
   NProgress.start(); // 开启进度条
-  const store = useUserInfoStore(pinia);
+  //const store = useUserInfoStore(pinia);
   const routeStore = useRouteConfigStore(pinia);
-  const { token } = storeToRefs(store);
+  //const { token } = storeToRefs(store);
   const { routeTree } = storeToRefs(routeStore);
   // console.log("去", to, "来自", from);
   // next()内部加了path等于跳转指定路由会再次触发router.beforeEach，内部无参数等于放行，不会触发router.beforeEach
 
+  //   // 1、去登录页，无token，放行
+  //   if (to.path === "/login" && !token.value) return next();
+
+  //   // 2、没有token，直接重定向到登录页
+  //   if (!token.value) return next("/login");
+
+  //   // 3、去登录页，有token，直接重定向到home页
+  //   if (to.path === "/login" && token.value) {
+  //     // 项目内的跳转，处理跳转路由高亮
+  //     currentlyRoute(to);
+  //     return next("/home");
+  //   }
+
+  // 新的登录逻辑
+  const tokenExist = hasToken();
   // 1、去登录页，无token，放行
-  if (to.path === "/login" && !token.value) return next();
-
+  if (to.path === "/login" && !tokenExist) return next();
   // 2、没有token，直接重定向到登录页
-  if (!token.value) return next("/login");
-
+  if (!tokenExist) return next("/login");
   // 3、去登录页，有token，直接重定向到home页
-  if (to.path === "/login" && token.value) {
+  if (to.path === "/login" && tokenExist) {
     // 项目内的跳转，处理跳转路由高亮
     currentlyRoute(to);
     return next("/home");
@@ -62,17 +77,26 @@ router.beforeEach(async (to: any, _: any, next: any) => {
   // 解决刷新页面404的问题
   if (!routeTree.value.length) {
     const routeStore = useRouteConfigStore(pinia);
-    // 获取账号信息
-    await store.setAccount();
-    // 获取路由信息
-    await routeStore.initSetRouter();
+    try {
+      // 获取账号信息
+      //await store.setAccount();
+      await useUserStoreHook().getUserInfo();
+      // 获取路由信息
+      await routeStore.initSetRouter();
 
-    // 判断是否是动态路由
-    const { isDynamicRoute } = useRoutingMethod();
-    if (isDynamicRoute(to.path)) {
-      return next({ name: to.name, params: to.params });
-    } else {
-      return next({ path: to.path, query: to.query });
+      // 判断是否是动态路由
+      const { isDynamicRoute } = useRoutingMethod();
+      if (isDynamicRoute(to.path)) {
+        return next({ name: to.name, params: to.params });
+      } else {
+        return next({ path: to.path, query: to.query });
+      }
+    } catch (error: any) {
+      console.error("获取用户信息或路由信息失败:", error);
+      // 清除可能无效的token
+      useUserStoreHook().logOut();
+      // 重定向到登录页
+      return next("/login");
     }
   }
 

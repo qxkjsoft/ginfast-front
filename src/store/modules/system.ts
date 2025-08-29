@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import persistedstateConfig from "@/store/config/index";
-import { getDictAPI } from "@/api/modules/system/index";
+//import { getDictAPI } from "@/api/modules/system/index";
+import { getDictAPI } from "@/api/system";
 /**
  * 用户信息
  * @methods setAccount 设置账号信息
@@ -13,8 +14,10 @@ const systemStore = () => {
 
   // 设置字典数据
   async function setDictData() {
-    let dictData = await getDictAPI();
-    dict.value = dictData.data || [];
+    // let dictData = await getDictAPI();
+    // dict.value = dictData.data || [];
+    const { data } = await getDictAPI();
+    dict.value = data.list || [];
   }
 
   return { dict, setDictData };

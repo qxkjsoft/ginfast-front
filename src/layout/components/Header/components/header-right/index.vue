@@ -28,7 +28,9 @@
           <icon-notification :size="18" />
         </template>
       </a-button>
-      <template #content><Notice /></template>
+      <template #content>
+        <Notice />
+      </template>
     </a-popover>
     <!-- 全屏 -->
     <a-tooltip :content="$t(`system.${fullScreen ? 'full-screen' : 'exit-full-screen'}`)">
@@ -58,8 +60,8 @@
     <!-- 我的 -->
     <a-dropdown trigger="hover">
       <div class="my_setting" id="system-my-setting">
-        <a-image width="32" height="32" fit="cover" :src="account.user.avatar || myImage" class="my_image" />
-        <span class="user-nickname">{{ account.user.nickName }}</span>
+        <a-image width="32" height="32" fit="cover" :src="account.avatar || myImage" class="my_image" />
+        <span class="user-nickname">{{ account.nickName }}</span>
         <div class="icon_down">
           <icon-down style="stroke-width: 3" />
         </div>
@@ -110,7 +112,7 @@ import { useI18n } from "vue-i18n";
 import { Modal } from "@arco-design/web-vue";
 import { useRouter } from "vue-router";
 import { storeToRefs } from "pinia";
-import { useUserInfoStore } from "@/store/modules/user-info";
+//import { useUserInfoStore } from "@/store/modules/user-info";
 import { useThemeConfig } from "@/store/modules/theme-config";
 import { useThemeMethods } from "@/hooks/useThemeMethods";
 import { useDevicesSize } from "@/hooks/useDevicesSize";
@@ -119,11 +121,12 @@ import { useRouteConfigStore } from "@/store/modules/route-config";
 const i18n = useI18n();
 const router = useRouter();
 const { isMobile } = useDevicesSize();
-const userStore = useUserInfoStore();
 const themeStore = useThemeConfig();
-const { account } = storeToRefs(userStore);
 const { language, darkMode } = storeToRefs(themeStore);
-
+//const userStore = useUserInfoStore();
+//const { account } = storeToRefs(userStore);
+import { useUserStoreHook } from "@/store/modules/user";
+const account = useUserStoreHook().account;
 // 系统设置
 const systemOpen = ref(false);
 const onSystemSetting = () => {
@@ -171,8 +174,8 @@ const onPerson = (type: number) => {
   router.push({
     path: "/system/userinfo",
     query: {
-      id: account.value.user.id,
-      userName: account.value.user.userName,
+      id: account.value.id,
+      userName: account.value.username,
       type
     }
   });
@@ -193,7 +196,8 @@ const logOut = () => {
     onBeforeOk: async () => {
       try {
         // 用户退出
-        await userStore.logOut();
+        //await userStore.logOut();
+        await useUserStoreHook().logOut();
         router.replace("/login");
         // 清除路由数据
         useRouteConfigStore().resetRoute();
@@ -212,12 +216,14 @@ const logOut = () => {
   top: 0;
   right: $padding;
 }
+
 .header_setting {
   display: flex;
   align-items: center;
   justify-content: space-between;
   height: 100%;
   background-color: $color-bg-2;
+
   > .icon_btn {
     box-sizing: border-box;
     display: flex;
@@ -229,6 +235,7 @@ const logOut = () => {
     color: $color-text-1;
     border-radius: $radius-box-1;
   }
+
   .my_setting {
     display: flex;
     align-items: center;
@@ -236,13 +243,16 @@ const logOut = () => {
     height: 32px;
     margin-left: $margin;
     overflow: hidden;
+
     .my_image {
       margin-right: 8px;
       border-radius: 50%;
     }
+
     .user-nickname {
       white-space: nowrap;
     }
+
     .icon_down {
       margin: 0 0 0 5px;
       transform: rotate(0deg);
@@ -250,8 +260,10 @@ const logOut = () => {
     }
   }
 }
+
 .notice {
   position: relative;
+
   &::before {
     position: absolute;
     top: -4px;
@@ -264,11 +276,13 @@ const logOut = () => {
     border-radius: 50%;
   }
 }
+
 :deep(.arco-dropdown-open) {
   .icon_down {
     transform: rotate(180deg) !important;
   }
 }
+
 .margin-left-text {
   margin-left: $margin-text;
 }

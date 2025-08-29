@@ -24,6 +24,7 @@ const { isPc } = useDevicesSize();
   position: relative;
   height: 100vh;
   overflow: hidden;
+
   .login {
     position: absolute;
     top: 50%;
@@ -34,21 +35,25 @@ const { isPc } = useDevicesSize();
     height: 500px;
     box-shadow: 0 0 8px 1px $color-fill-2;
     transform: translate(-50%, -50%);
+
     .login_box {
       position: relative;
       box-sizing: border-box;
       width: 350px;
       height: 100%;
       padding: 40px 30px 30px;
+
       .login_title {
         margin-bottom: $margin-text;
         font-size: $font-size-title-2;
         color: $color-text-1;
       }
+
       .login_title_desc {
         font-size: $font-size-body-1;
         color: $color-text-3;
       }
+
       .author {
         position: absolute;
         bottom: 30px;

@@ -47,18 +47,19 @@
           :data="accountList"
           :bordered="{ cell: true }"
           :loading="loading"
-          :scroll="{ x: '120%', y: '100%' }"
+          :scroll="{ x: '120%', y: '85%' }"
           :pagination="pagination"
           :row-selection="{ type: 'checkbox', showCheckedAll: true }"
           :selected-keys="selectedKeys"
           @select="select"
           @select-all="selectAll"
+          @page-change="handlePageChange"
         >
           <template #columns>
             <a-table-column title="序号" :width="64">
               <template #cell="cell">{{ cell.rowIndex + 1 }}</template>
             </a-table-column>
-            <a-table-column title="用户名称" data-index="userName"></a-table-column>
+            <a-table-column title="用户名称" data-index="username"></a-table-column>
             <a-table-column title="昵称" data-index="nickName"></a-table-column>
             <a-table-column title="性别" data-index="sex" align="center">
               <template #cell="{ record }">
@@ -67,7 +68,7 @@
                 <a-tag bordered size="small" v-else>未知</a-tag>
               </template>
             </a-table-column>
-            <a-table-column title="部门" data-index="deptName"></a-table-column>
+            <a-table-column title="部门" data-index="deptId"></a-table-column>
             <a-table-column title="手机号" data-index="phone" :width="180"></a-table-column>
             <a-table-column title="状态" :width="100" align="center">
               <template #cell="{ record }">
@@ -76,7 +77,7 @@
               </template>
             </a-table-column>
             <a-table-column title="描述" data-index="description" :ellipsis="true" :tooltip="true"></a-table-column>
-            <a-table-column title="创建时间" data-index="createTime" :width="180"></a-table-column>
+            <a-table-column title="创建时间" data-index="createdAt" :width="180"></a-table-column>
             <a-table-column title="操作" :width="200" align="center" :fixed="'right'">
               <template #cell="{ record }">
                 <a-space>
@@ -105,7 +106,7 @@
       </div>
     </div>
 
-    <a-modal width="40%" v-model:visible="open" @close="afterClose" @ok="handleOk" @cancel="afterClose">
+    <a-modal width="40%" v-model:visible="open" @close="afterClose" :on-before-ok="handleOk" @cancel="afterClose">
       <template #title> {{ title }} </template>
       <div>
         <a-form ref="formRef" auto-label-width :rules="rules" :model="addFrom">
@@ -134,7 +135,12 @@
             </a-col>
           </a-row>
           <a-row>
-            <a-col :span="24">
+            <a-col :span="12">
+              <a-form-item field="password" label="密码" validate-trigger="blur">
+                <a-input-password v-model="addFrom.password" :defaultVisibility="true" placeholder="请输入密码" allow-clear />
+              </a-form-item>
+            </a-col>
+            <a-col :span="12">
               <a-form-item field="sex" label="性别" validate-trigger="blur">
                 <a-radio-group v-model="addFrom.sex" :options="sexOption">
                   <template #label="{ data }">
@@ -158,13 +164,7 @@
           </a-form-item>
           <a-form-item field="roles" label="角色" validate-trigger="blur">
             <a-select v-model="addFrom.roles" multiple placeholder="请选择角色">
-              <a-option
-                v-for="item in roleList"
-                :key="item.code"
-                :value="item.code"
-                :label="item.name"
-                :disabled="item.admin"
-              ></a-option>
+              <a-option v-for="item in roleList" :key="item.id" :value="item.id" :label="item.name"></a-option>
             </a-select>
           </a-form-item>
           <a-form-item field="status" label="状态" validate-trigger="blur">
@@ -183,7 +183,9 @@
 </template>
 
 <script setup lang="ts">
-import { getDivisionAPI, getAccountAPI, getRoleAPI } from "@/api/modules/system/index";
+// import { getDivisionAPI, getAccountAPI, getRoleAPI } from "@/api/modules/system/index";
+import { getDivisionAPI, getRolesAPI } from "@/api/system";
+import { getAccountListAPI, addAccountAPI } from "@/api/user";
 import { deepClone } from "@/utils";
 
 const router = useRouter();
@@ -228,10 +230,16 @@ const rules = {
       message: "请选择性别"
     }
   ],
+  password: [
+    {
+      required: true,
+      message: "请输入密码"
+    }
+  ],
   deptId: [
     {
       required: true,
-      message: "请选择所属部门"
+      message: "请选择部门"
     }
   ],
   roles: [
@@ -252,6 +260,7 @@ const addFrom = ref<any>({
   nickName: "",
   phone: "",
   email: "",
+  password: "",
   sex: 2,
   deptId: null,
   roles: [],
@@ -268,9 +277,18 @@ const onAdd = () => {
 };
 const handleOk = async () => {
   let state = await formRef.value.validate();
-  if (state) return (open.value = true); // 校验不通过
-  arcoMessage("success", "模拟提交成功");
+  if (state) return false;
+
+  try {
+    await addAccountAPI(addFrom.value);
+  } catch (error) {
+    //console.error(error)
+    return false;
+  }
+
+  arcoMessage("success", "提交成功");
   getAccount();
+  return true;
 };
 // 关闭对话框动画结束后触发
 const afterClose = () => {
@@ -280,6 +298,7 @@ const afterClose = () => {
     nickName: "",
     phone: "",
     email: "",
+    password: "",
     sex: 2,
     deptId: null,
     roles: [],
@@ -308,17 +327,26 @@ const onDetail = (row: any) => {
 
 const loading = ref(false);
 const pagination = ref({
+  current: 1,
   pageSize: 10,
-  showPageSize: true
+  total: 0,
+  showPageSize: true,
+  showTotal: true,
+  showJumper: true
 });
 
 // 账户
 const accountList = ref();
 const getAccount = async () => {
   loading.value = true;
-  let res = await getAccountAPI();
-  res.data.forEach((item: any) => item.admin && (item.disabled = true));
-  accountList.value = res.data;
+  const params = {
+    pageNum: pagination.value.current,
+    pageSize: pagination.value.pageSize,
+    ...form.value
+  };
+  let { data } = await getAccountListAPI(params);
+  accountList.value = data.list;
+  pagination.value.total = data.total;
   loading.value = false;
 };
 const selectedKeys = ref([]);
@@ -327,6 +355,12 @@ const select = (list: []) => {
 };
 const selectAll = (state: boolean) => {
   selectedKeys.value = state ? (accountList.value.map((el: any) => el.id) as []) : [];
+};
+
+// 分页变化事件处理
+const handlePageChange = (page: number) => {
+  pagination.value.current = page;
+  getAccount();
 };
 
 // 部门树
@@ -338,8 +372,8 @@ const fieldNames = ref({
 const treeData = ref();
 const treeRef = ref();
 const getDivision = async () => {
-  let res = await getDivisionAPI();
-  treeData.value = res.data;
+  let { data } = await getDivisionAPI();
+  treeData.value = data.list;
   setTimeout(() => {
     treeRef.value.expandAll();
   }, 0);
@@ -351,8 +385,8 @@ const onSelectTree = () => {
 // 角色列表
 const roleList = ref<any>([]);
 const getRole = async () => {
-  let res = await getRoleAPI();
-  roleList.value = res.data;
+  let { data } = await getRolesAPI();
+  roleList.value = data.list;
 };
 
 onMounted(() => {
@@ -366,17 +400,20 @@ onMounted(() => {
 .container {
   display: flex;
   column-gap: $padding;
+
   .left-box {
     display: flex;
     flex-direction: column;
     width: 250px;
     height: 100%;
+
     .tree-box {
       flex: 1;
       margin-top: $padding;
       overflow: auto;
     }
   }
+
   .right-box {
     flex: 1;
   }

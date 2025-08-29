@@ -1,6 +1,8 @@
 <template>
   <div>
-    <a-config-provider :global="true" :locale="locale">
+    <!-- 移除 :global="true" 处理报错:[Vue warn]: App already provides property with key "Symbol(ArcoConfigProvider)". It will be overwritten with the new value.-->
+    <!-- <a-config-provider :global="true" :locale="locale"> -->
+    <a-config-provider :locale="locale">
       <slot></slot>
     </a-config-provider>
   </div>

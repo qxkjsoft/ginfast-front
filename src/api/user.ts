@@ -1,32 +1,91 @@
 import { http } from "@/utils/http";
 import { baseUrlApi } from "./utils";
-export type UserResult = {
-  code: number;
-  data: {
-    user: {
-      id: number;
-      /** 头像 */
-      avatar: string;
-      /** 用户名 */
-      username: string;
-      /** 昵称 */
-      nickname: string;
-      /** 当前登录用户的角色 */
-      roles: Array<string>;
-      /** 按钮级别权限 */
-      permissions: Array<string>;
-    };
+import { BaseResult } from "./types";
 
-    /** `token` */
-    accessToken: string;
-    /** 用于调用刷新`accessToken`的接口时所需的`token` */
-    refreshToken: string;
-    /** `accessToken`的过期时间（格式'xxxx/xx/xx xx:xx:xx'） */
-    expires: number;
-  };
-  message: string;
-};
+export type UserResult = BaseResult<{
+  /** `token` */
+  accessToken: string;
+  /** 用于调用刷新`accessToken`的接口时所需的`token` */
+  refreshToken: string;
+  /** `accessToken`的过期时间（格式'xxxx/xx/xx xx:xx:xx'） */
+  accessTokenExpires: number;
+  refreshTokenExpires: number;
+}>;
+
+export type RefreshTokenResult = BaseResult<{
+  accessToken: string;
+  accessTokenExpires: number;
+}>;
+
+export type ProfileResult = BaseResult<{
+  id: number;
+  /** 头像 */
+  avatar: string;
+  /** 用户名 */
+  username: string;
+  /** 昵称 */
+  nickname: string;
+  /** 当前登录用户的角色 */
+  roles: Array<string>;
+  /** 按钮级别权限 */
+  permissions: Array<string>;
+}>;
+
+export type CaptchaIdResult = BaseResult<{
+  captchaId: string;
+  imgUrl: string;
+}>;
+
+// 用户
+export interface AccountItem {
+  id: number;
+  createdAt: string;
+  updatedAt: string;
+  DeletedAt: string | null;
+  username: string;
+  password: string;
+  email: string;
+  status: number;
+  deptId: number;
+  phone: string;
+  sex: string;
+  nickName: string;
+  avatar: string;
+  createdBy: number;
+}
+
+// 用户列表
+export type AccountsResult = BaseResult<{
+  list: Array<AccountItem>;
+  total: number;
+}>;
+
 /** 登录 */
 export const getLogin = (data?: object) => {
-  return http.request<any>("post", baseUrlApi("login"), { data });
+  return http.request<UserResult>("post", baseUrlApi("login"), { data });
+};
+
+/** 刷新token */
+export const refreshTokenApi = (refreshToken: string) => {
+  return http.request<RefreshTokenResult>("post", baseUrlApi("refreshToken"), { data: { refreshToken } });
+};
+
+/** 获取登录用户信息 */
+export const getProfileAPI = () => {
+  return http.request<ProfileResult>("get", baseUrlApi("users/profile"));
+};
+
+/** 获取验证码id */
+export const getCaptchaId = () => {
+  return http.request<CaptchaIdResult>("get", baseUrlApi("captcha/id"));
+};
+
+// 获取用户列表
+export const getAccountListAPI = (param: any) => {
+  return http.request<AccountsResult>("get", baseUrlApi("users/list"), { params: param });
+};
+
+// 新增用户
+export const addAccountAPI = (param: any) => {
+  return http.request<BaseResult>("post", baseUrlApi("users/add"), { data: param });
 };

@@ -32,9 +32,10 @@ export default [
     method: "get",
     timeout: 300,
     response: ({ headers }: any) => {
-      let token = headers.authorization;
+      //let token = headers.authorization;
       // 根据token或登录账号判断是什么角色，这里模拟两个角色，admin、common
-      let userRoles = token === "Admin-Token" ? ["admin"] : ["common"];
+      //let userRoles = token === "Admin-Token" ? ["admin"] : ["common"];
+      let userRoles = ["admin"];
       const originMenu: any = deepClone(systemMenu);
       // 1. 过滤扁平路由，根据角色返回有权限且非禁用的节点
       const survivalTree = filterByDisable(originMenu, userRoles);

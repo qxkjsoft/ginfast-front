@@ -1,6 +1,7 @@
 import axios from "axios";
 import router from "@/router";
 import { Message } from "@arco-design/web-vue";
+import { getToken, formatToken, removeToken } from "@/utils/auth";
 
 // 是否开启本地mock
 const MOCK_FLAG = import.meta.env.VITE_APP_OPEN_MOCK === "true";
@@ -13,13 +14,10 @@ service.interceptors.request.use(
   function (config: any) {
     // 发送请求之前做什么
     // 获取token鉴权
-    let userInfo: any = {};
-    if (localStorage.getItem("user-info")) {
-      userInfo = JSON.parse(localStorage.getItem("user-info") as string);
-    }
-    if (userInfo?.token) {
+    const tokenData = getToken();
+    if (tokenData?.accessToken) {
       // 有token，在请求头中携带token
-      config.headers.Authorization = userInfo.token;
+      config.headers.Authorization = formatToken(tokenData.accessToken);
     }
     return config;
   },
@@ -53,7 +51,7 @@ service.interceptors.response.use(
     }
   },
   function (error: any) {
-    localStorage.removeItem("user-info");
+    removeToken();
     router.push("/login");
     return Promise.reject(error);
   }
