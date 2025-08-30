@@ -89,3 +89,13 @@ export const getAccountListAPI = (param: any) => {
 export const addAccountAPI = (param: any) => {
   return http.request<BaseResult>("post", baseUrlApi("users/add"), { data: param });
 };
+
+// 编辑用户
+export const editAccountAPI = (param: any) => {
+  return http.request<BaseResult>("put", baseUrlApi("users/edit"), { data: param });
+};
+
+// 删除用户
+export const deleteAccountAPI = (param: any) => {
+  return http.request<BaseResult>("delete", baseUrlApi("users/delete"), { data: param });
+};

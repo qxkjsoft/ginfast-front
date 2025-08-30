@@ -35,10 +35,6 @@
               <template #icon><icon-plus /></template>
               <span>新增</span>
             </a-button>
-            <a-button type="primary" status="danger">
-              <template #icon><icon-delete /></template>
-              <span>删除</span>
-            </a-button>
           </a-space>
         </a-row>
 
@@ -49,7 +45,6 @@
           :loading="loading"
           :scroll="{ x: '120%', y: '85%' }"
           :pagination="pagination"
-          :row-selection="{ type: 'checkbox', showCheckedAll: true }"
           :selected-keys="selectedKeys"
           @select="select"
           @select-all="selectAll"
@@ -59,7 +54,7 @@
             <a-table-column title="序号" :width="64">
               <template #cell="cell">{{ cell.rowIndex + 1 }}</template>
             </a-table-column>
-            <a-table-column title="用户名称" data-index="username"></a-table-column>
+            <a-table-column title="用户名称" data-index="userName"></a-table-column>
             <a-table-column title="昵称" data-index="nickName"></a-table-column>
             <a-table-column title="性别" data-index="sex" align="center">
               <template #cell="{ record }">
@@ -85,8 +80,8 @@
                     <template #icon><icon-edit /></template>
                     <span>修改</span>
                   </a-button>
-                  <a-popconfirm type="warning" content="确定删除该账号吗?">
-                    <a-button type="primary" status="danger" size="mini" :disabled="record.admin">
+                  <a-popconfirm type="warning" content="确定删除该账号吗?" @ok="onDelete(record)">
+                    <a-button type="primary" status="danger" size="mini">
                       <template #icon><icon-delete /></template>
                       <span>删除</span>
                     </a-button>
@@ -135,7 +130,7 @@
             </a-col>
           </a-row>
           <a-row>
-            <a-col :span="12">
+            <a-col :span="12" v-if="formType == 0">
               <a-form-item field="password" label="密码" validate-trigger="blur">
                 <a-input-password v-model="addFrom.password" :defaultVisibility="true" placeholder="请输入密码" allow-clear />
               </a-form-item>
@@ -185,7 +180,7 @@
 <script setup lang="ts">
 // import { getDivisionAPI, getAccountAPI, getRoleAPI } from "@/api/modules/system/index";
 import { getDivisionAPI, getRolesAPI } from "@/api/system";
-import { getAccountListAPI, addAccountAPI } from "@/api/user";
+import { getAccountListAPI, addAccountAPI, editAccountAPI, deleteAccountAPI } from "@/api/user";
 import { deepClone } from "@/utils";
 
 const router = useRouter();
@@ -278,9 +273,12 @@ const onAdd = () => {
 const handleOk = async () => {
   let state = await formRef.value.validate();
   if (state) return false;
-
   try {
-    await addAccountAPI(addFrom.value);
+    if (formType.value == 0) {
+      await addAccountAPI(addFrom.value);
+    } else {
+      await editAccountAPI(addFrom.value);
+    }
   } catch (error) {
     //console.error(error)
     return false;
@@ -309,8 +307,20 @@ const afterClose = () => {
 const onUpdate = (row: any) => {
   title.value = "修改账号";
   formType.value = 1;
-  addFrom.value = deepClone(row);
+  addFrom.value = deepClone({ ...row, roles: row.roles.map((item: any) => item.id) });
+  //console.log(addFrom.value)
   open.value = true;
+};
+
+// 删除
+const onDelete = async (row: any) => {
+  try {
+    await deleteAccountAPI({ id: row.id });
+    arcoMessage("success", "删除成功");
+    getAccount();
+  } catch (error) {
+    arcoMessage("error", "删除失败");
+  }
 };
 
 const onDetail = (row: any) => {
