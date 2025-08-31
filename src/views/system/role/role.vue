@@ -39,18 +39,12 @@
         :bordered="{ cell: true }"
         :loading="loading"
         :scroll="{ x: '100%', y: '100%', minWidth: 1000 }"
-        :pagination="pagination"
-        :row-selection="{ type: 'checkbox', showCheckedAll: true }"
-        :selected-keys="selectedKeys"
-        @select="select"
-        @select-all="selectAll"
       >
         <template #columns>
           <a-table-column title="序号" :width="64">
             <template #cell="cell">{{ cell.rowIndex + 1 }}</template>
           </a-table-column>
           <a-table-column title="角色名称" data-index="name"></a-table-column>
-          <a-table-column title="角色标识" data-index="code"></a-table-column>
           <a-table-column title="排序" data-index="sort" :width="100" align="center"></a-table-column>
           <a-table-column title="状态" :width="100" align="center">
             <template #cell="{ record }">
@@ -59,7 +53,7 @@
             </template>
           </a-table-column>
           <a-table-column title="描述" data-index="description" :ellipsis="true" :tooltip="true"></a-table-column>
-          <a-table-column title="创建时间" data-index="createTime" :width="180"></a-table-column>
+          <a-table-column title="创建时间" data-index="createdAt" :width="180"></a-table-column>
           <a-table-column title="操作" :width="280" align="center" :fixed="'right'">
             <template #cell="{ record }">
               <a-space>
@@ -168,7 +162,8 @@
 </template>
 
 <script setup lang="ts">
-import { getRoleAPI, getMenuListAPI, getUserPermissionAPI } from "@/api/modules/system/index";
+import { getMenuListAPI, getUserPermissionAPI } from "@/api/modules/system/index";
+import { type RoleItem, getRolesAPI } from "@/api/role";
 import { deepClone } from "@/utils";
 import useGlobalProperties from "@/hooks/useGlobalProperties";
 const proxy = useGlobalProperties();
@@ -239,27 +234,16 @@ const onUpdate = (row: any) => {
 
 // 获取列表
 const loading = ref(false);
-const pagination = ref({
-  pageSize: 10,
-  showPageSize: true
-});
-const roleList = ref([]);
+
+const roleList = ref<RoleItem[]>([]);
 const getRole = async () => {
   try {
     loading.value = true;
-    let res = await getRoleAPI();
-    res.data.forEach((item: any) => item.admin && (item.disabled = true));
-    roleList.value = res.data;
+    let res = await getRolesAPI();
+    roleList.value = res.data.list;
   } finally {
     loading.value = false;
   }
-};
-const selectedKeys = ref([]);
-const select = (list: []) => {
-  selectedKeys.value = list;
-};
-const selectAll = (state: boolean) => {
-  selectedKeys.value = state ? (roleList.value.map((el: any) => el.id) as []) : [];
 };
 
 // 获取权限树

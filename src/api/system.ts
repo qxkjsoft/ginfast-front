@@ -78,26 +78,6 @@ export type DivisionsResult = BaseResult<{
   list: DivisionItem[];
 }>;
 
-// 角色
-export interface RoleItem {
-  id: number;
-  createdAt: string;
-  updatedAt: string;
-  DeletedAt: string | null;
-  name: string;
-  sort: number;
-  status: number;
-  description: string;
-  parent_id: number;
-  created_by: number;
-  users: any[] | null;
-  children: RoleItem[] | null;
-}
-
-export type RolesResult = BaseResult<{
-  list: Array<RoleItem>;
-}>;
-
 // 字典项
 export interface DictOptionItem {
   id: number;
@@ -106,6 +86,7 @@ export interface DictOptionItem {
   status: number;
   dictId: number;
 }
+
 // 字典
 export interface DictItem {
   id: number;
@@ -173,11 +154,6 @@ export const getRoutersAPI = () => {
 // 获取部门数据
 export const getDivisionAPI = () => {
   return http.request<DivisionsResult>("get", baseUrlApi("sysDepartment/getDivision"));
-};
-
-// 获取角色数据
-export const getRolesAPI = () => {
-  return http.request<RolesResult>("get", baseUrlApi("sysRole/getRoles"));
 };
 
 // 获取字典数据

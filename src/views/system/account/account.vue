@@ -158,9 +158,17 @@
             ></a-tree-select>
           </a-form-item>
           <a-form-item field="roles" label="角色" validate-trigger="blur">
-            <a-select v-model="addFrom.roles" multiple placeholder="请选择角色">
-              <a-option v-for="item in roleList" :key="item.id" :value="item.id" :label="item.name"></a-option>
-            </a-select>
+            <a-tree-select
+              v-model="addFrom.roles"
+              :data="roleList"
+              :field-names="{
+                key: 'id',
+                title: 'name',
+                children: 'children'
+              }"
+              multiple
+              placeholder="请选择角色"
+            />
           </a-form-item>
           <a-form-item field="status" label="状态" validate-trigger="blur">
             <a-switch type="round" :checked-value="1" :unchecked-value="0" v-model="addFrom.status">
@@ -179,7 +187,8 @@
 
 <script setup lang="ts">
 // import { getDivisionAPI, getAccountAPI, getRoleAPI } from "@/api/modules/system/index";
-import { getDivisionAPI, getRolesAPI } from "@/api/system";
+import { getDivisionAPI } from "@/api/system";
+import { getRolesAPI } from "@/api/role";
 import { getAccountListAPI, addAccountAPI, editAccountAPI, deleteAccountAPI } from "@/api/user";
 import { deepClone } from "@/utils";
 
