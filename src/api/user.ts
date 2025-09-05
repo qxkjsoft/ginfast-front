@@ -26,7 +26,7 @@ export type ProfileResult = BaseResult<{
   /** 昵称 */
   nickname: string;
   /** 当前登录用户的角色 */
-  roles: Array<string>;
+  roles: Array<number>;
   /** 按钮级别权限 */
   permissions: Array<string>;
 }>;
@@ -63,6 +63,11 @@ export type AccountsResult = BaseResult<{
 /** 登录 */
 export const getLogin = (data?: object) => {
   return http.request<UserResult>("post", baseUrlApi("login"), { data });
+};
+
+/** 登出 */
+export const logout = () => {
+  return http.request<BaseResult>("post", baseUrlApi("users/logout"));
 };
 
 /** 刷新token */

@@ -26,7 +26,7 @@
         </template>
         <template #right>
           <a-space wrap>
-            <a-button type="primary" @click="onAdd">
+            <a-button type="primary" @click="onAdd" v-hasPerm="['system:menu:add']">
               <template #icon><icon-plus /></template>
               <span>新增</span>
             </a-button>
@@ -44,6 +44,7 @@
         :data="tableTree"
         :loading="loading"
         row-key="name"
+        column-resizable
         :bordered="{ cell: true }"
         show-empty-tree
         :pagination="false"
@@ -51,44 +52,44 @@
         :scroll="{ x: '150%', y: '93%' }"
       >
         <template #columns>
-          <a-table-column title="菜单名称">
+          <a-table-column title="菜单名称" :width="150" tooltip ellipsis>
             <template #cell="{ record }">
-              {{ $t(`menu.${record.meta.title}`) }}
+              {{ $t(`menu.${record.title}`) }}
             </template>
           </a-table-column>
-          <a-table-column title="菜单类型" align="center" :width="100">
+          <a-table-column title="菜单类型" align="center" :width="50">
             <template #cell="{ record }">
-              <a-tag v-if="record.meta.type == 1" bordered size="small" color="purple">目录</a-tag>
-              <a-tag v-else-if="record.meta.type == 2" bordered size="small" color="green">菜单</a-tag>
+              <a-tag v-if="record.type == 1" bordered size="small" color="purple">目录</a-tag>
+              <a-tag v-else-if="record.type == 2" bordered size="small" color="green">菜单</a-tag>
               <a-tag v-else bordered size="small" color="gray">按钮</a-tag>
             </template>
           </a-table-column>
-          <a-table-column title="图标" align="center" :width="100">
+          <a-table-column title="图标" align="center" :width="50">
             <template #cell="{ record }">
-              <MenuItemIcon :svg-icon="record.meta.svgIcon" :icon="record.meta.icon" />
+              <MenuItemIcon :svg-icon="record.svgIcon" :icon="record.icon" />
             </template>
           </a-table-column>
-          <a-table-column title="路由路径" data-index="path"></a-table-column>
-          <a-table-column title="路由名称" data-index="name"></a-table-column>
-          <a-table-column title="组件路径">
+          <a-table-column title="路由路径" data-index="path" :width="150" tooltip ellipsis></a-table-column>
+          <a-table-column title="路由名称" data-index="name" :width="80" tooltip ellipsis></a-table-column>
+          <a-table-column title="组件路径" :width="150" tooltip ellipsis>
             <template #cell="{ record }">
               {{ record.redirect ? record.redirect : record.component }}
             </template>
           </a-table-column>
-          <a-table-column title="权限标识" tooltip>
+          <a-table-column title="权限标识" tooltip :width="150" ellipsis>
             <template #cell="{ record }">
-              {{ record.meta.roles }}
+              {{ record.permission }}
             </template>
           </a-table-column>
           <a-table-column title="排序" align="center" :width="80">
             <template #cell="{ record }">
-              {{ record.meta.sort }}
+              {{ record.sort }}
             </template>
           </a-table-column>
           <a-table-column title="是否隐藏" align="center" :width="100">
             <template #cell="{ record }">
               <a-space>
-                <a-tag bordered size="small" color="arcoblue" v-if="record.meta.hide">是</a-tag>
+                <a-tag bordered size="small" color="arcoblue" v-if="record.hide">是</a-tag>
                 <a-tag bordered size="small" color="red" v-else>否</a-tag>
               </a-space>
             </template>
@@ -96,7 +97,7 @@
           <a-table-column title="是否禁用" align="center" :width="100">
             <template #cell="{ record }">
               <a-space>
-                <a-tag bordered size="small" color="arcoblue" v-if="record.meta.disable">是</a-tag>
+                <a-tag bordered size="small" color="arcoblue" v-if="record.disable">是</a-tag>
                 <a-tag bordered size="small" color="red" v-else>否</a-tag>
               </a-space>
             </template>
@@ -104,7 +105,7 @@
           <a-table-column title="是否缓存" align="center" :width="100">
             <template #cell="{ record }">
               <a-space>
-                <a-tag bordered size="small" color="arcoblue" v-if="record.meta.keepAlive">是</a-tag>
+                <a-tag bordered size="small" color="arcoblue" v-if="record.keepAlive">是</a-tag>
                 <a-tag bordered size="small" color="red" v-else>否</a-tag>
               </a-space>
             </template>
@@ -112,7 +113,7 @@
           <a-table-column title="是否外链" align="center" :width="100">
             <template #cell="{ record }">
               <a-space>
-                <a-tag bordered size="small" color="arcoblue" v-if="record.meta.link">是</a-tag>
+                <a-tag bordered size="small" color="arcoblue" v-if="record.link">是</a-tag>
                 <a-tag bordered size="small" color="red" v-else>否</a-tag>
               </a-space>
             </template>
@@ -120,24 +121,57 @@
           <a-table-column title="是否全屏" align="center" :width="100">
             <template #cell="{ record }">
               <a-space>
-                <a-tag bordered size="small" color="arcoblue" v-if="record.meta.isFull">是</a-tag>
+                <a-tag bordered size="small" color="arcoblue" v-if="record.isFull">是</a-tag>
                 <a-tag bordered size="small" color="red" v-else>否</a-tag>
               </a-space>
             </template>
           </a-table-column>
-          <a-table-column title="操作" align="center" :width="250" :fixed="'right'">
+          <a-table-column title="操作" align="center" :width="320" :fixed="'right'">
             <template #cell="{ record }">
               <a-space>
-                <a-button size="mini" type="primary" @click="onUpdate(record)">
-                  <template #icon><icon-edit /></template>
-                  <span>修改</span>
+                <a-button
+                  size="mini"
+                  type="primary"
+                  status="warning"
+                  @click="onAssignApi(record)"
+                  v-hasPerm="['system:menu:setMenuApis']"
+                >
+                  <template #icon v-if="!record.apis || record.apis.length === 0"><icon-link /></template>
+                  <template #icon v-else>
+                    <span
+                      style="
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 18px;
+                        height: 18px;
+                        font-size: 8px;
+                        color: white;
+                        background-color: #ff4757;
+                        border-radius: 50%;
+                      "
+                    >
+                      {{ record.apis.length > 99 ? "99+" : record.apis.length }}</span
+                    >
+                  </template>
+                  <span>API权限</span>
                 </a-button>
-                <a-button size="mini" type="primary" status="success" v-if="record.meta.type != 3" @click="onCurrentAdd(record)">
+                <a-button
+                  size="mini"
+                  type="primary"
+                  v-if="record.type != 3"
+                  @click="onCurrentAdd(record)"
+                  v-hasPerm="['system:menu:add']"
+                >
                   <template #icon><icon-plus /></template>
                   <span>新增</span>
                 </a-button>
-                <a-popconfirm type="warning" content="确定删除该项吗?">
-                  <a-button size="mini" type="primary" status="danger">
+                <a-button size="mini" type="outline" @click="onUpdate(record)" v-hasPerm="['system:menu:edit']">
+                  <template #icon><icon-edit /></template>
+                  <span>修改</span>
+                </a-button>
+                <a-popconfirm type="warning" content="确定删除该项吗?" @ok="onDelete(record)">
+                  <a-button size="mini" type="primary" status="danger" v-hasPerm="['system:menu:delete']">
                     <template #icon><icon-delete /></template>
                     <span>删除</span>
                   </a-button>
@@ -149,16 +183,16 @@
       </a-table>
     </div>
 
-    <a-modal width="40%" v-model:visible="open" @close="afterClose" @ok="handleOk" @cancel="afterClose">
+    <a-modal width="40%" v-model:visible="open" draggable @close="afterClose" :on-before-ok="handleOk" @cancel="afterClose">
       <template #title> {{ title }} </template>
       <div>
         <a-form ref="formRef" auto-label-width :rules="rules" :model="addFrom">
           <a-form-item field="type" label="菜单类型" validate-trigger="blur">
-            <a-radio-group type="button" :disabled="addFrom.id" v-model="addFrom.type" @change="typeChange">
+            <a-radio-group type="button" :disabled="!!addFrom.id" v-model="addFrom.type" @change="typeChange">
               <a-radio v-for="item in menuType" :key="item.value" :value="item.value">{{ item.name }}</a-radio>
             </a-radio-group>
           </a-form-item>
-          <a-form-item field="parentId" label="上级菜单" validate-trigger="blur" :disabled="addFrom.id">
+          <a-form-item field="parentId" label="上级菜单" validate-trigger="blur" :disabled="!!addFrom.id">
             <a-tree-select
               v-model="addFrom.parentId"
               :data="menuTree"
@@ -235,7 +269,7 @@
             field="component"
             label="组件路径"
             validate-trigger="blur"
-            :disabled="addFrom.isLink"
+            :disabled="!!addFrom.isLink"
           >
             <a-input
               v-model="addFrom.component"
@@ -324,12 +358,23 @@
         </a-form>
       </div>
     </a-modal>
+
+    <!-- API权限分配组件 -->
+    <s-api-permission
+      v-model:visible="apiPermissionVisible"
+      :menu-id="currentMenuRecord?.id"
+      :menu-name="currentMenuRecord?.title"
+      @success="onApiPermissionSuccess"
+      :showSelected="currentMenuRecord?.apis?.length > 0"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import MenuItemIcon from "@/layout/components/Menu/menu-item-icon.vue";
-import { getMenuListAPI } from "@/api/modules/system/index";
+import SApiPermission from "@/components/s-api-permission/index.vue";
+// import { getMenuListAPI } from "@/api/modules/system/index";
+import { type MenuItem, getMenuListAPI, addMenuAPI, updateMenuAPI, deleteMenuAPI } from "@/api/menu";
 import useGlobalProperties from "@/hooks/useGlobalProperties";
 import { deepClone, getPascalCase } from "@/utils";
 const proxy = useGlobalProperties();
@@ -362,7 +407,7 @@ const menuType = ref([
 ]);
 const addFrom = ref<any>({
   type: 1,
-  parentId: "",
+  parentId: undefined,
   svgIcon: "",
   icon: "",
   name: "",
@@ -384,6 +429,8 @@ const addFrom = ref<any>({
 const formType = ref(0); // 0新增 1修改
 const title = ref("");
 const formRef = ref();
+
+// 新增菜单
 const onAdd = () => {
   title.value = "新增菜单";
   formType.value = 0;
@@ -391,17 +438,29 @@ const onAdd = () => {
 };
 const handleOk = async () => {
   let state = await formRef.value.validate();
-  if (state) return (open.value = true); // 校验不通过
-  console.log("addFrom.value", addFrom.value);
-  arcoMessage("success", "模拟提交成功");
-  getMenuList();
+  if (state) return false;
+  //console.log("addFrom.value", addFrom.value);
+  try {
+    if (formType.value == 0) {
+      await addMenuAPI(addFrom.value);
+    } else {
+      await updateMenuAPI(addFrom.value);
+    }
+    arcoMessage("success", "提交成功");
+    getMenuList();
+    return true;
+  } catch (error) {
+    console.error(error);
+  }
+
+  return false;
 };
 // 关闭对话框动画结束后触发
 const afterClose = () => {
   formRef.value.resetFields();
   addFrom.value = {
     type: 1,
-    parentId: "",
+    parentId: undefined,
     svgIcon: "",
     icon: "",
     name: "",
@@ -422,29 +481,26 @@ const afterClose = () => {
   };
 };
 // 修改
-const onUpdate = (row: Menu.MenuOptions) => {
+const onUpdate = (row: any) => {
   let data = deepClone(row);
+  //console.log(JSON.stringify(data))
   delete data.children;
-  if (data.parentId == "0") data.parentId = "";
-  let form = {
-    ...data,
-    ...data.meta
-  };
-  if (form.meta) delete form.meta;
-  typeChange(form.type);
-  addFrom.value = form;
+  if (data.parentId == 0) data.parentId = undefined;
+  typeChange(data.type);
+  //console.log(JSON.stringify(data))
+  addFrom.value = data;
   title.value = "修改菜单";
+  formType.value = 1;
   open.value = true;
 };
-// 列表新增
+
+// 新增子菜单
 const onCurrentAdd = (record: any) => {
-  let {
-    id,
-    meta: { type }
-  } = record;
+  let { id, type } = record;
+  formType.value == 0;
   addFrom.value.parentId = id;
   addFrom.value.type = type == 2 ? 3 : type;
-  title.value = "新增菜单";
+  title.value = "新增子菜单";
   open.value = true;
 };
 
@@ -494,7 +550,7 @@ const onIframe = (is: boolean) => {
 const onSearch = () => getMenuList();
 const loading = ref(false);
 const tableRef = ref();
-const tableTree = ref([]);
+const tableTree = ref<Array<MenuItem>>([]);
 const menuTree = ref<any>([]);
 const getMenuList = async () => {
   try {
@@ -518,24 +574,26 @@ const onExpand = () => {
 };
 
 // 语言转化
-const translation = (tree: any) => {
+const translation = (tree: any[]) => {
   tree.forEach((item: any) => {
     if (item.children) translation(item.children);
-    if (item.meta.title) {
-      item.i18n = proxy.$t(`menu.${item.meta.title}`);
+    if (item.title) {
+      item.i18n = proxy.$t(`menu.${item.title}`);
     }
   });
 };
 
 /**
+ *
  * 过滤type:3的节点，该节点是按钮权限，不显示在菜单中-用于下拉选择
  * @param {object} nodes 路由树
  * @returns 节点过滤后的路由树
  */
-const filterTree = (nodes: Menu.MenuOptions[]) => {
+//const  filterTree = (nodes: Menu.MenuOptions[]) => {
+const filterTree = (nodes: MenuItem[]) => {
   // 过滤当前层级的节点，排除 type 为 3 的节点
   return nodes
-    .filter((node: any) => node.meta.type !== 3)
+    .filter((node: any) => node.type !== 3)
     .map((node: any) => {
       // 创建新节点以避免修改原数据
       const newNode = { ...node };
@@ -551,6 +609,34 @@ const filterTree = (nodes: Menu.MenuOptions[]) => {
       }
       return newNode;
     });
+};
+
+const onDelete = async (row: any) => {
+  try {
+    await deleteMenuAPI({ id: row.id });
+    getMenuList();
+    arcoMessage("success", "删除成功");
+  } catch (error) {
+    console.error(error);
+    arcoMessage("error", "删除失败");
+  }
+};
+
+// API权限分配相关状态
+const apiPermissionVisible = ref(false);
+const currentMenuRecord = ref<any>(null);
+
+// 分配API权限
+const onAssignApi = (record: any) => {
+  currentMenuRecord.value = record;
+  apiPermissionVisible.value = true;
+};
+
+// API权限分配成功回调
+const onApiPermissionSuccess = () => {
+  arcoMessage("success", "API权限分配成功");
+  currentMenuRecord.value = null;
+  getMenuList();
 };
 
 getMenuList();

@@ -1,6 +1,6 @@
 import { Directive } from "vue";
-import { useUserInfoStore } from "@/store/modules/user-info";
-
+// import { useUserInfoStore } from "@/store/modules/user-info";
+import { useUserStoreHook } from "@/store/modules/user";
 /**
  * 检测指令绑定值是否为空
  * @param value 指令绑定值
@@ -30,8 +30,8 @@ const checkPermissions = (el: HTMLElement, bindingValue: unknown) => {
     const all_permission = "*:*:*";
 
     // 获取用户权限标识-Array[string]
-    let { permissions } = useUserInfoStore().account;
-
+    //let { permissions } = useUserInfoStore().account;
+    let { permissions } = useUserStoreHook().account;
     // 如果是超级管理员则放行
     if (permissions.includes(all_permission)) return;
 

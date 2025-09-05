@@ -5,7 +5,6 @@
         <template #left>
           <a-space wrap>
             <a-input v-model="form.name" placeholder="请输入角色名称" allow-clear />
-            <a-input v-model="form.code" placeholder="请输入角色标识" allow-clear />
             <a-select placeholder="角色状态" v-model="form.status" style="width: 120px" allow-clear>
               <a-option v-for="item in openState" :key="item.value" :value="item.value">{{ item.name }}</a-option>
             </a-select>
@@ -22,13 +21,9 @@
         </template>
         <template #right>
           <a-space wrap>
-            <a-button type="primary" @click="onAdd">
+            <a-button type="primary" @click="onAdd" v-hasPerm="['system:role:add']">
               <template #icon><icon-plus /></template>
               <span>新增</span>
-            </a-button>
-            <a-button type="primary" status="danger">
-              <template #icon><icon-delete /></template>
-              <span>删除</span>
             </a-button>
           </a-space>
         </template>
@@ -38,12 +33,14 @@
         :data="roleList"
         :bordered="{ cell: true }"
         :loading="loading"
+        :pagination="false"
         :scroll="{ x: '100%', y: '100%', minWidth: 1000 }"
       >
         <template #columns>
-          <a-table-column title="序号" :width="64">
-            <template #cell="cell">{{ cell.rowIndex + 1 }}</template>
-          </a-table-column>
+          <!-- <a-table-column title="序号" :width="64">
+                        <template #cell="cell">{{ cell.rowIndex + 1 }}</template>
+    </a-table-column> -->
+          <a-table-column title="ID" data-index="id" :width="120"></a-table-column>
           <a-table-column title="角色名称" data-index="name"></a-table-column>
           <a-table-column title="排序" data-index="sort" :width="100" align="center"></a-table-column>
           <a-table-column title="状态" :width="100" align="center">
@@ -53,20 +50,32 @@
             </template>
           </a-table-column>
           <a-table-column title="描述" data-index="description" :ellipsis="true" :tooltip="true"></a-table-column>
-          <a-table-column title="创建时间" data-index="createdAt" :width="180"></a-table-column>
-          <a-table-column title="操作" :width="280" align="center" :fixed="'right'">
+          <a-table-column title="创建时间" data-index="createdAt" :width="180">
+            <template #cell="{ record }">{{ record.createdAt ? formatTime(record.createdAt) : "" }}</template>
+          </a-table-column>
+          <a-table-column title="操作" :width="350" align="center" :fixed="'right'">
             <template #cell="{ record }">
               <a-space>
-                <a-button type="primary" status="success" size="mini" :disabled="record.admin" @click="onPrivileges(record)">
+                <a-button
+                  v-hasPerm="['system:role:addRoleMenu']"
+                  type="primary"
+                  status="warning"
+                  size="mini"
+                  @click="onPrivileges(record)"
+                >
                   <template #icon><icon-safe /></template>
                   <span>分配权限</span>
                 </a-button>
-                <a-button type="primary" size="mini" :disabled="record.admin" @click="onUpdate(record)">
+                <a-button v-hasPerm="['system:role:add']" type="primary" size="mini" @click="onAddChild(record)">
+                  <template #icon><icon-plus /></template>
+                  <span>新增</span>
+                </a-button>
+                <a-button v-hasPerm="['system:role:edit']" type="outline" size="mini" @click="onUpdate(record)">
                   <template #icon><icon-edit /></template>
                   <span>修改</span>
                 </a-button>
-                <a-popconfirm type="warning" content="确定删除该角色吗?">
-                  <a-button type="primary" status="danger" size="mini" :disabled="record.admin">
+                <a-popconfirm type="warning" content="确定删除该角色吗?" @ok="onDelete(record)">
+                  <a-button v-hasPerm="['system:role:delete']" type="primary" status="danger" size="mini">
                     <template #icon><icon-delete /></template>
                     <span>删除</span>
                   </a-button>
@@ -77,16 +86,30 @@
         </template>
       </a-table>
     </div>
-    <a-modal width="40%" v-model:visible="open" @close="afterClose" @ok="handleOk" @cancel="afterClose">
+
+    <a-modal width="40%" v-model:visible="open" @close="afterClose" :on-before-ok="handleOk" @cancel="afterClose">
       <template #title> {{ title }} </template>
       <div>
         <a-form ref="formRef" auto-label-width :rules="rules" :model="addFrom">
+          <a-form-item field="parentId" label="父级角色" validate-trigger="blur">
+            <a-tree-select
+              v-model="addFrom.parentId"
+              :data="flattenRoleList"
+              placeholder="请选择父级角色"
+              allow-clear
+              allow-search
+              :field-names="{
+                key: 'id',
+                title: 'name',
+                children: 'children'
+              }"
+            />
+          </a-form-item>
+
           <a-form-item field="name" label="角色名称" validate-trigger="blur">
             <a-input v-model="addFrom.name" placeholder="请输入角色名称" allow-clear />
           </a-form-item>
-          <a-form-item field="code" label="角色编码" validate-trigger="blur">
-            <a-input v-model="addFrom.code" placeholder="请输入角色编码" allow-clear />
-          </a-form-item>
+
           <a-form-item field="status" label="状态" validate-trigger="blur">
             <a-switch type="round" :checked-value="1" :unchecked-value="0" v-model="addFrom.status">
               <template #checked> 启用 </template>
@@ -162,15 +185,24 @@
 </template>
 
 <script setup lang="ts">
-import { getMenuListAPI, getUserPermissionAPI } from "@/api/modules/system/index";
-import { type RoleItem, getRolesAPI } from "@/api/role";
+// import { getUserPermissionAPI } from "@/api/modules/system/index";
+import { type ConvertedRouteItem, getMenuListAPI, convertMenuItemsToRoutes } from "@/api/menu";
+import {
+  type RoleItem,
+  getRolesAPI,
+  getUserPermissionAPI,
+  addRoleMenuAPI,
+  addRoleAPI,
+  editRoleAPI,
+  deleteRoleAPI
+} from "@/api/role";
 import { deepClone } from "@/utils";
 import useGlobalProperties from "@/hooks/useGlobalProperties";
+import { formatTime } from "@/globals";
 const proxy = useGlobalProperties();
 const openState = ref(dictFilter("status"));
 const form = ref({
   name: "",
-  code: "",
   time: [],
   status: null
 });
@@ -180,7 +212,6 @@ const search = () => {
 const reset = () => {
   form.value = {
     name: "",
-    code: "",
     time: [],
     status: null
   };
@@ -191,50 +222,75 @@ const reset = () => {
 const open = ref(false);
 const rules = {
   name: [{ required: true, message: "请输入角色名称" }],
-  code: [{ required: true, message: "请输入角色编码" }],
+
   status: [{ required: true, message: "请选择状态" }]
 };
 const addFrom = ref<any>({
   name: "",
-  code: "",
   status: 1,
   sort: 1,
-  description: ""
+  description: "",
+  parentId: null
 });
-
+const formType = ref(0); // 0新增 1修改
 const title = ref("");
 const formRef = ref();
 const onAdd = () => {
+  formType.value = 0;
   title.value = "新增角色";
   open.value = true;
 };
+
+// 新增子角色
+const onAddChild = (record: RoleItem) => {
+  formType.value = 0;
+  title.value = "新增子角色";
+  // 设置父级角色为当前选中的角色
+  addFrom.value.parentId = record.id;
+  open.value = true;
+};
+
+// 添加角色
 const handleOk = async () => {
   let state = await formRef.value.validate();
-  if (state) return (open.value = true); // 校验不通过
-  arcoMessage("success", "模拟提交成功");
+  if (state) return false; // 校验不通过
+
+  try {
+    if (formType.value == 0) {
+      await addRoleAPI(addFrom.value);
+    } else {
+      await editRoleAPI(addFrom.value);
+    }
+  } catch (error) {
+    return false;
+  }
+
+  arcoMessage("success", "提交成功");
   getRole();
+  return true;
 };
 // 关闭对话框动画结束后触发
 const afterClose = () => {
   formRef.value.resetFields();
   addFrom.value = {
     name: "",
-    code: "",
     status: 1,
     sort: 1,
-    description: ""
+    description: "",
+    parentId: null
   };
 };
 // 修改角色
 const onUpdate = (row: any) => {
+  formType.value = 1;
   title.value = "修改角色";
-  addFrom.value = deepClone(row);
+  const clonedRow = deepClone(row);
+  addFrom.value = clonedRow;
   open.value = true;
 };
 
-// 获取列表
+// 获取角色列表
 const loading = ref(false);
-
 const roleList = ref<RoleItem[]>([]);
 const getRole = async () => {
   try {
@@ -245,6 +301,26 @@ const getRole = async () => {
     loading.value = false;
   }
 };
+
+// 扁平化角色列表，用于树形选择
+const flattenRoleList = computed(() => {
+  const flatten = (roles: RoleItem[]): any[] => {
+    let result: any[] = [];
+    roles.forEach(role => {
+      // 在编辑时，排除自己和自己的子节点，避免循环引用
+      if (addFrom.value.id && role.id === addFrom.value.id) {
+        return;
+      }
+      result.push({
+        id: role.id,
+        name: role.name,
+        children: role.children ? flatten(role.children) : undefined
+      });
+    });
+    return result;
+  };
+  return flatten(roleList.value);
+});
 
 // 获取权限树
 const treeRef = ref();
@@ -268,28 +344,36 @@ const treeSwitchReset = () => {
     selectAll: false // 全选
   };
 };
-const permissionTree = ref([]);
-const permissionKeys = ref([]);
+const permissionTree = ref<ConvertedRouteItem[]>([]);
+const permissionKeys = ref<number[]>([]);
+// 获取分配权限用菜单列表
 const getMenuList = async () => {
   let { data } = await getMenuListAPI();
-  translation(data);
-  permissionTree.value = data;
+  let menuList = convertMenuItemsToRoutes(data);
+  translation(menuList);
+  permissionTree.value = menuList;
 };
 
-// 分配权限
+// 开始分配权限
+const currentRow = ref<any>(null);
 const drawerOpen = ref(false);
 const onPrivileges = async (row: any) => {
-  let res = await getUserPermissionAPI({ role: row.code });
-  permissionKeys.value = res.data;
+  // 更具角色ID获取有权限的菜单数据
+  let res = await getUserPermissionAPI(row.id);
+  permissionKeys.value = res.data.list;
   drawerOpen.value = true;
   treeRef.value.expandAll(true);
+  currentRow.value = row;
 };
 
-const drawerOk = () => {
+// 分配权限提交
+const drawerOk = async () => {
+  await addRoleMenuAPI(currentRow.value.id, permissionKeys.value);
   drawerOpen.value = false;
   treeSwitchReset();
-  arcoMessage("success", "模拟提交成功");
-  getRole();
+  arcoMessage("success", "提交成功");
+  currentRow.value = null;
+  //getRole();
 };
 const drawerCancel = () => {
   drawerOpen.value = false;
@@ -304,6 +388,17 @@ const translation = (tree: any) => {
       item.i18n = proxy.$t(`menu.${item.meta.title}`);
     }
   });
+};
+
+// 删除
+const onDelete = async (row: any) => {
+  try {
+    await deleteRoleAPI({ id: row.id });
+    getRole();
+    arcoMessage("success", "删除成功");
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 getRole();

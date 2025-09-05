@@ -4,7 +4,7 @@ import pinia from "@/store";
 import { setToken, setRefreshToken, removeToken, UserInfoKey } from "@/utils/auth";
 //import { type userType } from "@/store/types";
 import { getLocalStorage, setLocalStorage, removeLocalStorage } from "@/utils/app";
-import { type UserResult, type RefreshTokenResult, getLogin, refreshTokenApi, getProfileAPI } from "@/api/user";
+import { type UserResult, type RefreshTokenResult, getLogin, refreshTokenApi, getProfileAPI, logout } from "@/api/user";
 import { userType } from "@/store/types";
 export const useUserStore = defineStore("user", () => {
   const userInfo = getLocalStorage<userType>(UserInfoKey);
@@ -37,7 +37,7 @@ export const useUserStore = defineStore("user", () => {
     });
   };
   /** 前端登出（不调用接口） */
-  const logOut = () => {
+  const logOut = async () => {
     account.value.id = 0;
     account.value.avatar = "";
     account.value.username = "";
@@ -52,6 +52,7 @@ export const useUserStore = defineStore("user", () => {
     return new Promise<RefreshTokenResult>((resolve, reject) => {
       refreshTokenApi(data)
         .then(res => {
+          //console.log("refreshTokenApi", res)
           if (res?.code === 0) {
             setRefreshToken(res.data?.accessToken, res.data?.accessTokenExpires);
             resolve(res);

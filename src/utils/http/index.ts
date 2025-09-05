@@ -6,6 +6,7 @@ import { getToken, formatToken } from "../auth";
 import { useUserStoreHook } from "@/store/modules/user";
 import router from "@/router";
 import { Message } from "@arco-design/web-vue";
+import { throttle } from "@/globals";
 // 相关配置请参考：www.axios-js.com/zh-cn/docs/#axios-request-config-1
 const defaultConfig: AxiosRequestConfig = {
   // 请求超时时间
@@ -50,26 +51,20 @@ class Http {
     });
   }
 
-  // 跳转登录页
-  private static redirectToLoginPage() {
+  // 跳转登录页（带节流功能）
+  private static redirectLoginPage = throttle(() => {
     // 刷新token失败，清除用户信息并跳转到登录页
     useUserStoreHook().logOut();
     // 清空待执行的请求队列
     Http.requests = [];
-    // 显示友好提示
-    // import("@arco-design/web-vue").then(({ Message }) => {
-    //     Message.error("登录状态已过期，请重新登录");
-    // });
     Message.error("登录状态已过期，请重新登录");
-    setTimeout(() => {
-      router.push({
-        path: "/login",
-        query: {
-          redirect: router.currentRoute.value.fullPath
-        }
-      });
-    }, 1000);
-  }
+    router.push({
+      path: "/login",
+      query: {
+        redirect: router.currentRoute.value.fullPath
+      }
+    });
+  }, 3000); // 3秒内只允许执行一次跳转
 
   /** 请求拦截 */
   private httpInterceptorsRequest(): void {
@@ -89,7 +84,7 @@ class Http {
 
         /** 请求白名单，放置一些不需要`token`的接口（通过设置请求白名单，防止`token`过期后再请求造成的死循环问题） */
         const whiteList = ["/refreshToken", "/login", "/captcha/id", "/captcha/image"];
-        return whiteList.some(url => config.url?.endsWith(url))
+        return whiteList.some(url => config.url?.includes(url))
           ? config
           : new Promise(resolve => {
               const data = getToken();
@@ -162,13 +157,9 @@ class Http {
         if (!$error.isCancelRequest) {
           const status = $error.response?.status;
           const config = $error.config;
-          if (config?.url?.includes("/refreshToken") && status === 400) {
-            Http.redirectToLoginPage();
-          }
-
-          // 401/403 认证相关错误处理
-          if (status === 401) {
-            Http.redirectToLoginPage();
+          // 刷新token的API报错或token中间件验证失败时跳转登录页
+          if (config?.url?.includes("/refreshToken") || status === 401) {
+            Http.redirectLoginPage();
           }
         }
         // 所有的响应异常 区分来源为取消请求/非取消请求
@@ -199,10 +190,9 @@ class Http {
           resolve(response);
         })
         .catch(error => {
+          console.error("http.error:", error);
           const { response } = error;
-          if (response?.data?.code == 1) {
-            Message.error(response?.data?.message || "服务器异常，请联系管理员");
-          }
+          Message.error(response?.data?.message || "服务器异常，请联系管理员");
           reject(error);
         });
     });

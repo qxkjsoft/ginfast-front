@@ -31,7 +31,7 @@
 
         <a-row>
           <a-space wrap>
-            <a-button type="primary" @click="onAdd">
+            <a-button type="primary" @click="onAdd" v-hasPerm="['system:account:add']">
               <template #icon><icon-plus /></template>
               <span>新增</span>
             </a-button>
@@ -51,9 +51,10 @@
           @page-change="handlePageChange"
         >
           <template #columns>
-            <a-table-column title="序号" :width="64">
-              <template #cell="cell">{{ cell.rowIndex + 1 }}</template>
-            </a-table-column>
+            <!-- <a-table-column title="序号" :width="64">
+                            <template #cell="cell">{{ cell.rowIndex + 1 }}</template>
+        </a-table-column> -->
+            <a-table-column title="ID" data-index="id" :width="64"></a-table-column>
             <a-table-column title="用户名称" data-index="userName"></a-table-column>
             <a-table-column title="昵称" data-index="nickName"></a-table-column>
             <a-table-column title="性别" data-index="sex" align="center">
@@ -72,16 +73,18 @@
               </template>
             </a-table-column>
             <a-table-column title="描述" data-index="description" :ellipsis="true" :tooltip="true"></a-table-column>
-            <a-table-column title="创建时间" data-index="createdAt" :width="180"></a-table-column>
+            <a-table-column title="创建时间" data-index="createdAt" :width="180">
+              <template #cell="{ record }">{{ record.createdAt ? formatTime(record.createdAt) : "" }}</template>
+            </a-table-column>
             <a-table-column title="操作" :width="200" align="center" :fixed="'right'">
               <template #cell="{ record }">
                 <a-space>
-                  <a-button type="primary" size="mini" @click="onUpdate(record)">
+                  <a-button type="primary" size="mini" @click="onUpdate(record)" v-hasPerm="['system:account:edit']">
                     <template #icon><icon-edit /></template>
                     <span>修改</span>
                   </a-button>
                   <a-popconfirm type="warning" content="确定删除该账号吗?" @ok="onDelete(record)">
-                    <a-button type="primary" status="danger" size="mini">
+                    <a-button type="primary" status="danger" size="mini" v-hasPerm="['system:account:delete']">
                       <template #icon><icon-delete /></template>
                       <span>删除</span>
                     </a-button>
@@ -187,10 +190,11 @@
 
 <script setup lang="ts">
 // import { getDivisionAPI, getAccountAPI, getRoleAPI } from "@/api/modules/system/index";
-import { getDivisionAPI } from "@/api/system";
+import { getDivisionAPI } from "@/api/department";
 import { getRolesAPI } from "@/api/role";
 import { getAccountListAPI, addAccountAPI, editAccountAPI, deleteAccountAPI } from "@/api/user";
 import { deepClone } from "@/utils";
+import { formatTime } from "@/globals";
 
 const router = useRouter();
 const openState = ref(dictFilter("status"));
@@ -327,9 +331,7 @@ const onDelete = async (row: any) => {
     await deleteAccountAPI({ id: row.id });
     arcoMessage("success", "删除成功");
     getAccount();
-  } catch (error) {
-    arcoMessage("error", "删除失败");
-  }
+  } catch (error) {}
 };
 
 const onDetail = (row: any) => {

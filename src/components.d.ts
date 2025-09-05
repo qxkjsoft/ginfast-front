@@ -11,6 +11,7 @@ declare module 'vue' {
     'Index copy': typeof import('./components/s-layout-search/index copy.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SApiPermission: typeof import('./components/s-api-permission/index.vue')['default']
     SBarcodeDraw: typeof import('./components/s-barcode-draw/index.vue')['default']
     SCodeView: typeof import('./components/s-code-view/index.vue')['default']
     SExternalLinkPage: typeof import('./components/s-external-link-page/index.vue')['default']

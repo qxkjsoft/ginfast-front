@@ -117,7 +117,7 @@ import { useThemeConfig } from "@/store/modules/theme-config";
 import { useThemeMethods } from "@/hooks/useThemeMethods";
 import { useDevicesSize } from "@/hooks/useDevicesSize";
 import { useRouteConfigStore } from "@/store/modules/route-config";
-
+import { logout } from "@/api/user";
 const i18n = useI18n();
 const router = useRouter();
 const { isMobile } = useDevicesSize();
@@ -197,6 +197,14 @@ const logOut = () => {
       try {
         // 用户退出
         //await userStore.logOut();
+        await logout().catch((error: any) => {
+          // 根据项目规范，区分是否为请求取消
+          if (!error.isCancelRequest) {
+            console.warn("退出登录API调用失败，但继续执行本地清理:", error);
+            // 可以选择显示警告信息，但不阻断流程
+            // Message.warning("退出登录请求失败，但已清理本地数据");
+          }
+        });
         await useUserStoreHook().logOut();
         router.replace("/login");
         // 清除路由数据

@@ -4,7 +4,8 @@ import { staticRoutes } from "@/router/route";
 //import { getRoutersAPI } from "@/api/modules/system/index";
 import { moduleReplacement, linearArray } from "@/router/route-output";
 import { getUrlWithParams } from "@/utils/index";
-import { getRoutersAPI, convertMenuItemsToRoutes } from "@/api/system";
+
+import { getRoutersAPI, convertMenuItemsToRoutes } from "@/api/menu";
 /**
  * 路由列表
  * @method setTabsTitle 设置tabs标签页名称
@@ -137,6 +138,7 @@ export const routeConfigStore = () => {
     let flatRoute = linearArray(data);
     // 3、将模块设置为真实模块
     let realTree = await moduleReplacement(flatRoute);
+    //console.log("realTree", JSON.stringify(realTree));
     // 4、动态添加路由
     realTree.forEach((route: any) => {
       if (route.meta.isFull) {

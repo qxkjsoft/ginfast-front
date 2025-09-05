@@ -1,6 +1,8 @@
 import { useSystemStore } from "@/store/modules/system";
 import { storeToRefs } from "pinia";
 import { Message } from "@arco-design/web-vue";
+import dayjs from "dayjs";
+
 /**
  * 字典解析
  * @param { string } code 字典编码code
@@ -91,4 +93,48 @@ export const debounce = <T extends (...args: any[]) => any>(fn: T, delay: number
       timer = null;
     }, delay);
   };
+};
+
+/**
+ * 节流函数
+ * @param fn 要节流的函数
+ * @param delay 节流间隔时间（毫秒）
+ * @returns 节流后的函数
+ */
+export const throttle = <T extends (...args: any[]) => any>(fn: T, delay: number): ((...args: Parameters<T>) => void) => {
+  let timer: NodeJS.Timeout | null = null;
+  let lastExecTime = 0;
+  return function (this: ThisParameterType<T>, ...args: Parameters<T>) {
+    const currentTime = Date.now();
+
+    if (currentTime - lastExecTime > delay) {
+      // 如果距离上次执行超过了延迟时间，立即执行
+      fn.apply(this, args);
+      lastExecTime = currentTime;
+    } else {
+      // 否则设置定时器，确保在延迟时间后执行最后一次调用
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(
+        () => {
+          fn.apply(this, args);
+          lastExecTime = Date.now();
+          timer = null;
+        },
+        delay - (currentTime - lastExecTime)
+      );
+    }
+  };
+};
+
+/**
+ * 格式化时间函数
+ * @param time 时间值，可以是 Date 对象、时间戳或字符串
+ * @param format 格式化模板，默认为 'YYYY-MM-DD HH:mm:ss'
+ * @returns 格式化后的时间字符串
+ */
+export const formatTime = (time?: dayjs.ConfigType, format: string = "YYYY-MM-DD HH:mm:ss"): string => {
+  if (!time) {
+    return dayjs().format(format);
+  }
+  return dayjs(time).format(format);
 };
