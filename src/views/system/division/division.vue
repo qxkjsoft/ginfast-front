@@ -20,13 +20,9 @@
         </template>
         <template #right>
           <a-space wrap>
-            <a-button type="primary" @click="onAdd">
+            <a-button type="primary" @click="onAdd" v-hasPerm="['system:division:add']">
               <template #icon><icon-plus /></template>
               <span>新增</span>
-            </a-button>
-            <a-button type="primary" status="danger">
-              <template #icon><icon-delete /></template>
-              <span>删除</span>
             </a-button>
           </a-space>
         </template>
@@ -54,21 +50,33 @@
               </a-space>
             </template>
           </a-table-column>
-          <a-table-column title="描述" data-index="description" :ellipsis="true" :tooltip="true"></a-table-column>
-          <a-table-column title="创建时间" data-index="createTime" :ellipsis="true" :tooltip="true"></a-table-column>
+          <a-table-column title="描述" data-index="describe" :ellipsis="true" :tooltip="true"></a-table-column>
+          <a-table-column title="创建时间" data-index="createdAt" :ellipsis="true" :tooltip="true"></a-table-column>
           <a-table-column title="操作" align="center" :fixed="'right'">
             <template #cell="{ record }">
               <a-space>
-                <a-button size="mini" type="primary" @click="onUpdate(record)">
+                <a-button size="mini" type="primary" v-hasPerm="['system:division:edit']" @click="onUpdate(record)">
                   <template #icon><icon-edit /></template>
                   <span>修改</span>
                 </a-button>
-                <a-button size="mini" type="primary" status="success" @click="addDivision(record.id)">
+                <a-button
+                  size="mini"
+                  type="primary"
+                  v-hasPerm="['system:division:add']"
+                  status="success"
+                  @click="addDivision(record.id)"
+                >
                   <template #icon><icon-plus /></template>
                   <span>新增</span>
                 </a-button>
-                <a-popconfirm type="warning" content="确定删除该部门吗?">
-                  <a-button size="mini" type="primary" status="danger" v-if="record.id != '100'">
+                <a-popconfirm type="warning" content="确定删除该部门吗?" @ok="deleteDivision(record)">
+                  <a-button
+                    size="mini"
+                    v-hasPerm="['system:division:delete']"
+                    type="primary"
+                    status="danger"
+                    v-if="record.id != 100"
+                  >
                     <template #icon><icon-delete /></template>
                     <span>删除</span>
                   </a-button>
@@ -87,13 +95,14 @@
           <a-form-item field="parentId" label="上级部门" validate-trigger="blur">
             <a-tree-select
               v-model="addFrom.parentId"
-              :data="tableData"
+              :data="[{ id: 0, name: '无上级部门', children: null }, ...tableData]"
               :field-names="{
                 key: 'id',
                 title: 'name',
                 children: 'children'
               }"
               placeholder="选择上级部门"
+              allow-clear
             ></a-tree-select>
           </a-form-item>
           <a-row :gutter="24">
@@ -143,8 +152,8 @@
               </a-form-item>
             </a-col>
           </a-row>
-          <a-form-item field="description" label="描述" validate-trigger="blur">
-            <a-textarea v-model="addFrom.description" placeholder="请输入描述" allow-clear />
+          <a-form-item field="describe" label="描述" validate-trigger="blur">
+            <a-textarea v-model="addFrom.describe" placeholder="请输入描述" allow-clear />
           </a-form-item>
         </a-form>
       </div>
@@ -153,18 +162,19 @@
 </template>
 
 <script setup lang="ts">
-import { getDivisionAPI } from "@/api/modules/system/index";
+import {
+  getDivisionAPI,
+  addDivisionAPI,
+  updateDivisionAPI,
+  deleteDivisionAPI,
+  type DivisionItem,
+  type DivisionFormData
+} from "@/api/department";
 import { deepClone } from "@/utils";
 
 // 新增
 const open = ref(false);
 const rules = {
-  parentId: [
-    {
-      required: true,
-      message: "请选择上级部门"
-    }
-  ],
   name: [
     {
       required: true,
@@ -178,15 +188,15 @@ const rules = {
     }
   ]
 };
-const addFrom = ref<any>({
-  parentId: null,
+const addFrom = ref<DivisionFormData>({
+  parentId: 0,
   name: "",
-  sort: 0,
+  sort: 1,
   leader: "",
   phone: "",
   email: "",
   status: 1,
-  description: ""
+  describe: ""
 });
 const formType = ref(0); // 0新增 1修改 2新增下级
 const title = ref("");
@@ -198,37 +208,70 @@ const onAdd = () => {
 };
 const handleOk = async () => {
   let state = await formRef.value.validate();
-  if (state) return (open.value = true); // 校验不通过
-  console.log("模拟提交", formType.value, addFrom.value);
-  arcoMessage("success", "模拟提交成功");
-  getDivision();
+  if (state) return; // 校验不通过
+
+  try {
+    if (formType.value === 1) {
+      // 修改
+      await updateDivisionAPI(addFrom.value);
+      arcoMessage("success", "修改成功");
+    } else {
+      // 新增
+      await addDivisionAPI(addFrom.value);
+      arcoMessage("success", "添加成功");
+    }
+    open.value = false;
+    getDivision();
+  } catch (error) {
+    arcoMessage("error", "操作失败");
+  }
 };
 // 关闭对话框动画结束后触发
 const afterClose = () => {
   formRef.value.resetFields();
   addFrom.value = {
-    parentId: null,
+    parentId: 0,
     name: "",
-    sort: 0,
+    sort: 1,
     leader: "",
     phone: "",
     email: "",
     status: 1,
-    description: ""
+    describe: ""
   };
 };
-const onUpdate = (row: any) => {
+const onUpdate = (row: DivisionItem) => {
   title.value = "修改部门";
   formType.value = 1;
-  addFrom.value = deepClone(row);
-  row.parentId == 0 && (addFrom.value.parentId = null);
+  addFrom.value = {
+    id: row.id,
+    parentId: row.parentId,
+    name: row.name,
+    status: row.status,
+    leader: row.leader || "",
+    phone: row.phone || "",
+    email: row.email || "",
+    sort: row.sort || 1,
+    describe: row.describe || ""
+  };
   open.value = true;
 };
-const addDivision = (id: any) => {
+const addDivision = (id: number) => {
   title.value = "新增部门";
   formType.value = 2;
-  addFrom.value.parentId = id == 0 ? null : id;
+  addFrom.value.parentId = id;
   open.value = true;
+};
+
+// 删除部门
+const deleteDivision = async (record: DivisionItem) => {
+  try {
+    await deleteDivisionAPI({ id: record.id });
+    arcoMessage("success", "删除成功");
+    getDivision();
+  } catch (error) {
+    arcoMessage("error", "删除失败");
+  }
 };
 
 const openState = ref(dictFilter("status"));
@@ -248,14 +291,19 @@ const reset = () => {
 };
 const loading = ref(false);
 const tableRef = ref();
-const tableData = ref();
+const tableData = ref<DivisionItem[]>([]);
 const getDivision = async () => {
   loading.value = true;
-  let res = await getDivisionAPI();
-  tableData.value = res.data;
+  try {
+    let res = await getDivisionAPI();
+    tableData.value = res.data.list || [];
+  } catch (error) {
+    arcoMessage("error", "获取部门列表失败");
+    tableData.value = [];
+  }
   loading.value = false;
   setTimeout(() => {
-    tableRef.value.expandAll();
+    tableRef.value?.expandAll();
   }, 0);
 };
 

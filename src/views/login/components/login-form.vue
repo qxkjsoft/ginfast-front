@@ -142,7 +142,9 @@ const onLogin = async () => {
     // useSystemStore().setDictData();
   } catch (error) {
     console.error("登录失败:", error);
-    arcoMessage("error", typeof error === "string" ? error : "登录失败，请检查用户名和密码");
+    //arcoMessage("error", typeof error === "string" ? error : "登录失败，请检查用户名和密码");
+    form.value.captchaId = "";
+    refreshCaptcha();
   } finally {
     loginLoading.value = false;
   }
@@ -150,8 +152,8 @@ const onLogin = async () => {
 
 // 验证码
 const captchaImgUrl = ref("");
-const captchaWidth = ref(130);
-const captchaHeight = ref(30);
+const captchaWidth = ref(160);
+const captchaHeight = ref(50);
 const refreshCaptcha = () => {
   if (!form.value.captchaId) {
     getCaptchaId().then(res => {

@@ -174,8 +174,8 @@ const onPerson = (type: number) => {
   router.push({
     path: "/system/userinfo",
     query: {
-      id: account.value.id,
-      userName: account.value.username,
+      id: account.id,
+      userName: account.username,
       type
     }
   });

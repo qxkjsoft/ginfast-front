@@ -8,7 +8,6 @@ import { type UserResult, type RefreshTokenResult, getLogin, refreshTokenApi, ge
 import { userType } from "@/store/types";
 export const useUserStore = defineStore("user", () => {
   const userInfo = getLocalStorage<userType>(UserInfoKey);
-
   // State
   const account = ref<userType>({
     id: userInfo?.id ?? 0,
@@ -18,6 +17,7 @@ export const useUserStore = defineStore("user", () => {
     roles: userInfo?.roles ?? [],
     permissions: userInfo?.permissions ?? []
   });
+
   // action
   /** 登入 */
   const loginByUsername = async (data: any) => {
