@@ -70,7 +70,7 @@
                   <template #icon><icon-edit /></template>
                   <span>修改</span>
                 </a-button>
-                <a-popconfirm type="warning" content="确定删除该字典吗?">
+                <a-popconfirm type="warning" content="确定删除该字典吗?" @ok="onDelete(record)">
                   <a-button type="primary" status="danger" size="mini">
                     <template #icon><icon-delete /></template>
                     <span>删除</span>
@@ -128,7 +128,7 @@
           :bordered="{ cell: true }"
           :loading="detailLoading"
           :scroll="{ x: '100%', y: '100%' }"
-          :pagination="pagination"
+          :pagination="false"
           :row-selection="{ type: 'checkbox', showCheckedAll: true }"
           :selected-keys="selectedKeysDetail"
           @select="selectDetail"
@@ -153,7 +153,7 @@
                     <template #icon><icon-edit /></template>
                     <span>修改</span>
                   </a-button>
-                  <a-popconfirm type="warning" content="确定删除该字典吗?">
+                  <a-popconfirm type="warning" content="确定删除该字典吗?" @ok="onDeleteDetail(record)">
                     <a-button type="primary" status="danger" size="mini">
                       <template #icon><icon-delete /></template>
                       <span>删除</span>
@@ -190,13 +190,29 @@
 </template>
 
 <script setup lang="ts">
-import { getDictAPI } from "@/api/modules/system/index";
 import { deepClone } from "@/utils";
+import {
+  getDictListAPI,
+  addDictAPI,
+  updateDictAPI,
+  deleteDictAPI,
+  getDictItemsByDictIdAPI,
+  addDictItemAPI,
+  updateDictItemAPI,
+  deleteDictItemAPI,
+  type SystemDict,
+  type DictListParams,
+  type DictAddParams,
+  type DictUpdateParams,
+  type SystemDictItem,
+  type DictItemAddParams,
+  type DictItemUpdateParams
+} from "@/api/dictionary";
 const openState = ref(dictFilter("status"));
-const form = ref({
+const form = ref<DictListParams>({
   name: "",
   code: "",
-  status: null
+  status: undefined
 });
 const search = () => {
   getDict();
@@ -205,8 +221,9 @@ const reset = () => {
   form.value = {
     name: "",
     code: "",
-    status: null
+    status: undefined
   };
+  currentPage.value = 1;
   getDict();
 };
 
@@ -232,7 +249,7 @@ const rules = {
     }
   ]
 };
-const addFrom = ref({
+const addFrom = ref<DictAddParams & { id?: number }>({
   name: "",
   code: "",
   description: "",
@@ -245,9 +262,37 @@ const onAdd = () => {
 };
 const handleOk = async () => {
   let state = await formRef.value.validate();
-  if (state) return (open.value = true); // 校验不通过
-  arcoMessage("success", "模拟提交成功");
-  getDict();
+  if (state) return; // 校验不通过
+
+  try {
+    if (addFrom.value.id) {
+      // 编辑模式
+      const updateData: DictUpdateParams = {
+        id: addFrom.value.id,
+        name: addFrom.value.name,
+        code: addFrom.value.code,
+        status: addFrom.value.status,
+        description: addFrom.value.description
+      };
+      await updateDictAPI(updateData);
+      arcoMessage("success", "修改字典成功");
+    } else {
+      // 新增模式
+      const addData: DictAddParams = {
+        name: addFrom.value.name,
+        code: addFrom.value.code,
+        status: addFrom.value.status,
+        description: addFrom.value.description
+      };
+      await addDictAPI(addData);
+      arcoMessage("success", "新增字典成功");
+    }
+    open.value = false;
+    getDict();
+  } catch (error) {
+    console.error("操作失败:", error);
+    arcoMessage("error", "操作失败");
+  }
 };
 // 关闭对话框动画结束后触发
 const afterClose = () => {
@@ -259,51 +304,109 @@ const afterClose = () => {
     status: 1
   };
 };
-const onUpdate = (record: any) => {
+const onUpdate = (record: SystemDict) => {
   title.value = "修改字典";
-  addFrom.value = deepClone(record);
+  addFrom.value = { ...deepClone(record) };
   open.value = true;
 };
 
+// 删除字典
+const onDelete = async (record: SystemDict) => {
+  try {
+    await deleteDictAPI({ id: record.id });
+    arcoMessage("success", "删除成功");
+    getDict();
+  } catch (error) {
+    console.error("删除失败:", error);
+    arcoMessage("error", "删除失败");
+  }
+};
+
 const loading = ref(false);
+const currentPage = ref(1);
+const pageSize = ref(10);
+const total = ref(0);
 const pagination = ref({
-  pageSize: 10,
-  showPageSize: true
+  current: currentPage,
+  pageSize: pageSize,
+  total: total,
+  showPageSize: true,
+  showTotal: true,
+  onChange: (page: number) => {
+    currentPage.value = page;
+    getDict();
+  },
+  onPageSizeChange: (size: number) => {
+    pageSize.value = size;
+    currentPage.value = 1;
+    getDict();
+  }
 });
-const selectedKeys = ref([]);
-const select = (list: []) => {
+const selectedKeys = ref<number[]>([]);
+const select = (list: number[]) => {
   selectedKeys.value = list;
 };
 const selectAll = (state: boolean) => {
-  selectedKeys.value = state ? (dictList.value.map((el: any) => el.id) as []) : [];
+  selectedKeys.value = state ? dictList.value.map((el: SystemDict) => el.id) : [];
 };
-const dictList = ref();
+const dictList = ref<SystemDict[]>([]);
 const getDict = async () => {
   loading.value = true;
-  let res = await getDictAPI();
-  dictList.value = res.data || [];
-  loading.value = false;
+  try {
+    const params: DictListParams = {
+      page: currentPage.value,
+      limit: pageSize.value,
+      ...form.value
+    };
+    const res = await getDictListAPI(params);
+    if (res.data) {
+      dictList.value = res.data.list || [];
+      total.value = res.data.total || 0;
+    }
+  } catch (error) {
+    console.error("获取字典列表失败:", error);
+    arcoMessage("error", "获取字典列表失败");
+  } finally {
+    loading.value = false;
+  }
 };
 
 // 字典详情
 const detailLoading = ref(false);
 const detailOpen = ref(false);
-const dictDetail = ref({
+const currentDict = ref<SystemDict | null>(null);
+const dictDetail = ref<{
+  list: SystemDictItem[];
+}>({
   list: []
 });
-const onDictData = (record: any) => {
-  detailLoading.value = true;
-  dictDetail.value = record;
+const onDictData = async (record: SystemDict) => {
+  currentDict.value = record;
   detailOpen.value = true;
-  detailLoading.value = false;
+  await getDictItems(record.id);
+};
+const getDictItems = async (dictId: number) => {
+  detailLoading.value = true;
+  try {
+    const res = await getDictItemsByDictIdAPI(dictId);
+    dictDetail.value.list = res.data?.list || [];
+  } catch (error) {
+    console.error("获取字典项失败:", error);
+    arcoMessage("error", "获取字典项失败");
+  } finally {
+    detailLoading.value = false;
+  }
 };
 const detailOk = () => {
   detailOpen.value = false;
+  currentDict.value = null;
+  dictDetail.value.list = [];
 };
-const deatilForm = ref({
+const deatilForm = ref<DictItemAddParams & { id?: number }>({
   name: "",
   value: "",
-  status: 1
+  status: 1,
+  dictId: 0
 });
 const detaulRules = ref({
   name: [
@@ -330,17 +433,68 @@ const detailTitle = ref("");
 const detailCaseOpen = ref(false);
 const onAddDetail = () => {
   detailTitle.value = "新增字典数据";
+  deatilForm.value = {
+    name: "",
+    value: "",
+    status: 1,
+    dictId: currentDict.value?.id || 0
+  };
   detailCaseOpen.value = true;
 };
 const handleOkDetail = async () => {
   let state = await detailFormRef.value.validate();
-  if (state) return (detailCaseOpen.value = true); // 校验不通过
-  arcoMessage("success", "模拟提交成功");
+  if (state) return; // 校验不通过
+
+  try {
+    if (deatilForm.value.id) {
+      // 编辑模式
+      const updateData: DictItemUpdateParams = {
+        id: deatilForm.value.id,
+        name: deatilForm.value.name,
+        value: deatilForm.value.value,
+        status: deatilForm.value.status,
+        dictId: deatilForm.value.dictId
+      };
+      await updateDictItemAPI(updateData);
+      arcoMessage("success", "修改字典项成功");
+    } else {
+      // 新增模式
+      const addData: DictItemAddParams = {
+        name: deatilForm.value.name,
+        value: deatilForm.value.value,
+        status: deatilForm.value.status,
+        dictId: deatilForm.value.dictId
+      };
+      await addDictItemAPI(addData);
+      arcoMessage("success", "新增字典项成功");
+    }
+    detailCaseOpen.value = false;
+    if (currentDict.value) {
+      await getDictItems(currentDict.value.id);
+    }
+  } catch (error) {
+    console.error("操作失败:", error);
+    arcoMessage("error", "操作失败");
+  }
 };
-const onDetailUpdate = (record: any) => {
+const onDetailUpdate = (record: SystemDictItem) => {
   detailTitle.value = "修改字典数据";
-  deatilForm.value = deepClone(record);
+  deatilForm.value = { ...deepClone(record) };
   detailCaseOpen.value = true;
+};
+
+// 删除字典项
+const onDeleteDetail = async (record: SystemDictItem) => {
+  try {
+    await deleteDictItemAPI({ id: record.id });
+    arcoMessage("success", "删除成功");
+    if (currentDict.value) {
+      await getDictItems(currentDict.value.id);
+    }
+  } catch (error) {
+    console.error("删除失败:", error);
+    arcoMessage("error", "删除失败");
+  }
 };
 // 关闭对话框动画结束后触发
 const afterCloseDetail = () => {
@@ -348,15 +502,16 @@ const afterCloseDetail = () => {
   deatilForm.value = {
     name: "",
     value: "",
-    status: 1
+    status: 1,
+    dictId: currentDict.value?.id || 0
   };
 };
-const selectedKeysDetail = ref([]);
-const selectDetail = (list: []) => {
+const selectedKeysDetail = ref<number[]>([]);
+const selectDetail = (list: number[]) => {
   selectedKeysDetail.value = list;
 };
 const selectAllDetail = (state: boolean) => {
-  selectedKeysDetail.value = state ? (dictDetail.value.list.map((el: any) => el.id) as []) : [];
+  selectedKeysDetail.value = state ? dictDetail.value.list.map((el: SystemDictItem) => el.id) : [];
 };
 
 getDict();
