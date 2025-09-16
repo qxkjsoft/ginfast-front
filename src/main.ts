@@ -10,7 +10,7 @@ import pinia from "@/store/index";
 // arco-css
 import "@arco-design/web-vue/dist/arco.css";
 // vchart-arco-theme 主题关联-黑暗模式
-import { initVChartArcoTheme } from "@visactor/vchart-arco-theme";
+//import { initVChartArcoTheme } from "@visactor/vchart-arco-theme";
 // 额外引入图标库
 import ArcoVueIcon from "@arco-design/web-vue/es/icon";
 // 注册全局svg
@@ -24,7 +24,12 @@ import directives from "@/directives/index";
 
 // vchart黑暗模式
 // https://arco.design/react/docs/vchart
-initVChartArcoTheme();
+//initVChartArcoTheme();
+// 延迟初始化VChart主题，避免阻塞首次启动
+const initVChartTheme = async () => {
+  const { initVChartArcoTheme } = await import("@visactor/vchart-arco-theme");
+  initVChartArcoTheme();
+};
 
 const app = createApp(App);
 
@@ -41,3 +46,6 @@ app.use(router);
 app.use(i18n);
 app.use(directives);
 app.mount("#app");
+
+// 异步初始化VChart主题，不阻塞应用启动
+initVChartTheme();

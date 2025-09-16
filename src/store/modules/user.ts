@@ -4,7 +4,7 @@ import pinia from "@/store";
 import { setToken, setRefreshToken, removeToken, UserInfoKey } from "@/utils/auth";
 //import { type userType } from "@/store/types";
 import { getLocalStorage, setLocalStorage, removeLocalStorage } from "@/utils/app";
-import { type UserResult, type RefreshTokenResult, getLogin, refreshTokenApi, getProfileAPI, logout } from "@/api/user";
+import { type UserResult, type RefreshTokenResult, getLogin, refreshTokenApi, getProfileAPI } from "@/api/user";
 import { userType } from "@/store/types";
 export const useUserStore = defineStore("user", () => {
   const userInfo = getLocalStorage<userType>(UserInfoKey);
