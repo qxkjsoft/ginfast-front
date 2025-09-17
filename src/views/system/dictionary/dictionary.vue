@@ -21,13 +21,9 @@
         </template>
         <template #right>
           <a-space wrap>
-            <a-button type="primary" @click="onAdd">
+            <a-button type="primary" @click="onAdd" v-hasPerm="['system:dict:add']">
               <template #icon><icon-plus /></template>
               <span>新增</span>
-            </a-button>
-            <a-button type="primary" status="danger">
-              <template #icon><icon-delete /></template>
-              <span>删除</span>
             </a-button>
           </a-space>
         </template>
@@ -40,10 +36,6 @@
         :loading="loading"
         :scroll="{ x: '100%', y: '100%', minWidth: 1000 }"
         :pagination="pagination"
-        :row-selection="{ type: 'checkbox', showCheckedAll: true }"
-        :selected-keys="selectedKeys"
-        @select="select"
-        @select-all="selectAll"
       >
         <template #columns>
           <a-table-column title="序号" :width="64">
@@ -62,16 +54,22 @@
           <a-table-column title="操作" :width="280" align="center" :fixed="'right'">
             <template #cell="{ record }">
               <a-space>
-                <a-button type="primary" status="success" size="mini" @click="onDictData(record)">
+                <a-button
+                  type="primary"
+                  status="success"
+                  size="mini"
+                  @click="onDictData(record)"
+                  v-hasPerm="['system:dictitem:list']"
+                >
                   <template #icon><icon-file /></template>
                   <span>字典值</span>
                 </a-button>
-                <a-button type="primary" size="mini" @click="onUpdate(record)">
+                <a-button type="primary" size="mini" @click="onUpdate(record)" v-hasPerm="['system:dict:edit']">
                   <template #icon><icon-edit /></template>
                   <span>修改</span>
                 </a-button>
                 <a-popconfirm type="warning" content="确定删除该字典吗?" @ok="onDelete(record)">
-                  <a-button type="primary" status="danger" size="mini">
+                  <a-button type="primary" status="danger" size="mini" v-hasPerm="['system:dict:delete']">
                     <template #icon><icon-delete /></template>
                     <span>删除</span>
                   </a-button>
@@ -83,7 +81,7 @@
       </a-table>
     </div>
 
-    <a-modal v-model:visible="open" @close="afterClose" @ok="handleOk" @cancel="afterClose">
+    <a-modal v-model:visible="open" @close="afterClose" :on-before-ok="handleOk" @cancel="afterClose">
       <template #title> {{ title }} </template>
       <div>
         <a-form ref="formRef" auto-label-width :rules="rules" :model="addFrom">
@@ -111,13 +109,9 @@
       <div>
         <a-row>
           <a-space wrap>
-            <a-button type="primary" @click="onAddDetail">
+            <a-button type="primary" @click="onAddDetail" v-hasPerm="['system:dictitem:add']">
               <template #icon><icon-plus /></template>
               <span>新增</span>
-            </a-button>
-            <a-button type="primary" status="danger">
-              <template #icon><icon-delete /></template>
-              <span>删除</span>
             </a-button>
           </a-space>
         </a-row>
@@ -129,10 +123,6 @@
           :loading="detailLoading"
           :scroll="{ x: '100%', y: '100%' }"
           :pagination="false"
-          :row-selection="{ type: 'checkbox', showCheckedAll: true }"
-          :selected-keys="selectedKeysDetail"
-          @select="selectDetail"
-          @select-all="selectAllDetail"
         >
           <template #columns>
             <a-table-column title="序号" :width="64">
@@ -149,12 +139,12 @@
             <a-table-column title="操作" align="center" :fixed="'right'">
               <template #cell="{ record }">
                 <a-space>
-                  <a-button type="primary" size="mini" @click="onDetailUpdate(record)">
+                  <a-button type="primary" size="mini" @click="onDetailUpdate(record)" v-hasPerm="['system:dictitem:edit']">
                     <template #icon><icon-edit /></template>
                     <span>修改</span>
                   </a-button>
                   <a-popconfirm type="warning" content="确定删除该字典吗?" @ok="onDeleteDetail(record)">
-                    <a-button type="primary" status="danger" size="mini">
+                    <a-button type="primary" status="danger" size="mini" v-hasPerm="['system:dictitem:delete']">
                       <template #icon><icon-delete /></template>
                       <span>删除</span>
                     </a-button>
@@ -262,7 +252,7 @@ const onAdd = () => {
 };
 const handleOk = async () => {
   let state = await formRef.value.validate();
-  if (state) return; // 校验不通过
+  if (state) return false; // 校验不通过
 
   try {
     if (addFrom.value.id) {
@@ -287,11 +277,12 @@ const handleOk = async () => {
       await addDictAPI(addData);
       arcoMessage("success", "新增字典成功");
     }
-    open.value = false;
     getDict();
+    return true;
   } catch (error) {
     console.error("操作失败:", error);
-    arcoMessage("error", "操作失败");
+    return false;
+    //arcoMessage("error", "操作失败");
   }
 };
 // 关闭对话框动画结束后触发
@@ -342,14 +333,9 @@ const pagination = ref({
     getDict();
   }
 });
-const selectedKeys = ref<number[]>([]);
-const select = (list: number[]) => {
-  selectedKeys.value = list;
-};
-const selectAll = (state: boolean) => {
-  selectedKeys.value = state ? dictList.value.map((el: SystemDict) => el.id) : [];
-};
+
 const dictList = ref<SystemDict[]>([]);
+// 获取字典列表
 const getDict = async () => {
   loading.value = true;
   try {
@@ -505,13 +491,6 @@ const afterCloseDetail = () => {
     status: 1,
     dictId: currentDict.value?.id || 0
   };
-};
-const selectedKeysDetail = ref<number[]>([]);
-const selectDetail = (list: number[]) => {
-  selectedKeysDetail.value = list;
-};
-const selectAllDetail = (state: boolean) => {
-  selectedKeysDetail.value = state ? dictDetail.value.list.map((el: SystemDictItem) => el.id) : [];
 };
 
 getDict();
