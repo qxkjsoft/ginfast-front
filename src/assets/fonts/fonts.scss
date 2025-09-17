@@ -1,6 +1,8 @@
 @font-face {
-  font-family: "AliFangYuanTi"; /*字体名-自定义*/
-  src: url("./AlimamaFangYuanTiVF-Thin.ttf"); /* 字体路径 */
-  font-weight: normal;
+  font-family: AliFangYuanTi; /* 字体名-自定义 */
   font-style: normal;
+  font-weight: normal;
+  src: url("./AlimamaFangYuanTiVF-Thin.ttf") format("woff2"); /* 字体路径 */
+  font-display: swap; /* 字体加载期间使用降级字体 */
+  unicode-range: U+4E00-9FFF; /* 只包含中文字符，减少字体大小 */
 }

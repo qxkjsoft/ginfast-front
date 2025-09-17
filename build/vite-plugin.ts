@@ -43,11 +43,13 @@ export const createVitePlugins = (viteEnv: ViteEnv): (PluginOption | PluginOptio
       // 配置文件生成位置
       dts: "src/auto-import.d.ts"
     }),
+    // 组件按需加载
     Components({
       resolvers: [
         // arco组件的按需加载
         ArcoResolver({
-          sideEffect: true
+          sideEffect: true, // 自动导入样式
+          importStyle: "css" // 导入 CSS 样式
         })
       ],
       // 自动加载组件的目录配置,默认的为 'src/components'

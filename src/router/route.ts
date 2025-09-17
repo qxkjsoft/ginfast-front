@@ -1,5 +1,5 @@
 import { HOME_PATH } from "@/config/index";
-import Layout from "@/layout/index.vue";
+//import Layout from "@/layout/index.vue";
 /**
  * 路由path路径与文件夹名称相同，找文件可以浏览器地址快速查找，方便定位文件
  *
@@ -33,7 +33,7 @@ export const staticRoutes = [
   {
     path: "/login",
     name: "login",
-    component: () => import("@/views/login/login.vue"),
+    component: () => import(/* webpackChunkName: "login" */ "@/views/login/login.vue"),
     meta: {
       title: "login"
     }
@@ -42,8 +42,7 @@ export const staticRoutes = [
     path: "/layout",
     name: "layout",
     redirect: HOME_PATH,
-    component: Layout, // 容器布局-顶层路由
-    // 二级路由-主要渲染页面
+    component: () => import(/* webpackChunkName: "layout" */ "@/layout/index.vue"),
     children: []
   }
   /**
@@ -63,7 +62,7 @@ export const notFoundAndNoPower = [
   {
     path: "/401", // 无权限，跳转401
     name: "no-access",
-    component: () => import("@/views/error/401.vue"),
+    component: () => import(/* webpackChunkName: "error" */ "@/views/error/401.vue"),
     meta: {
       title: "no-access",
       hide: true
@@ -72,7 +71,7 @@ export const notFoundAndNoPower = [
   {
     path: "/500", // 无网络-浏览器离线
     name: "no-network",
-    component: () => import("@/views/error/500.vue"),
+    component: () => import(/* webpackChunkName: "error" */ "@/views/error/500.vue"),
     meta: {
       title: "no-network",
       hide: true
@@ -81,7 +80,7 @@ export const notFoundAndNoPower = [
   {
     path: "/:path(.*)*", // 匹配任意路由，兜底，未找到页面的时候跳转该页面
     name: "not-found",
-    component: () => import("@/views/error/404.vue"),
+    component: () => import(/* webpackChunkName: "error" */ "@/views/error/404.vue"),
     meta: {
       title: "not-found",
       hide: true

@@ -1,51 +1,49 @@
 import { createApp } from "vue";
 import "@/style.css";
 import App from "@/App.vue";
-// arco-design
-import ArcoVue from "@arco-design/web-vue";
+
 // vue-router
 import router from "@/router/index";
 // pinia
 import pinia from "@/store/index";
-// arco-css
-import "@arco-design/web-vue/dist/arco.css";
-// vchart-arco-theme 主题关联-黑暗模式
-//import { initVChartArcoTheme } from "@visactor/vchart-arco-theme";
-// 额外引入图标库
-import ArcoVueIcon from "@arco-design/web-vue/es/icon";
 // 注册全局svg
 import "virtual:svg-icons-register";
-// 引入i18n
-import i18n from "@/lang/index";
-// 引入字体
-import "@/assets/fonts/fonts.scss";
 // 引入自定义指令
 import directives from "@/directives/index";
 
-// vchart黑暗模式
-// https://arco.design/react/docs/vchart
-//initVChartArcoTheme();
+const app = createApp(App);
+app.use(pinia);
+app.use(router);
+app.use(directives);
+
 // 延迟初始化VChart主题，避免阻塞首次启动
-const initVChartTheme = async () => {
+const loadNonCriticalDependencies = async () => {
+  // 异步加载 ArcoVue
+  const [ArcoVue, ArcoVueIcon] = await Promise.all([import("@arco-design/web-vue"), import("@arco-design/web-vue/es/icon")]);
+
+  // 异步加载 CSS
+  await import("@arco-design/web-vue/dist/arco.css");
+
+  // 应用 ArcoVue
+  app.use(ArcoVue.default, {
+    componentPrefix: "arco"
+  });
+  app.use(ArcoVueIcon.default);
+
+  // 异步加载 i18n
+  const i18n = await import("@/lang/index");
+  app.use(i18n.default);
+
+  // 异步加载字体
+  await import("@/assets/fonts/fonts.scss");
+
+  // 异步初始化 VChart 主题
   const { initVChartArcoTheme } = await import("@visactor/vchart-arco-theme");
   initVChartArcoTheme();
 };
 
-const app = createApp(App);
-
-// app.use(plugin, options)
-// 其中 plugin 表示要传递的插件对象， options 参数是可选的，表示选项配置
-// https://cn.vuejs.org/api/application.html#app-use
-
-app.use(ArcoVue, {
-  componentPrefix: "arco"
-});
-app.use(pinia);
-app.use(ArcoVueIcon);
-app.use(router);
-app.use(i18n);
-app.use(directives);
+// 立即挂载应用，不等待非关键依赖加载
 app.mount("#app");
 
-// 异步初始化VChart主题，不阻塞应用启动
-initVChartTheme();
+// 在后台加载非关键依赖
+loadNonCriticalDependencies();
