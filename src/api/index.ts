@@ -1,7 +1,7 @@
 import axios from "axios";
 import router from "@/router";
 import { Message } from "@arco-design/web-vue";
-import { getToken, formatToken, removeToken } from "@/utils/auth";
+import { getAccessToken, formatToken, removeAccessToken, removeRefreshToken } from "@/utils/auth";
 
 // 是否开启本地mock
 const MOCK_FLAG = import.meta.env.VITE_APP_OPEN_MOCK === "true";
@@ -14,7 +14,7 @@ service.interceptors.request.use(
   function (config: any) {
     // 发送请求之前做什么
     // 获取token鉴权
-    const tokenData = getToken();
+    const tokenData = getAccessToken();
     if (tokenData?.accessToken) {
       // 有token，在请求头中携带token
       config.headers.Authorization = formatToken(tokenData.accessToken);
@@ -51,7 +51,8 @@ service.interceptors.response.use(
     }
   },
   function (error: any) {
-    removeToken();
+    removeAccessToken();
+    removeRefreshToken();
     router.push("/login");
     return Promise.reject(error);
   }

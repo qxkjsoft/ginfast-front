@@ -7,7 +7,7 @@ import { storeToRefs } from "pinia";
 //import { useUserInfoStore } from "@/store/modules/user-info";
 import { useRouteConfigStore } from "@/store/modules/route-config";
 import { useRoutingMethod } from "@/hooks/useRoutingMethod";
-import { hasToken } from "@/utils/auth";
+import { hasRefreshToken } from "@/utils/auth";
 import { useUserStoreHook } from "@/store/modules/user";
 /**
  * 创建vue的路由示例
@@ -40,7 +40,7 @@ const router = createRouter({
 router.beforeEach(async (to: any, _: any, next: any) => {
   NProgress.start(); // 开启进度条
   // 新的登录逻辑
-  const tokenExist = hasToken();
+  const tokenExist = hasRefreshToken();
   // 1、去登录页，无token，放行
   if (to.path === "/login" && !tokenExist) return next();
   // 2、没有token，直接重定向到登录页

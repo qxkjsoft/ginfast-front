@@ -26,6 +26,9 @@
                   <span v-else-if="data.key == 'sex'">
                     {{ value === 1 ? "男" : "女" }}
                   </span>
+                  <span v-else-if="data.key == 'createTime'">
+                    {{ formatTime(value) }}
+                  </span>
                   <span v-else>{{ value }}</span>
                 </template>
               </a-descriptions>
@@ -55,9 +58,9 @@
 import BasicInfo from "@/views/system/userinfo/components/basic-info.vue";
 import SecuritySettings from "@/views/system/userinfo/components/security-settings.vue";
 import useGlobalProperties from "@/hooks/useGlobalProperties";
-import { getUserInfoAPI } from "@/api/modules/user/index";
 import { useRouteConfigStore } from "@/store/modules/route-config";
-
+import { type AccountDetail, getAccountDetailAPI } from "@/api/user";
+import { formatTime } from "@/globals";
 const route = useRoute();
 const proxy = useGlobalProperties();
 const routerStore = useRouteConfigStore();
@@ -138,18 +141,30 @@ const refresh = () => {
 };
 
 const loading = ref<boolean>(false);
-const userInfo = ref<any>({});
+const userInfo = ref<AccountDetail>({} as AccountDetail);
 const getUserInfo = async () => {
   try {
     loading.value = true;
     let params = {
       id: route.query.id ? route.query.id : ""
     };
-    let data = await getUserInfoAPI(params);
-    userInfo.value = data.data.user;
+    let data = await await getAccountDetailAPI(params.id);
+    userInfo.value = data.data;
+    const userMap = {
+      userName: userInfo.value.userName,
+      nickName: userInfo.value.nickName,
+      sex: userInfo.value.sex,
+      roles: userInfo.value.roles,
+      status: userInfo.value.status,
+      email: userInfo.value.email,
+      phone: userInfo.value.phone,
+      deptName: userInfo.value.department.name,
+      createTime: userInfo.value.createdAt,
+      description: userInfo.value.description
+    };
     detail.value.forEach((item: Detail) => {
-      if (userInfo.value.hasOwnProperty(item.key)) {
-        item.value = userInfo.value[item.key];
+      if (userMap.hasOwnProperty(item.key)) {
+        item.value = (userMap as any)[item.key];
       }
     });
   } finally {
@@ -165,9 +180,4 @@ routerStore.setTabsTitle(`用户${route.query.userName ? " - " + route.query.use
 .margin-top {
   margin-top: $padding;
 }
-
-// 解决tabs宽度异常的bug
-// :deep(.arco-tabs-content .arco-tabs-content-list) {
-//   display: unset;
-// }
 </style>

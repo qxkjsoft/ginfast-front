@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import pinia from "@/store";
-import { setToken, setRefreshToken, removeToken, UserInfoKey } from "@/utils/auth";
+import { setAccessToken, setRefreshToken, removeAccessToken, removeRefreshToken, UserInfoKey } from "@/utils/auth";
 //import { type userType } from "@/store/types";
 import { getLocalStorage, setLocalStorage, removeLocalStorage } from "@/utils/app";
 import { type UserResult, type RefreshTokenResult, getLogin, refreshTokenApi, getProfileAPI } from "@/api/user";
@@ -25,7 +25,9 @@ export const useUserStore = defineStore("user", () => {
       getLogin(data)
         .then(res => {
           if (res?.code === 0) {
-            setToken(res?.data);
+            // 登录成功后，设置 accessToken 和 refreshToken
+            setAccessToken(res?.data?.accessToken, res?.data?.accessTokenExpires);
+            setRefreshToken(res?.data?.refreshToken, res?.data?.refreshTokenExpires);
             resolve(res);
           } else {
             reject(res?.message || "登录失败");
@@ -44,7 +46,9 @@ export const useUserStore = defineStore("user", () => {
     account.value.nickname = "";
     account.value.roles = [];
     account.value.permissions = [];
-    removeToken();
+    // 清除 accessToken 和 refreshToken
+    removeAccessToken();
+    removeRefreshToken();
     removeLocalStorage(UserInfoKey);
   };
   /** 刷新`token` */
@@ -54,7 +58,7 @@ export const useUserStore = defineStore("user", () => {
         .then(res => {
           //console.log("refreshTokenApi", res)
           if (res?.code === 0) {
-            setRefreshToken(res.data?.accessToken, res.data?.accessTokenExpires);
+            setAccessToken(res.data?.accessToken, res.data?.accessTokenExpires);
             resolve(res);
           } else {
             reject(res?.message || "刷新`token`失败");

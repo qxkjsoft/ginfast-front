@@ -27,7 +27,7 @@
 
 <script setup lang="ts">
 import useGlobalProperties from "@/hooks/useGlobalProperties";
-
+import { updateAccountAPI } from "@/api/user";
 const emit = defineEmits(["refresh"]);
 const proxy = useGlobalProperties();
 const data = defineModel() as any;
@@ -54,8 +54,11 @@ const rules = {
 
 const onSubmit = ({ errors }: ArcoDesign.ArcoSubmit) => {
   if (errors) return;
-  proxy.$message.success("模拟修改成功");
-  emit("refresh");
+  //proxy.$message.success("模拟修改成功");
+  updateAccountAPI(form.value).then(() => {
+    proxy.$message.success("修改成功");
+    emit("refresh");
+  });
 };
 
 watch(

@@ -14,6 +14,7 @@ export function getLocalStorage<T>(key: string): T | null {
     // 返回解析后的值，类型断言为 T
     return parsedValue as T;
   } catch (error) {
+    console.error("Error parsing JSON from localStorage:", error);
     // JSON 解析失败时，说明是原始字符串或数值，直接返回
     const item = localStorage.getItem(key);
     // 尝试转换为数值，如果失败则返回原始字符串

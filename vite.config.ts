@@ -1,7 +1,7 @@
 import { defineConfig, loadEnv } from "vite";
 import path from "path";
 import { resolve } from "path";
-import { include } from "./build/optimize";
+import { include, exclude } from "./build/optimize";
 import postcssPresetEnv from "postcss-preset-env";
 import { createVitePlugins } from "./build/vite-plugin";
 // const themePath = normalizePath(path.normalize("./src/style/global-theme.scss"));
@@ -49,7 +49,8 @@ export default defineConfig(({ mode }) => {
     },
     // 依赖预加载 https://cn.vitejs.dev/config/dep-optimization-options.html#dep-optimization-options
     optimizeDeps: {
-      include
+      include,
+      exclude
     },
     build: {
       outDir: "dist", // 指定打包路径，默认为项目根目录下的dist目录

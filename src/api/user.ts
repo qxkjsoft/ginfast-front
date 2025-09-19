@@ -1,7 +1,8 @@
 import { http } from "@/utils/http";
 import { baseUrlApi } from "./utils";
 import { BaseResult } from "./types";
-
+import { type RoleItem } from "./role";
+import { type DivisionItem } from "./department";
 export type UserResult = BaseResult<{
   /** `token` */
   accessToken: string;
@@ -42,7 +43,7 @@ export interface AccountItem {
   createdAt: string;
   updatedAt: string;
   DeletedAt: string | null;
-  username: string;
+  userName: string;
   password: string;
   email: string;
   status: number;
@@ -52,7 +53,17 @@ export interface AccountItem {
   nickName: string;
   avatar: string;
   createdBy: number;
+  description: string;
 }
+
+// 用户详情
+export interface AccountDetail extends AccountItem {
+  permissions: Array<string>;
+  roles: Array<RoleItem>;
+  department: DivisionItem;
+}
+
+export type AccountDetailResult = BaseResult<AccountDetail>;
 
 // 用户列表
 export type AccountsResult = BaseResult<{
@@ -103,4 +114,14 @@ export const editAccountAPI = (param: any) => {
 // 删除用户
 export const deleteAccountAPI = (param: any) => {
   return http.request<BaseResult>("delete", baseUrlApi("users/delete"), { data: param });
+};
+
+// 根据ID获取用户详情
+export const getAccountDetailAPI = (id: number) => {
+  return http.request<AccountDetailResult>("get", baseUrlApi(`users/${id}`));
+};
+
+// 修改用户的密码、手机、邮箱
+export const updateAccountAPI = (param: any) => {
+  return http.request<BaseResult>("put", baseUrlApi(`users/updateAccount`), { data: param });
 };

@@ -2,7 +2,7 @@ import Axios, { type AxiosInstance, type AxiosRequestConfig, type CustomParamsSe
 import type { HttpError, RequestMethods, HttpResponse, HttpRequestConfig } from "./types.d";
 import { stringify } from "qs";
 //import NProgress from "../progress";
-import { getToken, formatToken } from "../auth";
+import { getAccessToken, getRefreshToken, formatToken } from "../auth";
 import { useUserStoreHook } from "@/store/modules/user";
 import router from "@/router";
 import { Message } from "@arco-design/web-vue";
@@ -87,38 +87,34 @@ class Http {
         return whiteList.some(url => config.url?.includes(url))
           ? config
           : new Promise(resolve => {
-              const data = getToken();
-              //console.log("httpInterceptorsRequest:", config.url, data)
-              if (data) {
-                const expired = data.accessTokenExpires * 1000 - Date.now() <= 0;
-                if (expired) {
-                  // 过期处理
-                  if (!Http.isRefreshing) {
-                    Http.isRefreshing = true;
-                    // token过期刷新
-                    useUserStoreHook()
-                      .handRefreshToken(data.refreshToken)
-                      .then((res: any) => {
-                        const token = res.data.accessToken;
-                        if (config.headers) {
-                          config.headers["Authorization"] = formatToken(token);
-                        }
-                        Http.requests.forEach(cb => cb(token));
-                        Http.requests = [];
-                      })
-                      .finally(() => {
-                        Http.isRefreshing = false;
-                      });
-                  }
-                  resolve(Http.retryOriginalRequest(config));
-                } else {
-                  // 未过期
-                  if (config.headers) {
-                    config.headers["Authorization"] = formatToken(data.accessToken);
-                  }
-                  resolve(config);
+              const data = getAccessToken();
+              const refreshTokenData = getRefreshToken();
+              const expired = !data || data.accessTokenExpires * 1000 - Date.now() <= 0;
+              if (expired && refreshTokenData) {
+                // 过期处理
+                if (!Http.isRefreshing) {
+                  Http.isRefreshing = true;
+                  // token过期刷新
+                  useUserStoreHook()
+                    .handRefreshToken(refreshTokenData.refreshToken)
+                    .then((res: any) => {
+                      const token = res.data.accessToken;
+                      if (config.headers) {
+                        config.headers["Authorization"] = formatToken(token);
+                      }
+                      Http.requests.forEach(cb => cb(token));
+                      Http.requests = [];
+                    })
+                    .finally(() => {
+                      Http.isRefreshing = false;
+                    });
                 }
+                resolve(Http.retryOriginalRequest(config));
               } else {
+                // 未过期
+                if (config.headers && data?.accessToken) {
+                  config.headers["Authorization"] = formatToken(data.accessToken);
+                }
                 resolve(config);
               }
             });
