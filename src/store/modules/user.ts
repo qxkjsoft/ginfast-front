@@ -59,9 +59,10 @@ export const useUserStore = defineStore("user", () => {
           //console.log("refreshTokenApi", res)
           if (res?.code === 0) {
             setAccessToken(res.data?.accessToken, res.data?.accessTokenExpires);
+            setRefreshToken(res.data?.refreshToken, res.data?.refreshTokenExpires);
             resolve(res);
           } else {
-            reject(res?.message || "刷新`token`失败");
+            reject(res?.message || "刷新`refreshToken`失败");
           }
         })
         .catch(error => {

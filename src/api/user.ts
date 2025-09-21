@@ -16,6 +16,8 @@ export type UserResult = BaseResult<{
 export type RefreshTokenResult = BaseResult<{
   accessToken: string;
   accessTokenExpires: number;
+  refreshToken: string;
+  refreshTokenExpires: number;
 }>;
 
 export type ProfileResult = BaseResult<{
