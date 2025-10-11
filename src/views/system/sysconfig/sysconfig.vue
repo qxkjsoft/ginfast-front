@@ -33,7 +33,8 @@
                                 <a-col :span="12">
                                     <a-form-item field="systemIcon" label="系统图标">
                                         <!-- 图片上传组件 -->
-                                        <ImageUpload v-model:image-url="configData.system.systemIcon" :title="'上传系统图标'"
+                                        <ImageUpload :width="40" :height="40"
+                                            v-model:image-url="configData.system.systemIcon" :title="'上传系统图标'"
                                             :accept="'.ico'" />
                                         <template #extra>
                                             <div>浏览器标签页显示的网站图标（建议 .ico 格式）</div>

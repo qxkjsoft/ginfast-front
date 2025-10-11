@@ -5,8 +5,10 @@
             <template #upload-button>
                 <div
                     :class="`arco-upload-list-item${file && file.status === 'error' ? ' arco-upload-list-item-error' : ''}`">
-                    <div class="arco-upload-list-picture custom-upload-avatar" v-if="file && file.url">
-                        <img :src="handleUrl(file.url)" />
+                    <div class="arco-upload-list-picture custom-upload-avatar" v-if="file && file.url"
+                        :style="{ width: typeof width === 'number' ? width + 'px' : width, height: typeof height === 'number' ? height + 'px' : height }">
+                        <img :src="handleUrl(file.url)"
+                            :style="{ width: typeof width === 'number' ? width + 'px' : width, height: typeof height === 'number' ? height + 'px' : height }" />
                         <div class="arco-upload-list-picture-mask">
                             <IconEdit />
                         </div>
@@ -18,7 +20,8 @@
                                 transform: 'translateX(-50%) translateY(-50%)',
                             }" />
                     </div>
-                    <div class="arco-upload-picture-card" v-else>
+                    <div class="arco-upload-picture-card" v-else
+                        :style="{ width: typeof width === 'number' ? width + 'px' : width, height: typeof height === 'number' ? height + 'px' : height }">
                         <div class="arco-upload-picture-card-text">
                             <IconPlus />
                             <div style="margin-top: 10px; font-weight: 600">{{ title }}</div>
@@ -49,6 +52,14 @@ const props = defineProps({
     accept: {
         type: String,
         default: 'image/*'
+    },
+    width: {
+        type: [String, Number],
+        default: 120
+    },
+    height: {
+        type: [String, Number],
+        default: 120
     }
 });
 
@@ -135,8 +146,6 @@ const handleUpload = async (options: any) => {
 <style scoped>
 .arco-upload-list-picture {
     position: relative;
-    width: 120px;
-    height: 120px;
     overflow: hidden;
     border-radius: 4px;
 }
@@ -167,8 +176,6 @@ const handleUpload = async (options: any) => {
 }
 
 .arco-upload-picture-card {
-    width: 120px;
-    height: 120px;
     border: 1px dashed var(--color-border-2);
     border-radius: 4px;
     background-color: var(--color-fill-2);
