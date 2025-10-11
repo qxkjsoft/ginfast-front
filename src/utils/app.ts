@@ -1,5 +1,5 @@
 import _ from "lodash"
-import { Message } from "@arco-design/web-vue";
+import { Message, Modal } from "@arco-design/web-vue";
 
 // 从 localStorage 获取项
 export function getLocalStorage<T>(key: string): T | null {
@@ -110,3 +110,27 @@ export async function copyTextToClipboard(text: string): Promise<boolean> {
         }
     }
 }
+
+// 节流的 Modal.confirm 函数，每3秒最多调用一次
+let lastCallTime = 0;
+export const throttledModalConfirm = (options: {
+    title: string;
+    content: string;
+    okText?: string;
+    cancelText?: string;
+    onOk?: () => void;
+    onCancel?: () => void;
+}) => {
+    const now = Date.now();
+    if (now - lastCallTime >= 3000) {
+        lastCallTime = now;
+        Modal.confirm({
+            title: options.title,
+            content: options.content,
+            okText: options.okText || '确定',
+            cancelText: options.cancelText || '取消',
+            onOk: options.onOk,
+            onCancel: options.onCancel
+        });
+    }
+};

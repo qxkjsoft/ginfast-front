@@ -7,6 +7,8 @@ import { useUserStoreHook } from "@/store/modules/user";
 import router from "@/router";
 import { Message } from "@arco-design/web-vue";
 import { throttle } from "@/globals";
+import { throttledModalConfirm } from "@/utils/app";
+
 // 相关配置请参考：www.axios-js.com/zh-cn/docs/#axios-request-config-1
 const defaultConfig: AxiosRequestConfig = {
     // 请求超时时间
@@ -57,7 +59,7 @@ class Http {
         useUserStoreHook().logOut();
         // 清空待执行的请求队列
         Http.requests = [];
-        Message.error("登录状态已过期，请重新登录");
+        //Message.error("登录状态已过期，请重新登录");
         router.push({
             path: "/login",
             query: {
@@ -65,6 +67,9 @@ class Http {
             }
         });
     }, 3000); // 3秒内只允许执行一次跳转
+
+
+
 
     /** 请求拦截 */
     private httpInterceptorsRequest(): void {
@@ -154,9 +159,29 @@ class Http {
                 if (!$error.isCancelRequest) {
                     const status = $error.response?.status;
                     const config = $error.config;
-                    // 刷新token的API报错或token中间件验证失败时跳转登录页
-                    if (config?.url?.includes("/refreshToken") || status === 401) {
-                        Http.redirectLoginPage();
+                    // 刷新token的API报错时提示跳转登录页
+                    if (config?.url?.includes("/refreshToken")) {
+                        // 弹窗询问用户是否跳转登录页（带节流功能）
+                        throttledModalConfirm({
+                            title: '提示',
+                            content: '登录状态已过期，请重新登录',
+                            okText: '确定',
+                            cancelText: '取消',
+                            onOk: () => {
+                                Http.redirectLoginPage();
+                            }
+                        });
+                    } else if (status === 401) {
+                        // 401错误时，提示用户刷新页面重试（带节流功能）
+                        throttledModalConfirm({
+                            title: '提示',
+                            content: '登录状态已过期，请刷新页面重试',
+                            okText: '刷新页面',
+                            cancelText: '取消',
+                            onOk: () => {
+                                window.location.reload();
+                            }
+                        });
                     }
                 }
                 // 所有的响应异常 区分来源为取消请求/非取消请求

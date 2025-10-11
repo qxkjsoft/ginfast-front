@@ -9,11 +9,11 @@
                         <a-input v-model="form.permission" placeholder="权限标识" allow-clear />
                         <a-select v-model="form.hide" placeholder="请选择显示状态" allow-clear style="width: 120px">
                             <a-option v-for="item in openState" :key="item.value" :value="item.value">{{ item.name
-                                }}</a-option>
+                            }}</a-option>
                         </a-select>
                         <a-select v-model="form.disable" placeholder="请选择启用状态" allow-clear style="width: 120px">
                             <a-option v-for="item in openState" :key="item.value" :value="item.value">{{ item.name
-                                }}</a-option>
+                            }}</a-option>
                         </a-select>
                         <a-button type="primary" @click="performSearch">
                             <template #icon><icon-search /></template>
@@ -50,9 +50,12 @@
                 <template #columns>
                     <a-table-column title="菜单名称" :width="150" tooltip ellipsis>
                         <template #cell="{ record }">
-                            <span>{{ $t(`menu.${record.title}`) }}</span>
-                            <a-badge v-if="record.apis && record.apis.length > 0" :count="record.apis.length"
-                                :max-count="99"></a-badge>
+                            <a-space>
+                                <div>{{ $t(`menu.${record.title}`) }}</div>
+                                <a-badge v-if="record.apis && record.apis.length > 0" :count="record.apis.length"
+                                    :max-count="99"></a-badge>
+                            </a-space>
+
 
                         </template>
                     </a-table-column>
@@ -164,7 +167,7 @@
                         <a-radio-group type="button" :disabled="!!addFrom.id" v-model="addFrom.type"
                             @change="typeChange">
                             <a-radio v-for="item in menuType" :key="item.value" :value="item.value">{{ item.name
-                                }}</a-radio>
+                            }}</a-radio>
                         </a-radio-group>
                     </a-form-item>
                     <a-form-item field="parentId" label="上级菜单" validate-trigger="blur" :disabled="!!addFrom.id">

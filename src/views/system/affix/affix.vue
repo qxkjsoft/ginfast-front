@@ -38,7 +38,7 @@
                     <a-table-column title="序号" :width="64">
                         <template #cell="cell">{{ cell.rowIndex + 1 }}</template>
                     </a-table-column>
-                    <a-table-column title="文件名" data-index="name" :ellipsis="true"></a-table-column>
+                    <a-table-column title="文件名" data-index="name" :ellipsis="true" tooltip></a-table-column>
                     <a-table-column title="文件类型" data-index="ftype" :width="120">
                         <template #cell="{ record }">
                             <a-tag v-if="record.ftype === 'image'" color="arcoblue">图片</a-tag>
@@ -53,14 +53,14 @@
                     </a-table-column>
                     <a-table-column title="创建人" data-index="createdBy" :width="150">
                         <template #cell="{ record }">{{ record.user ? record.user.nickName : ""
-                            }}</template>
+                        }}</template>
                     </a-table-column>
                     <a-table-column title="创建部门" :width="150">
                         <template #cell="{ record }">{{ record.user.department.name }}</template>
                     </a-table-column>
                     <a-table-column title="创建时间" data-index="createdAt" :width="180">
                         <template #cell="{ record }">{{ record.createdAt ? formatTime(record.createdAt) : ""
-                            }}</template>
+                        }}</template>
                     </a-table-column>
                     <a-table-column title="操作" :width="320" align="center" :fixed="'right'">
                         <template #cell="{ record }">
