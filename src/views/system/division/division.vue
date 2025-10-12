@@ -7,7 +7,7 @@
                         <a-input v-model="form.name" placeholder="请输入部门名称" allow-clear />
                         <a-select placeholder="部门状态" v-model="form.status" style="width: 120px" allow-clear>
                             <a-option v-for="item in openState" :key="item.value" :value="item.value">{{ item.name
-                                }}</a-option>
+                            }}</a-option>
                         </a-select>
                         <a-button type="primary" @click="search">
                             <template #icon><icon-search /></template>
@@ -49,7 +49,7 @@
                     <a-table-column title="描述" data-index="describe" :ellipsis="true" :tooltip="true"></a-table-column>
                     <a-table-column title="创建时间" data-index="createdAt" :ellipsis="true" :tooltip="true">
                         <template #cell="{ record }">{{ record.createdAt ? formatTime(record.createdAt) : ""
-                            }}</template>
+                        }}</template>
                     </a-table-column>
                     <a-table-column title="操作" align="center" :fixed="'right'">
                         <template #cell="{ record }">
@@ -199,6 +199,7 @@ const handleOk = async () => {
         open.value = false;
         getDivision();
     } catch (error) {
+        console.error("操作失败:", error);
         arcoMessage("error", "操作失败");
     }
 };
@@ -246,6 +247,7 @@ const deleteDivision = async (record: DivisionItem) => {
         arcoMessage("success", "删除成功");
         getDivision();
     } catch (error) {
+        console.error("删除失败:", error);
         arcoMessage("error", "删除失败");
     }
 };
@@ -322,6 +324,7 @@ const getDivision = async () => {
         // 初始化显示所有数据
         displayDivisionList.value = [...allDivisionList.value];
     } catch (error) {
+        console.error("获取部门列表失败:", error);
         arcoMessage("error", "获取部门列表失败");
         allDivisionList.value = [];
         displayDivisionList.value = [];

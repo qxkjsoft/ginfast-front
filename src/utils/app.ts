@@ -80,6 +80,7 @@ export async function copyTextToClipboard(text: string): Promise<boolean> {
         return true;
     } catch (error) {
         // Clipboard API可能因为权限问题失败，尝试备选方案
+        console.error("Clipboard API failed, trying fallback...", error);
         try {
             const textArea = document.createElement("textarea");
             textArea.value = text;
@@ -105,6 +106,7 @@ export async function copyTextToClipboard(text: string): Promise<boolean> {
                 return false;
             }
         } catch (fallbackError) {
+            console.error("Fallback failed:", fallbackError);
             Message.error("复制链接失败");
             return false;
         }

@@ -8,7 +8,7 @@
                         <a-input v-model="form.path" placeholder="请输入API路径" allow-clear />
                         <a-select v-model="form.method" placeholder="请选择请求方法" allow-clear style="width: 120px">
                             <a-option v-for="item in methodOptions" :key="item.value" :value="item.value">{{ item.name
-                            }}</a-option>
+                                }}</a-option>
                         </a-select>
                         <a-input v-model="form.apiGroup" placeholder="请输入API分组" allow-clear />
                         <a-button type="primary" @click="onSearch">
@@ -45,7 +45,7 @@
                     <a-table-column title="API分组" data-index="apiGroup"></a-table-column>
                     <a-table-column title="创建时间" data-index="createdAt" :width="180">
                         <template #cell="{ record }">{{ record.createdAt ? formatTime(record.createdAt) : ""
-                        }}</template>
+                            }}</template>
                     </a-table-column>
                     <a-table-column title="操作" :width="200" align="center" :fixed="'right'">
                         <template #cell="{ record }">
@@ -80,7 +80,7 @@
                     <a-form-item field="method" label="请求方法" validate-trigger="blur">
                         <a-select v-model="addFrom.method" placeholder="请选择请求方法" allow-clear>
                             <a-option v-for="item in methodOptions" :key="item.value" :value="item.value">{{ item.name
-                            }}</a-option>
+                                }}</a-option>
                         </a-select>
                     </a-form-item>
                     <a-form-item field="apiGroup" label="API分组" validate-trigger="blur">
@@ -246,6 +246,7 @@ const onUpdate = async (row: SysApiItem) => {
         };
         open.value = true;
     } catch (error) {
+        console.error("获取API详情失败", error);
         Message.error("获取API详情失败");
     }
 };
@@ -270,6 +271,7 @@ const handleOk = async () => {
         getSysApiList();
         return true;
     } catch (error) {
+        console.error("操作失败", error);
         Message.error("操作失败");
         return false;
     }
@@ -293,6 +295,7 @@ const onDelete = async (row: SysApiItem) => {
         Message.success("删除成功");
         getSysApiList();
     } catch (error) {
+        console.error("删除失败", error);
         Message.error("删除失败");
     }
 };
