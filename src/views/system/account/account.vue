@@ -53,7 +53,7 @@
           <template #columns>
             <!-- <a-table-column title="序号" :width="64">
                             <template #cell="cell">{{ cell.rowIndex + 1 }}</template>
-        </a-table-column> -->
+    </a-table-column> -->
             <a-table-column title="ID" data-index="id" :width="64"></a-table-column>
             <a-table-column title="用户名称" data-index="userName"></a-table-column>
             <a-table-column title="昵称" data-index="nickName"></a-table-column>
