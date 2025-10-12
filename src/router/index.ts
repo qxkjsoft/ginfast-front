@@ -15,16 +15,16 @@ import { useUserStoreHook } from "@/store/modules/user";
  * @link 参考：https://next.router.vuejs.org/zh/api/#createrouter
  */
 const router = createRouter({
-  history: createWebHashHistory(),
-  /**
-   * 设置静态路由，其它的路由通过addRoute动态添加
-   * 1、staticRoutes登录页、layout页、默认页面('/')
-   * 2、notFoundAndNoPower 添加默认 401、500界面，防止提示 No match found for location with path 'xxx'
-   * 2、后端控制路由中也需要添加 notFoundAndNoPower 401、500界面
-   * 静态添加 notFoundAndNoPower 401、500界面将全屏显示
-   * 如果要 notFoundAndNoPower 在layout容器展示，则需要移除静态添加并将其添加到缓存路由树
-   */
-  routes: [...staticRoutes, ...notFoundAndNoPower]
+    history: createWebHashHistory(),
+    /**
+     * 设置静态路由，其它的路由通过addRoute动态添加
+     * 1、staticRoutes登录页、layout页、默认页面('/')
+     * 2、notFoundAndNoPower 添加默认 401、500界面，防止提示 No match found for location with path 'xxx'
+     * 2、后端控制路由中也需要添加 notFoundAndNoPower 401、500界面
+     * 静态添加 notFoundAndNoPower 401、500界面将全屏显示
+     * 如果要 notFoundAndNoPower 在layout容器展示，则需要移除静态添加并将其添加到缓存路由树
+     */
+    routes: [...staticRoutes, ...notFoundAndNoPower]
 });
 
 /**
@@ -38,70 +38,70 @@ const router = createRouter({
  * 页面刷新会导致addRoute动态添加的路由失效，需要重新初始化路由
  */
 router.beforeEach(async (to: any, _: any, next: any) => {
-  NProgress.start(); // 开启进度条
-  // 新的登录逻辑
-  const tokenExist = hasRefreshToken();
-  // 1、去登录页，无token，放行
-  if (to.path === "/login" && !tokenExist) return next();
-  // 2、没有token，直接重定向到登录页
-  if (!tokenExist) return next("/login");
-  // 3、去登录页，有token，直接重定向到home页
-  if (to.path === "/login" && tokenExist) {
+    NProgress.start(); // 开启进度条
+    // 新的登录逻辑
+    const tokenExist = hasRefreshToken();
+    // 1、去登录页，无token，放行
+    if (to.path === "/login" && !tokenExist) return next();
+    // 2、没有token，直接重定向到登录页
+    if (!tokenExist) return next("/login");
+    // 3、去登录页，有token，直接重定向到home页
+    if (to.path === "/login" && tokenExist) {
+        // 项目内的跳转，处理跳转路由高亮
+        currentlyRoute(to);
+        return next("/home");
+    }
+
+    const routeStore = useRouteConfigStore(pinia);
+
+    const { routeTree } = storeToRefs(routeStore);
+
+    // 4、去非登录页，有token，用户信息是否存在，有则放行，否则重新获取路由信息、初始化路由
+    // 判断路由是否获取，先获取账号信息和路由信息，添加路由后再跳转(页面刷新时触发)
+    // 解决刷新页面404的问题
+    if (!routeTree.value.length) {
+        const routeStore = useRouteConfigStore(pinia);
+        try {
+            // 并行获取用户信息和路由信息
+            await Promise.all([useUserStoreHook().getUserInfo(), routeStore.initSetRouter()]);
+
+            // 判断是否是动态路由
+            const { isDynamicRoute } = useRoutingMethod();
+            if (isDynamicRoute(to.path)) {
+                return next({ name: to.name, params: to.params });
+            } else {
+                return next({ path: to.path, query: to.query });
+            }
+        } catch (error: any) {
+            console.error("获取用户信息或路由信息失败:", error);
+            // 清除可能无效的token
+            useUserStoreHook().logOut();
+            // 重定向到登录页
+            return next("/login");
+        }
+    }
+
+    // 获取外链路由的处理函数
+    // 所有的路由正常放行，只不过额外判断是否是外链，如果是，则打开新窗口跳转外链
+    // 外链的页面依旧正常打开，只不过不会参与缓存与tabs显示，符合路由跳转的直觉
+    const { openExternalLinks } = useRoutingMethod();
+    // 处理外链跳转
+    openExternalLinks(to);
     // 项目内的跳转，处理跳转路由高亮
     currentlyRoute(to);
-    return next("/home");
-  }
-
-  const routeStore = useRouteConfigStore(pinia);
-
-  const { routeTree } = storeToRefs(routeStore);
-
-  // 4、去非登录页，有token，用户信息是否存在，有则放行，否则重新获取路由信息、初始化路由
-  // 判断路由是否获取，先获取账号信息和路由信息，添加路由后再跳转(页面刷新时触发)
-  // 解决刷新页面404的问题
-  if (!routeTree.value.length) {
-    const routeStore = useRouteConfigStore(pinia);
-    try {
-      // 并行获取用户信息和路由信息
-      await Promise.all([useUserStoreHook().getUserInfo(), routeStore.initSetRouter()]);
-
-      // 判断是否是动态路由
-      const { isDynamicRoute } = useRoutingMethod();
-      if (isDynamicRoute(to.path)) {
-        return next({ name: to.name, params: to.params });
-      } else {
-        return next({ path: to.path, query: to.query });
-      }
-    } catch (error: any) {
-      console.error("获取用户信息或路由信息失败:", error);
-      // 清除可能无效的token
-      useUserStoreHook().logOut();
-      // 重定向到登录页
-      return next("/login");
-    }
-  }
-
-  // 获取外链路由的处理函数
-  // 所有的路由正常放行，只不过额外判断是否是外链，如果是，则打开新窗口跳转外链
-  // 外链的页面依旧正常打开，只不过不会参与缓存与tabs显示，符合路由跳转的直觉
-  const { openExternalLinks } = useRoutingMethod();
-  // 处理外链跳转
-  openExternalLinks(to);
-  // 项目内的跳转，处理跳转路由高亮
-  currentlyRoute(to);
-  // 动态路由添加过走这里，直接放行
-  next();
+    // 动态路由添加过走这里，直接放行
+    next();
 });
 
 // 路由跳转错误
 router.onError((error: any) => {
-  NProgress.done();
-  console.warn("路由错误", error.message);
+    NProgress.done();
+    console.warn("路由错误", error.message);
 });
 
 // 路由加载后
 router.afterEach(() => {
-  NProgress.done();
+    NProgress.done();
 });
 
 export default router;
