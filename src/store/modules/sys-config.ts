@@ -7,7 +7,6 @@ import type {
     SystemConfig,
     SafeConfig,
     CaptchaConfig,
-    ConfigResponseData,
     ConfigRequestData
 } from "@/api/sysconfig";
 import { handleUrl } from "@/utils/app"

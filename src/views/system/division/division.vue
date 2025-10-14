@@ -77,7 +77,7 @@
             </a-table>
         </div>
 
-        <a-modal width="40%" v-model:visible="open" @close="afterClose" @ok="handleOk" @cancel="afterClose">
+        <a-modal width="40%" v-model:visible="open" @close="afterClose" :on-before-ok="handleOk" @cancel="afterClose">
             <template #title> {{ title }} </template>
             <div>
                 <a-form ref="formRef" auto-label-width :rules="rules" :model="addFrom">
@@ -184,7 +184,7 @@ const onAdd = () => {
 };
 const handleOk = async () => {
     let state = await formRef.value.validate();
-    if (state) return; // 校验不通过
+    if (state) return false; // 校验不通过
 
     try {
         if (formType.value === 1) {
@@ -196,12 +196,14 @@ const handleOk = async () => {
             await addDivisionAPI(addFrom.value);
             arcoMessage("success", "添加成功");
         }
-        open.value = false;
-        getDivision();
     } catch (error) {
         console.error("操作失败:", error);
         arcoMessage("error", "操作失败");
+        return false
     }
+
+    getDivision();
+    return true;
 };
 // 关闭对话框动画结束后触发
 const afterClose = () => {

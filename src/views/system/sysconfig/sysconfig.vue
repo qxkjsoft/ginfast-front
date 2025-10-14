@@ -20,7 +20,7 @@
                     <a-card :bordered="false" class="mb-4">
                         <a-form :model="configData.system" auto-label-width>
                             <a-row :gutter="24">
-                                <a-col :span="12">
+                                <a-col :span="24">
                                     <a-form-item field="systemLogo" label="系统Logo">
                                         <!-- 图片上传组件 -->
                                         <ImageUpload v-model:image-url="configData.system.systemLogo"
@@ -30,7 +30,7 @@
                                         </template>
                                     </a-form-item>
                                 </a-col>
-                                <a-col :span="12">
+                                <a-col :span="24">
                                     <a-form-item field="systemIcon" label="系统图标">
                                         <!-- 图片上传组件 -->
                                         <ImageUpload :width="40" :height="40"
@@ -168,11 +168,10 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useSysConfigStore } from '@/store/modules/sys-config';
-import useGlobalProperties from '@/hooks/useGlobalProperties';
 // 引入图片上传组件
 import ImageUpload from './components/ImageUpload.vue';
 
-const proxy = useGlobalProperties();
+//const proxy = useGlobalProperties();
 const activeTab = ref('server');
 
 // 使用系统配置 store

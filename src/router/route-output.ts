@@ -12,24 +12,24 @@ import { arrayFlattened } from "@/utils/tree-tools";
  * @param {any} current 需要跳转的路由和路由参数
  */
 export const currentlyRoute = (current: any) => {
-  const route = deepCloneRoute(current);
-  const themeStore = useThemeConfig();
-  const { isTabs } = storeToRefs(themeStore);
-  const store = useRouteConfigStore(pinia);
-  const { tabsList, routeList } = storeToRefs(store);
-  // tabs无数据则默认添加首页
-  if (tabsList.value.length == 0 && routeList.value.length != 0) {
-    store.setTabs(routeList.value[0]);
-  }
-  // 存入当前路由-高亮
-  store.setCurrentRoute(route);
-  // 如果是外链路由则不做后续任何缓存操作，条件: 有外链 && 非内嵌
-  if (route.meta.link && !route.meta.iframe) return;
-  // 存入tabs栏数据，条件：开启tabs
-  if (isTabs.value && !route.meta.isFull) store.setTabs(route);
-  // 不缓存路由 || 不渲染tabs ，符合任意条件则不缓存路由
-  if (!route.meta.keepAlive || !isTabs.value) return;
-  store.setRoutePaths(route.path); // 缓存路由
+    const route = deepCloneRoute(current);
+    const themeStore = useThemeConfig();
+    const { isTabs } = storeToRefs(themeStore);
+    const store = useRouteConfigStore(pinia);
+    const { tabsList, routeList } = storeToRefs(store);
+    // tabs无数据则默认添加首页
+    if (tabsList.value.length == 0 && routeList.value.length != 0) {
+        store.setTabs(routeList.value[0]);
+    }
+    // 存入当前路由-高亮
+    store.setCurrentRoute(route);
+    // 如果是外链路由则不做后续任何缓存操作，条件: 有外链 && 非内嵌
+    if (route.meta.link && !route.meta.iframe) return;
+    // 存入tabs栏数据，条件：开启tabs
+    if (isTabs.value && !route.meta.isFull) store.setTabs(route);
+    // 不缓存路由 || 不渲染tabs ，符合任意条件则不缓存路由
+    if (!route.meta.keepAlive || !isTabs.value) return;
+    store.setRoutePaths(route.path); // 缓存路由
 };
 
 /**
@@ -38,13 +38,13 @@ export const currentlyRoute = (current: any) => {
  * @returns 深拷贝后的路由
  */
 export const deepCloneRoute = (route: any) => {
-  return deepClone({
-    path: route.fullPath,
-    name: route.name,
-    meta: route.meta,
-    query: route.query,
-    params: route.params
-  });
+    return deepClone({
+        path: route.fullPath,
+        name: route.name,
+        meta: route.meta,
+        query: route.query,
+        params: route.params
+    });
 };
 
 /**
@@ -52,11 +52,11 @@ export const deepCloneRoute = (route: any) => {
  * @param {array} tree 过滤角色权限后的树
  */
 export const moduleReplacement = (tree: any) => {
-  tree.forEach((item: any) => {
-    item.children && delete item.children;
-    moduleMatch(item);
-  });
-  return tree;
+    tree.forEach((item: any) => {
+        item.children && delete item.children;
+        moduleMatch(item);
+    });
+    return tree;
 };
 
 /**
@@ -67,17 +67,36 @@ export const moduleReplacement = (tree: any) => {
  */
 // 匹配views里面所有的.vue文件
 const modules = import.meta.glob("@/views/**/*.vue");
+// 匹配插件目录下的.vue文件
+const pluginModules = import.meta.glob("@/plugins/**/*.vue");
+
 export const moduleMatch = (item: any) => {
-  // 匹配每个views文件夹下的文件路径
-  for (const key in modules) {
-    const dir = key.split("views/")[1].replace(".vue", "");
-    // 若匹配上，则替换真实模块
-    if (item.component === dir) {
-      // 按需引入modules
-      // 将模块的导入操作和实际使用操作解耦，使得我们可以在需要的时候才执行导入操作
-      item.component = () => modules[key]();
+    let matched = false;
+    // 匹配每个views文件夹下的文件路径
+    for (const key in modules) {
+        const dir = key.split("views/")[1].replace(".vue", "");
+        // 若匹配上，则替换真实模块
+        if (item.component === dir) {
+            // 按需引入modules
+            // 将模块的导入操作和实际使用操作解耦，使得我们可以在需要的时候才执行导入操作
+            item.component = () => modules[key]();
+            matched = true;
+            break;
+        }
     }
-  }
+
+    // 如果在主views目录中未找到，则在插件目录中查找
+    if (!matched) {
+        for (const key in pluginModules) {
+            const dir = key.split("src/")[1].replace(".vue", "");
+            // 若匹配上，则替换真实模块
+            if (item.component === dir) {
+                // 按需引入插件modules
+                item.component = () => pluginModules[key]();
+                break;
+            }
+        }
+    }
 };
 
 /**
@@ -86,6 +105,6 @@ export const moduleMatch = (item: any) => {
  * @returns 一维路由数组
  */
 export function linearArray(tree: any) {
-  const nodes: any = deepClone(tree);
-  return arrayFlattened(nodes, "children");
+    const nodes: any = deepClone(tree);
+    return arrayFlattened(nodes, "children");
 }

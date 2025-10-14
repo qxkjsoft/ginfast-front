@@ -42,7 +42,13 @@
                             <a-tag :color="getMethodColor(record.method)">{{ record.method }}</a-tag>
                         </template>
                     </a-table-column>
-                    <a-table-column title="API分组" data-index="apiGroup"></a-table-column>
+                    <a-table-column title="API分组" data-index="apiGroup" :width="100"></a-table-column>
+                    <a-table-column title="关联的菜单" :width="170" ellipsis tooltip>
+                        <template #cell="{ record }">
+                            {{record.sysMenuList ? record.sysMenuList.map((item: any) => item.id + '：' +
+                            item.title).join(', ') : '无'}}
+                        </template>
+                    </a-table-column>
                     <a-table-column title="创建时间" data-index="createdAt" :width="180">
                         <template #cell="{ record }">{{ record.createdAt ? formatTime(record.createdAt) : ""
                             }}</template>

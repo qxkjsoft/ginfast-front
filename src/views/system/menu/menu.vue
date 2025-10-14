@@ -4,16 +4,17 @@
             <s-layout-tools>
                 <template #left>
                     <a-space wrap>
+                        <a-input v-model="form.id" placeholder="请输入菜单ID" allow-clear />
                         <a-input v-model="form.name" placeholder="请输入菜单名称" allow-clear />
                         <a-input v-model="form.path" placeholder="路由路径" allow-clear />
                         <a-input v-model="form.permission" placeholder="权限标识" allow-clear />
                         <a-select v-model="form.hide" placeholder="请选择显示状态" allow-clear style="width: 120px">
                             <a-option v-for="item in openState" :key="item.value" :value="item.value">{{ item.name
-                            }}</a-option>
+                                }}</a-option>
                         </a-select>
                         <a-select v-model="form.disable" placeholder="请选择启用状态" allow-clear style="width: 120px">
                             <a-option v-for="item in openState" :key="item.value" :value="item.value">{{ item.name
-                            }}</a-option>
+                                }}</a-option>
                         </a-select>
                         <a-button type="primary" @click="performSearch">
                             <template #icon><icon-search /></template>
@@ -167,7 +168,7 @@
                         <a-radio-group type="button" :disabled="!!addFrom.id" v-model="addFrom.type"
                             @change="typeChange">
                             <a-radio v-for="item in menuType" :key="item.value" :value="item.value">{{ item.name
-                            }}</a-radio>
+                                }}</a-radio>
                         </a-radio-group>
                     </a-form-item>
                     <a-form-item field="parentId" label="上级菜单" validate-trigger="blur" :disabled="!!addFrom.id">
@@ -324,6 +325,7 @@ import { deepClone, getPascalCase } from "@/utils";
 const proxy = useGlobalProperties();
 const openState = ref(dictFilter("status"));
 const form = ref({
+    id: "",
     name: "",
     hide: "",
     disable: "",
@@ -338,6 +340,7 @@ const displayMenuList = ref<MenuItem[]>([]);
 
 // 查询功能 - 在前端完成筛选，递归查找
 const performSearch = () => {
+    const idFilter = form.value.id?.trim();
     const nameFilter = form.value.name?.trim();
     const pathFilter = form.value.path?.trim();
     const permissionFilter = form.value.permission?.trim();
@@ -345,7 +348,7 @@ const performSearch = () => {
     const disableFilter = form.value.disable !== "" ? form.value.disable : null;
 
     // 如果没有筛选条件，显示所有数据
-    if (!nameFilter && !pathFilter && !permissionFilter && hideFilter === null && disableFilter === null) {
+    if (!idFilter && !nameFilter && !pathFilter && !permissionFilter && hideFilter === null && disableFilter === null) {
         displayMenuList.value = [...allMenuList.value];
         // 重新展开/收起状态
         tableRef.value.expandAll(expand.value);
@@ -357,6 +360,7 @@ const performSearch = () => {
         const result: MenuItem[] = [];
         for (const menu of menus) {
             // 检查当前节点是否符合条件
+            const idMatch = !idFilter || (menu.id && menu.id.toString().includes(idFilter));
             const nameMatch = !nameFilter || (menu.title && menu.title.includes(nameFilter));
             const pathMatch = !pathFilter || (menu.path && menu.path.includes(pathFilter));
             const permissionMatch = !permissionFilter || (menu.permission && menu.permission.includes(permissionFilter));
@@ -368,7 +372,7 @@ const performSearch = () => {
                 (disableFilter === "false" && menu.disable === false) ||
                 (disableFilter === "true" && menu.disable === true);
             // 如果当前节点符合条件，添加到结果中，并继续处理子节点
-            if (nameMatch && pathMatch && permissionMatch && hideMatch && disableMatch) {
+            if (idMatch && nameMatch && pathMatch && permissionMatch && hideMatch && disableMatch) {
                 const filteredMenu = { ...menu };
                 if (filteredMenu.children && filteredMenu.children.length > 0) {
                     // 递归处理子节点
@@ -397,7 +401,7 @@ const performSearch = () => {
 
 
 const onReset = () => {
-    form.value = { name: "", hide: "", disable: "", path: "", permission: "" };
+    form.value = { id: "", name: "", hide: "", disable: "", path: "", permission: "" };
     // 重置后显示所有数据
     displayMenuList.value = [...allMenuList.value];
     // 重新展开/收起状态
@@ -564,7 +568,6 @@ const onIframe = (is: boolean) => {
 
 const loading = ref(false);
 const tableRef = ref();
-const tableTree = ref<Array<MenuItem>>([]);
 const menuTree = ref<any>([]);
 const getMenuList = async () => {
     try {
@@ -613,6 +616,9 @@ const filterTree = (nodes: MenuItem[]) => {
         .map((node: any) => {
             // 创建新节点以避免修改原数据
             const newNode = { ...node };
+            // 删除 icon 字段以避免传递给 a-tree-select 组件，因为 a-tree-select 期望 icon 是函数类型
+            // 而我们的数据中 icon 是字符串类型
+            delete newNode.icon;
             // 递归处理子节点
             if (newNode.children) {
                 const filteredChildren = filterTree(newNode.children);
