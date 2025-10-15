@@ -1,256 +1,371 @@
-# SnowAdmin
+# GinFast
 
-<div>
-	<p>
-    <a href="https://github.com/WangFan-io/SnowAdmin" target="_blank">
-		  <img src="https://img.shields.io/badge/License-MIT-%2343aefc" alt="License">
-		</a>
-		<a href="https://github.com/WangFan-io/SnowAdmin" target="_blank">
-		  <img src="https://img.shields.io/badge/vue_.js-vue3_.x-%2300b42a" alt="Vue">
-		</a>
-    <a href="https://github.com/WangFan-io/SnowAdmin" target="_blank">
-		  <img src="https://img.shields.io/badge/Vite-6x-%2311B337" alt="Vite">
-		</a>
-     <a href="https://github.com/WangFan-io/SnowAdmin" target="_blank">
-		 <img alt="arco.design" src="https://img.shields.io/badge/arco.design-2.57.0-%23%2028%2C175%2C%2063">
-		</a>
-	</p>
-</div>
+<p align="center">
+  <img src="https://img.shields.io/badge/Vue-3.5.15-brightgreen.svg" alt="Vue Version">
+  <img src="https://img.shields.io/badge/Vite-6.3.5-blue.svg" alt="Vite Version">
+  <img src="https://img.shields.io/badge/TypeScript-5.2.2-blue.svg" alt="TypeScript Version">
+  <img src="https://img.shields.io/badge/Arco Design-2.57.0-blue.svg" alt="Arco Design Version">
+  <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License">
+</p>
 
-### 介绍 📖
+> 一个基于 Vue3 + Vite6 + TypeScript + Arco Design 的现代化后台管理模板，开箱即用的企业级中后台解决方案。
 
-SnowAdmin 是一个清新优雅、高颜值且功能强大的后台管理模板，基于最新的前端技术栈，包括 Vue3, Vite6, TypeScript, Pinia。它内置了丰富的主题配置和组件，代码规范严谨，实现了自动化的文件路由系统。SnowAdmin 为您提供了一站式的后台管理解决方案，无需额外配置，开箱即用。同样是一个快速学习前沿技术的最佳实践。
+## 简介
 
-### 版本 📦
+GinFast 是一个功能完备、高颜值、高性能的后台管理模板，致力于为开发者提供一个稳定、可扩展、易于维护的前端框架。项目采用现代化的技术栈和模块化分层架构，结合 Arco Design UI 组件库，实现了企业级应用所需的各种功能。
 
-**预览及文档**
+### 核心特性
 
-项目预览地址：[SnowAdmin](http://115.190.79.132/#/login)
+- **现代化技术栈**：Vue3 Composition API + Vite6 + TypeScript + Pinia
+- **开箱即用**：内置动态路由、权限控制、多主题、国际化、标签页管理等功能
+- **代码规范**：集成 ESLint、Prettier、Stylelint 等工具，确保代码风格统一
+- **高性能**：Vite 构建工具提供极速的开发体验和优化的生产构建
+- **易扩展**：模块化架构设计，便于功能扩展和维护
 
-项目文档地址：[SnowAdmin-开发指南](http://115.190.79.132:81/)
+## 技术栈
 
-**代码仓库**
+| 类别 | 技术栈 |
+|------|--------|
+| 前端框架 | Vue3 (Composition API) |
+| 构建工具 | Vite 6.x |
+| 编程语言 | TypeScript |
+| 状态管理 | Pinia + pinia-plugin-persistedstate |
+| 路由管理 | Vue Router 4.x |
+| UI 组件库 | Arco Design Vue 2.57.0 |
+| 样式处理 | Sass (sass-embedded), CSS Modules |
+| HTTP 请求 | Axios |
+| 国际化 | vue-i18n 10.0.0-alpha.3 |
+| 代码校验 | ESLint + Stylelint |
+| 格式化 | Prettier |
+| Git 规范 | husky + lint-staged + commitlint |
 
-| 平台   | 仓库地址                                               |
-| ------ | ------------------------------------------------------ |
-| GitHub | [Github 仓库](https://github.com/WangFan-io/SnowAdmin) |
-| Gitee  | [Gitee 仓库](https://gitee.com/wang_fan_w/SnowAdmin)   |
+## 功能特性
 
-> 完整版分支：main
->
-> 极简版分支：main-thin
->
-> ⚠️主要的维护在github上，提issue/pr请认准github主战场
->
-> 大家也可以进wx群交流，二维码在介绍末尾
+- ✅ **动态路由**：支持前端和后端控制的动态路由生成
+- ✅ **权限控制**：RBAC 权限模型，支持菜单权限和按钮权限
+- ✅ **多主题**：支持暗黑模式和自定义主题
+- ✅ **国际化**：多语言支持（i18n）
+- ✅ **标签页管理**：多标签页操作和缓存
+- ✅ **页面缓存**：基于 keep-alive 的页面状态保持
+- ✅ **Mock 数据**：本地开发 Mock 数据支持
+- ✅ **响应式布局**：适配多种屏幕尺寸
+- ✅ **SVG 图标**：SVG 图标系统支持
+- ✅ **代码规范**：完善的代码规范和提交规范
 
-### 先行预览 🖼️
+## 目录结构
 
-![登录页](https://ooo.0x0.ooo/2025/04/11/O0lhbG.png)
-
-![首页](https://ooo.0x0.ooo/2025/04/11/O0lnVI.png)
-
-![文件库](https://ooo.0x0.ooo/2025/04/11/O0l7qD.png)
-
-![国际化](https://ooo.0x0.ooo/2025/04/11/O0lNAF.png)
-
-![横向布局](https://ooo.0x0.ooo/2025/04/11/O0leQ6.png)
-
-![混合布局](https://ooo.0x0.ooo/2025/04/11/O0lrCP.png)
-
-![主题配置](https://ooo.0x0.ooo/2025/04/11/O0lKnb.png)
-
-![黑暗模式-1](https://ooo.0x0.ooo/2025/04/11/O0lZ4l.png)
-
-![黑暗模式-2](https://ooo.0x0.ooo/2025/04/11/O0lv6g.png)
-
-![黑暗模式-3](https://ooo.0x0.ooo/2025/04/11/O0lgkB.png)
-
-### 项目功能 🔨
-
-- 清晰的项目架构：结构清晰，优雅易懂，代码全注释
-- 前沿技术应用：采用 Vue3, Vite6, TypeScript等最新流行的技术栈
-- 内置RBAC角色权限模型，实现路由、角色、按钮权限访问控制
-- 使用 Pinia 替代 Vuex，轻量、简单、易用，集成 Pinia 持久化插件
-- 支持 Arco-Design 组件大小切换、多主题布局、暗黑模式、i18n 国际化
-- 使用 VueRouter 配置动态路由权限拦截、路由懒加载，支持页面按钮权限控制
-- 使用 KeepAlive 对页面进行缓存，支持多级嵌套路由缓存
-- 使用 Prettier 统一格式化代码，集成 ESLint、Stylelint 代码校验规范
-- 使用 husky、lint-staged、commitlint等插件，规范提交信息
-- 丰富的页面组件：内置多样页面和组件，包括 401、404、500 页面，以及布局组件、标签组件、主题配置组件等
-
-### 环境准备 🏝️
-
-确保你的环境满足以下要求（重要）：
-
-- **git**: 你需要 git 来克隆和管理项目版本。
-- **NodeJS**: >=18.12.0，推荐 20.12.0 或更高。
-- **pnpm**: >= 8.7.0，推荐最新版本。
-
-### 安装使用步骤 📔
-
-### 从 GitHub 获取代码 🔗
-
-```bash
-# 克隆代码
-git clone https://github.com/WangFan-io/SnowAdmin.git
+```
+GinFast/
+├── public/                  # 静态资源（不参与打包）
+├── src/
+│   ├── api/                 # 所有接口请求定义，按模块分类
+│   ├── assets/              # 图片、字体等静态资源
+│   ├── components/          # 全局通用组件
+│   ├── config/              # 全局常量配置
+│   ├── directives/          # 自定义指令
+│   ├── globals/             # 全局挂载函数或属性
+│   ├── hooks/               # Composition API 封装
+│   ├── lang/                # 多语言配置
+│   ├── layout/              # 主布局组件
+│   ├── mock/                # 本地 Mock 数据服务
+│   ├── router/              # 路由配置
+│   ├── store/               # Pinia 状态管理
+│   ├── style/               # 全局样式与 SCSS 变量
+│   ├── typings/             # TypeScript 类型声明扩展
+│   ├── utils/               # 工具函数库
+│   ├── views/               # 页面视图组件
+│   ├── main.ts              # 应用入口
+│   ├── App.vue              # 根组件
+│   └── vite-env.d.ts        # 类型声明
+├── build/                   # Vite 构建相关配置
+├── .husky/                  # Git 提交钩子
+├── .vscode/                 # 推荐编辑器配置
+├── env 文件系列             # 环境变量配置
+└── 各类 lint 配置文件       # ESLint, Prettier, Stylelint, commitlint 等
 ```
 
-### 从 Gitee 获取代码 🔗
+## 环境要求
+
+- **Node.js**: >= 18.12.0 (推荐 20.12.0+)
+- **pnpm**: >= 8.7.0
+- **git**: 用于克隆项目代码和版本控制
+
+## 快速开始
+
+### 克隆项目
 
 ```bash
-# 克隆代码
-git clone https://gitee.com/wang_fan_w/SnowAdmin.git
+# GitHub
+git clone https://github.com/WANG-Fan0912/GinFast.git
+
+# 进入项目目录
+cd GinFast
 ```
 
-### 安装依赖 📌
-
-安装项目依赖
+### 安装依赖
 
 ```bash
+# 必须使用 pnpm 安装依赖
 pnpm install
 ```
 
-### 插件配置 🛠️
+### 开发调试
 
-安装 Vue - Official，禁用 Vetur
+```bash
+# 启动开发服务器
+pnpm dev
+```
 
-- [Vue - Official](https://marketplace.visualstudio.com/items?itemName=Vue.volar) - Vue 服务插件
+### 构建部署
 
-### 项目启动 🚀
+```bash
+# 开发环境构建
+pnpm build:dev
 
-```json
-{
-  // 开发环境启动
-  "dev": "vite",
-  // 开发环境构建
-  "build:dev": "vue-tsc && vite build --mode development",
-  // 生产环境构建
-  "build:prod": "vue-tsc && vite build --mode production",
-  // 测试环境构建
-  "build:test": "vue-tsc && vite build --mode test",
-  // 预览环境启动
-  "preview": "vite preview"
+# 生产环境构建
+pnpm build:prod
+
+# 测试环境构建
+pnpm build:test
+
+# 构建后预览
+pnpm preview
+```
+
+## 项目配置
+
+### 环境变量
+
+项目支持多种环境配置：
+
+- `.env`: 默认环境变量
+- `.env.development`: 开发环境变量
+- `.env.test`: 测试环境变量
+- `.env.production`: 生产环境变量
+
+### 代理配置
+
+在 `vite.config.ts` 中配置开发服务器代理：
+
+```ts
+server: {
+  proxy: {
+    "/api": {
+      target: env.VITE_APP_BASE_URL,
+      changeOrigin: true
+    }
+  }
 }
 ```
 
-### 文件资源目录 📚
+## 核心模块
 
-```text
-SnowAdmin
-├─ .husky                 # husky 配置文件
-├─ .vscode                # VSCode 推荐配置
-├─ build                  # vite项目配置目录
-├─ public                 # 静态资源文件（该文件夹不会被打包）
-├─ src
-│  ├─ api                 # API 接口管理
-│  ├─ assets              # 静态资源文件
-│  ├─ components          # 全局组件
-│  ├─ config              # 全局配置项
-│  ├─ directives          # 全局自定义指令文件
-│  ├─ globals             # 全局函数
-│  ├─ hooks               # 常用 Hooks 封装
-│  ├─ lang                # 语言国际化 i18n
-│  ├─ layout              # 框架布局模块
-│  ├─ mock                # 本地数据mock
-│  ├─ router              # 路由管理
-│  ├─ store               # pinia store
-│  ├─ style               # 全局样式文件
-│  ├─ typings             # 全局 ts 声明
-│  ├─ utils               # 常用工具库
-│  ├─ views               # 项目所有页面
-│  ├─ App.vue             # 项目主组件
-│  ├─ main.ts             # 项目入口文件
-│  └─ vite-env.d.ts       # 指定 ts 识别 vue
-├─ .editorconfig          # 代码编辑器配置文件
-├─ .env                   # 通用环境配置
-├─ .env.development       # 开发环境配置
-├─ .env.production        # 生产环境配置
-├─ .env.test              # 测试环境配置
-├─ .eslintignore          # 忽略 Eslint 校验
-├─ .eslintrc.cjs          # Eslint 校验配置文件
-├─ .gitignore             # 忽略 git 提交
-├─ .prettierignore        # 忽略 Prettier 格式化
-├─ .prettierrc.cjs        # Prettier 格式化配置
-├─ .stylelintignore       # 忽略 Stylelint 校验
-├─ .stylelintrc.cjs       # Stylelint 格式化配置
-├─ commitlint.config.cjs  # git 提交规范配置
-├─ index.html             # 入口 html
-├─ LICENSE                # 开源协议
-├─ lint-staged.config.cjs # lint-staged 配置文件
-├─ package-lock.json      # 依赖包包版本锁
-├─ package.json           # 依赖包管理
-├─ pnpm-lock.yaml         # 依赖包包版本锁
-├─ README.md              # README 介绍
-├─ tsconfig.json          # typescript 全局配置
-└─ vite.config.ts         # vite 全局配置文件
+### 路由系统
+
+项目采用动态路由机制，支持前端和后端两种控制模式：
+
+- 静态路由：定义在 `src/router/route.ts` 中
+- 动态路由：通过 Mock 数据或后端接口动态生成
+
+### 权限控制
+
+实现基于 RBAC 的权限控制模型：
+
+1. **菜单权限**：通过路由配置控制菜单显示
+2. **按钮权限**：通过自定义指令 `v-permission` 控制按钮显示
+
+### 状态管理
+
+使用 Pinia 进行全局状态管理，主要模块包括：
+
+- 用户信息：`src/store/modules/user.ts`
+- 路由配置：`src/store/modules/route-config.ts`
+- 主题配置：`src/store/modules/theme-config.ts`
+- 系统配置：`src/store/modules/sys-config.ts`
+
+### 国际化
+
+支持多语言切换，语言包位于 `src/lang/modules/` 目录下。
+
+### 主题系统
+
+支持暗黑模式和自定义主题，配置位于 `src/store/modules/theme-config.ts`。
+
+## 构建优化
+
+项目采用多种构建优化策略：
+
+1. **代码分割**：将大型第三方库单独分包
+2. **Tree Shaking**：移除未使用的代码
+3. **压缩优化**：生产环境去除 console 和 debugger
+4. **资源内联**：小资源内联以减少 HTTP 请求
+
+## 浏览器支持
+
+- 现代浏览器（Chrome, Firefox, Safari, Edge 最近2个版本）
+- 不支持 IE 浏览器
+
+## 插件开发规范
+
+项目支持插件化开发，允许开发者通过插件方式扩展系统功能。插件目录位于 `src/plugins/` 下，每个插件作为一个独立的文件夹。
+
+### 插件目录结构
+
+```
+plugins/
+├── example/                 # 插件示例
+│   ├── api/                 # 插件API接口定义
+│   ├── store/               # 插件状态管理
+│   └── views/               # 插件页面视图
 ```
 
-### 浏览器支持 🌎
+### 插件开发步骤
 
-- 本地开发推荐使用 Chrome 最新版浏览器 [Download](https://www.google.com/intl/zh-CN/chrome/)。
-- 生产环境支持现代浏览器，不再支持 IE 浏览器，更多浏览器可以查看 [Can I Use Es Module](https://caniuse.com/?search=ESModule)。
+1. **创建插件目录**
+   在 `src/plugins/` 目录下创建插件文件夹，建议使用有意义的插件名称。
 
-| ![IE](https://i.imgtg.com/2023/04/11/8z7ot.png) | ![Edge](https://i.imgtg.com/2023/04/11/8zr3p.png) | ![Firefox](https://i.imgtg.com/2023/04/11/8zKiU.png) | ![Chrome](https://i.imgtg.com/2023/04/11/8zNrx.png) | ![Safari](https://i.imgtg.com/2023/04/11/8zeGj.png) |
-| :---------------------------------------------: | :-----------------------------------------------: | :--------------------------------------------------: | :-------------------------------------------------: | :-------------------------------------------------: |
-|                   not support                   |                  last 2 versions                  |                   last 2 versions                    |                   last 2 versions                   |                   last 2 versions                   |
+2. **插件API定义**
+   在插件目录下创建 `api/` 文件夹，用于定义插件的接口请求：
+   ```typescript
+   // src/plugins/[plugin-name]/api/[plugin-name].ts
+   import { http } from '@/utils/http';
+   import { baseUrlApi } from "@/api/utils";
+   import { BaseResult } from "@/api/types";
+   
+   // 定义数据接口
+   export interface ExampleData {
+       id: number;
+       name: string;
+       description: string;
+   }
+   
+   // 定义API请求方法
+   export const getExampleList = (params: any) => {
+       return http.request<ExampleListResult>("get", baseUrlApi("plugins/example/list"), { params });
+   };
+   ```
 
-### 鸣谢列表 🧩
+3. **插件状态管理**
+   在插件目录下创建 `store/` 文件夹，使用 Pinia 定义插件的状态管理：
+   ```typescript
+   // src/plugins/[plugin-name]/store/[plugin-name].ts
+   import { defineStore } from 'pinia';
+   import { ref, computed } from 'vue';
+   import { getExampleList } from '../api/example';
+   
+   export const useExamplePluginStore = defineStore('example-plugin', () => {
+       // State
+       const dataList = ref<any[]>([]);
+       const loading = ref<boolean>(false);
+       
+       // Getters
+       const getDataList = computed(() => dataList.value);
+       const isLoading = computed(() => loading.value);
+       
+       // Actions
+       const fetchDataList = async (params?: any) => {
+           loading.value = true;
+           try {
+               const response = await getExampleList(params);
+               dataList.value = response.data.list || [];
+           } finally {
+               loading.value = false;
+           }
+       };
+       
+       return {
+           // State
+           dataList,
+           loading,
+           
+           // Getters
+           getDataList,
+           isLoading,
+           
+           // Actions
+           fetchDataList
+       };
+   });
+   ```
 
-- [vue：https://v3.cn.vuejs.org/](https://v3.cn.vuejs.org/)
-- [axios：https://github.com/axios/axios](https://github.com/axios/axios)
-- [nprogress：https://github.com/rstacruz/nprogress](https://github.com/rstacruz/nprogress)
-- [sortablejs：https://github.com/SortableJS/Sortabl](https://github.com/SortableJS/Sortable)
-- [sass：https://github.com/sass/sass](https://github.com/sass/sass)
-- [typescript：https://github.com/microsoft/TypeScript](https://github.com/microsoft/TypeScript)
-- [vite：https://github.com/vitejs/vite](https://github.com/vitejs/vite)
-- [wangeditor：https://github.com/wangeditor-team/wangEditor](https://github.com/wangeditor-team/wangEditor)
-- [qrcodejs：https://github.com/davidshimjs/qrcodejs](https://github.com/davidshimjs/qrcodejs)
-- [print-js：https://github.com/crabbly/Print.js](https://github.com/crabbly/Print.js)
-- [eslint：https://github.com/eslint/eslint](https://github.com/eslint/eslint)
-- [prettier：https://github.com/prettier/prettier](https://github.com/prettier/prettier)
-- [arco.design：https://arco.design/](https://arco.design/)
-- [pinyin-pro：https://github.com/zh-lx/pinyin-pro](https://github.com/zh-lx/pinyin-pro)
-- [qrcode：https://www.npmjs.com/package/qrcode](https://www.npmjs.com/package/qrcode)
-- [jsbarcode：https://github.com/lindell/JsBarcode/wiki/Options](https://github.com/lindell/JsBarcode/wiki/Options)
-- [fingerprintjs2：https://www.npmjs.com/package/fingerprintjs2](https://www.npmjs.com/package/fingerprintjs2)
+4. **插件页面视图**
+   在插件目录下创建 `views/` 文件夹，开发插件的页面组件：
+   ```vue
+   <!-- src/plugins/[plugin-name]/views/[view-name].vue -->
+   <template>
+       <div class="example-plugin-container">
+           <a-card title="示例插件列表" :loading="loading">
+               <!-- 页面内容 -->
+           </a-card>
+       </div>
+   </template>
+   
+   <script setup lang="ts">
+   import { ref, onMounted } from 'vue';
+   import { useExamplePluginStore } from '../store/example';
+   import { storeToRefs } from 'pinia';
+   
+   const exampleStore = useExamplePluginStore();
+   const { dataList, loading } = storeToRefs(exampleStore);
+   const { fetchDataList } = exampleStore;
+   
+   onMounted(async () => {
+       await fetchDataList();
+   });
+   </script>
+   ```
 
-### 特别鸣谢 🎉
+5. **插件路由配置**
+   插件页面会自动被路由系统识别，无需手动配置路由。路由系统会自动扫描 `src/plugins/**/*.vue` 文件并进行动态加载。
 
-- [vue-next-admin：http://vuenextadmin.ccfast.cc/](http://vuenextadmin.ccfast.cc/)
-- [Gi-admin：https://lin-97.github.io/gi-demo/](https://lin-97.github.io/gi-demo/#/home)
-- [Geeker-Admin：https://admin.spicyboy.cn/](https://admin.spicyboy.cn/#/home/index)
+6. **插件权限控制**
+   插件可以使用系统的权限控制机制，通过 `v-hasPerm` 指令控制按钮权限：
+   ```vue
+   <a-button v-hasPerm="['plugins:example:add']">新增数据</a-button>
+   ```
 
-感谢以上框架为本项目提供了帮助，项目中的很多设计思想值得参考和学习，再次感谢。
+### 插件开发最佳实践
 
-### 学习 & 交流 🏫
+1. **命名规范**
+   - 插件文件夹使用小写字母和连字符分隔，如 `user-management`
+   - 插件Store命名使用 `use[PluginName]PluginStore` 格式
+   - 插件API文件命名与插件名称保持一致
 
-|                                              SnowAdmin 交流群                                               |
-| :---------------------------------------------------------------------------------------------------------: |
-| ![微信图片_20250726141221](https://github.com/user-attachments/assets/8c1ebf3c-4630-487e-9a54-810fd4d6972c) |
+2. **代码组织**
+   - 按功能模块组织代码，保持目录结构清晰
+   - 重复使用的组件应提取到 `src/components/` 目录
+   - 工具函数应提取到 `src/utils/` 目录
 
-使用过程中有各种问题也可以进群交流，欢迎大家积极参与
+3. **类型安全**
+   - 所有接口数据应定义 TypeScript 接口
+   - 使用泛型确保API响应类型安全
+   - 避免使用 `any` 类型
 
-### 支持作者 🌟
+4. **状态管理**
+   - 使用 Pinia 进行状态管理
+   - 合理划分 state、getters、actions
+   - 使用 `storeToRefs` 解构响应式状态
 
-如果觉得框架不错，或者已经在使用了，希望你可以去 [GitHub](https://github.com/WangFan-io/SnowAdmin) ⭐ Star，这将是对我极大的鼓励与支持。
+## License
 
-### 免责条款 📫
+MIT License
 
-您充分了解并同意，您必须为自己使用本服务及注册帐号下的一切行为负责，包括您所发表的任何内容以及由此产生的任何后果。您应对本服务中的内容自行加以判断，并自行承担因使用内容而引起的所有风险。
+Copyright (c) 2025 WANGFan
 
-`SnowAdmin` 对网站上所显示的信息或资料的准确性、内容、完整性、合法性、可靠性、可操作性或可用性不承担任何责任。
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-`SnowAdmin` 二次开发使用者因为违法而触犯中华人民共和国法律的，一切后果自己负责，`SnowAdmin` 作者不承担任何责任。
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-本声明未涉及的问题参见国家有关法律法规，当本声明与国家法律法规冲突时，以国家法律法规为准。
-
-### 学习 & 商用 🌈
-
-`SnowAdmin` 是免费和开源的，可免费用于学习、商业使用 。
-
-### 捐赠 💖
-
-|                        微信                        |                        支付宝                        |
-| :------------------------------------------------: | :--------------------------------------------------: |
-| ![微信](https://ooo.0x0.ooo/2025/07/20/OYtFn1.jpg) | ![支付宝](https://ooo.0x0.ooo/2025/07/20/OYth4I.jpg) |
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
