@@ -114,6 +114,10 @@ export default {
         ["common-layouts"]: "common layouts",
         ["data-screen"]: "data screen",
         ["thin-preview"]: "thin preview",
-        ["test"]: "test"
+        ["test"]: "test",
+        ["system-config"]: "system config",
+        ["file-manager"]: "file manager",
+        ["api-management"]: "api management",
+        ["plugin-example"]: "plugin example",
     }
 };

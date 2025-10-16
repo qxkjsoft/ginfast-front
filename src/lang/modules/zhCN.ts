@@ -114,6 +114,10 @@ export default {
         ["common-layouts"]: "常用布局",
         ["data-screen"]: "数据大屏",
         ["thin-preview"]: "极简版预览",
-        ["test"]: "测试"
+        ["test"]: "测试",
+        ["system-config"]: "系统配置",
+        ["file-manager"]: "文件管理",
+        ["api-management"]: "接口管理",
+        ["plugin-example"]: "插件示例",
     },
 };
