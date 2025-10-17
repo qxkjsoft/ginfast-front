@@ -1,5 +1,6 @@
 <template>
     <div class="container">
+        <Logo />
         <div class="login">
             <LoginBanner v-if="isPc" />
             <div class="login_box">
@@ -27,6 +28,10 @@ const { isPc } = useDevicesSize();
 import { useSysConfigStore } from "@/store/modules/sys-config";
 import { storeToRefs } from "pinia";
 
+// 系统logo
+import Logo from "@/views/login/components/logo.vue";
+
+
 
 // 获取系统配置
 const sysConfigStore = useSysConfigStore();
@@ -50,7 +55,15 @@ const systemRecordNo = computed(() => {
     position: relative;
     height: 100vh;
     overflow: hidden;
+    background-image: url('@/assets/img/login-bg.jpg');
+    /* 设置背景图 */
+    background-size: cover;
+    /* 覆盖整个容器 */
+    background-position: center;
+    /* 居中显示 */
+    background-repeat: no-repeat;
 
+    /* 不重复 */
     .login {
         position: absolute;
         top: 50%;
@@ -59,7 +72,7 @@ const systemRecordNo = computed(() => {
         align-items: center;
         max-width: 1000px;
         height: 500px;
-        box-shadow: 0 0 8px 1px $color-fill-2;
+
         transform: translate(-50%, -50%);
 
         .login_box {
@@ -68,6 +81,8 @@ const systemRecordNo = computed(() => {
             width: 350px;
             height: 100%;
             padding: 40px 30px 30px;
+            box-shadow: 0 0 8px 1px $color-fill-2;
+            background-color: #fff;
 
             .login_title {
                 margin-bottom: $margin-text;
@@ -97,14 +112,17 @@ const systemRecordNo = computed(() => {
         right: 0;
         text-align: center;
         padding: 0 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
 
         .copyright-text {
             font-size: $font-size-body-3;
             color: $color-text-4;
-            margin-bottom: 5px;
         }
 
         .record-text {
+            margin-left: 5px;
             font-size: $font-size-body-3;
             color: $color-text-4;
         }

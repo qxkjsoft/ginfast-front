@@ -19,7 +19,8 @@
                             <a-input v-model="form.email" placeholder="请输入邮箱" allow-clear />
                         </a-form-item>
                         <a-form-item>
-                            <a-button type="primary" html-type="submit">提交</a-button>
+                            <a-button type="primary" html-type="submit"
+                                v-hasPerm="['system:userinfo:updateAccount']">提交</a-button>
                         </a-form-item>
                     </a-form>
                 </a-card>

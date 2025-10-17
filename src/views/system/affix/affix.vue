@@ -22,11 +22,14 @@
 
             <a-row>
                 <a-space wrap>
-                    <a-upload :custom-request="handleUpload" :show-file-list="false" :disabled="uploadLoading">
-                        <a-button type="primary" :loading="uploadLoading">
-                            <template #icon><icon-plus /></template>
-                            <span>上传文件</span>
-                        </a-button>
+                    <a-upload :custom-request="handleUpload" :show-file-list="false" :disabled="uploadLoading"
+                        v-hasPerm="['system:affix:upload']">
+                        <template #upload-button>
+                            <a-button type="primary" :loading="uploadLoading">
+                                <template #icon><icon-plus /></template>
+                                <span>上传文件</span>
+                            </a-button>
+                        </template>
                     </a-upload>
                 </a-space>
             </a-row>
@@ -39,7 +42,7 @@
                         <template #cell="cell">{{ cell.rowIndex + 1 }}</template>
                     </a-table-column>
                     <a-table-column title="文件名" data-index="name" :ellipsis="true" tooltip
-                        :width="120"></a-table-column>
+                        :width="200"></a-table-column>
                     <a-table-column title="文件类型" data-index="ftype" :width="90">
                         <template #cell="{ record }">
                             <a-tag v-if="record.ftype === 'image'" color="arcoblue">图片</a-tag>
@@ -68,20 +71,20 @@
                     <a-table-column title="操作" :width="320" align="center" :fixed="'right'">
                         <template #cell="{ record }">
                             <a-space>
-                                <a-link @click="onDownload(record)">
+                                <a-link @click="onDownload(record)" v-hasPerm="['system:affix:download']">
                                     <template #icon><icon-download /></template>
                                     下载
                                 </a-link>
-                                <a-link @click="copyLink(record)">
+                                <a-link @click="copyLink(record)" v-hasPerm="['system:affix:copy']">
                                     <template #icon><icon-copy /></template>
                                     复制链接
                                 </a-link>
-                                <a-link @click="onEdit(record)">
+                                <a-link @click="onEdit(record)" v-hasPerm="['system:affix:updateName']">
                                     <template #icon><icon-edit /></template>
                                     重命名
                                 </a-link>
                                 <a-popconfirm type="warning" content="确定删除该文件吗?" @ok="onDelete(record)">
-                                    <a-link status="danger">
+                                    <a-link status="danger" v-hasPerm="['system:affix:delete']">
                                         <template #icon><icon-delete /></template>
                                         删除
                                     </a-link>
@@ -337,12 +340,12 @@ const getFileUrl = async (record: any): Promise<string> => {
         url = handleUrl(res.data.url);
     } catch (apiError) {
         // API调用失败，使用path字段构造URL
-        console.warn('获取下载链接失败，使用path字段:', apiError);
+        console.warn('获取下载链接失败，使用url字段:', apiError);
     }
 
     // 如果API没有返回有效的URL，则尝试使用path字段
-    if (!url && record.path) {
-        url = handleUrl(record.path);
+    if (!url && record.url) {
+        url = handleUrl(record.url);
     }
 
     return url;

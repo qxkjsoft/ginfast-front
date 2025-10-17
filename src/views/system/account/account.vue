@@ -90,7 +90,8 @@
                                         </a-link>
                                     </a-popconfirm>
                                     <a-tooltip content="用户详情">
-                                        <a-link status="success" @click="onDetail(record)">
+                                        <a-link status="success" @click="onDetail(record)"
+                                            v-hasPerm="['system:account:details']">
                                             <template #icon>
                                                 <icon-more />
                                             </template>

@@ -1,8 +1,8 @@
 <template>
     <div :class="layoutType == 'layoutHead' ? 'logo_head no-border' : 'logo_head'">
         <div class="logo_box" :class="(collapsed || layoutType == 'layoutHead') && 'padding-unset'">
-            <img v-if="sysLogo" :src="sysLogo" alt="系统logo" style="width: 30px; height: 30px;" />
-            <s-svg-icon v-else name="snow" :size="30" />
+            <img v-if="sysLogo" :src="sysLogo" alt="系统logo" style="width: 32px; height: 32px;" />
+            <s-svg-icon v-else name="snow" :size="32" />
             <span :class="isDark ? 'logo_title dark' : 'logo_title'" v-if="isTitle">{{ bannerTitle }}</span>
         </div>
     </div>
@@ -70,7 +70,7 @@ const isTitle = computed(() => {
 
     .logo_box {
         display: flex;
-        column-gap: $padding;
+        // column-gap: $padding;
         align-items: center;
         width: 100%;
         padding: 0 $padding;
@@ -88,7 +88,7 @@ const isTitle = computed(() => {
         max-width: 140px;
         overflow: hidden;
         text-overflow: ellipsis;
-        font-size: $font-size-title-2;
+        font-size: $font-size-title-1;
         font-weight: bold;
         text-align: left;
         white-space: nowrap;

@@ -4,7 +4,7 @@
             <s-layout-tools>
                 <template #right>
                     <a-space>
-                        <a-button type="primary" @click="onSave">
+                        <a-button type="primary" @click="onSave" v-hasPerm="['system:config:update']">
                             <template #icon>
                                 <icon-save />
                             </template>

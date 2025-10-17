@@ -53,7 +53,8 @@
                                     @click="onPrivileges(record)">
                                     分配权限
                                 </a-link>
-                                <a-link @click="onDataScope(record)" status="warning">
+                                <a-link @click="onDataScope(record)" status="warning"
+                                    v-hasPerm="['system:role:dataScope']">
                                     数据权限
                                 </a-link>
                                 <a-link v-hasPerm="['system:role:add']" @click="onAddChild(record)">
@@ -428,7 +429,7 @@ const onDataScope = (row: any) => {
             defaultCheckedKeys: row.checkedDepts.split(',').map(Number),
             dataScope: row.dataScope ? String(row.dataScope) : '',
             'onUpdate:checkedKeys': (data: any) => {
-                // console.log(data)
+                console.log(data)
             }
         }),
         onBeforeOk: async () => {

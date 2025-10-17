@@ -18,7 +18,7 @@ const include = [
  * 如果你有某些依赖包不希望被预构建，可以使用 exclude 属性来排除它们。
  */
 const exclude = [
-    "@visactor/vchart-arco-theme",
+
 ];
 
 export { include, exclude };
