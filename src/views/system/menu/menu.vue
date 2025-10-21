@@ -10,11 +10,11 @@
                         <a-input v-model="form.permission" placeholder="权限标识" allow-clear />
                         <a-select v-model="form.hide" placeholder="请选择显示状态" allow-clear style="width: 120px">
                             <a-option v-for="item in openState" :key="item.value" :value="item.value">{{ item.name
-                                }}</a-option>
+                            }}</a-option>
                         </a-select>
                         <a-select v-model="form.disable" placeholder="请选择启用状态" allow-clear style="width: 120px">
                             <a-option v-for="item in openState" :key="item.value" :value="item.value">{{ item.name
-                                }}</a-option>
+                            }}</a-option>
                         </a-select>
                         <a-button type="primary" @click="performSearch">
                             <template #icon><icon-search /></template>
@@ -41,11 +41,22 @@
                             </template>
                             <span>{{ expand ? "收起" : "展开" }}</span>
                         </a-button>
+
+                        <a-button type="primary" @click="onExport" v-hasPerm="['system:menu:export']">
+                            <template #icon><icon-export /></template>
+                            <span>导出</span>
+                        </a-button>
+
+                        <a-button type="outline" status="success" @click="onImport" v-hasPerm="['system:menu:import']">
+                            <template #icon><icon-import /></template>
+                            <span>导入</span>
+                        </a-button>
                     </a-space>
                 </template>
             </s-layout-tools>
             <!-- 修改表格数据源为displayMenuList -->
-            <a-table ref="tableRef" :data="displayMenuList" :loading="loading" row-key="name" column-resizable
+            <a-table ref="tableRef" :data="displayMenuList" :loading="loading" row-key="id" column-resizable
+                :row-selection="{ type: 'checkbox', showCheckedAll: true }" v-model:selectedKeys="selectedKeys"
                 :bordered="{ cell: true }" show-empty-tree :pagination="false" size="medium"
                 :scroll="{ x: '150%', y: '93%' }">
                 <template #columns>
@@ -56,11 +67,9 @@
                                 <a-badge v-if="record.apis && record.apis.length > 0" :count="record.apis.length"
                                     :max-count="99"></a-badge>
                             </a-space>
-
-
                         </template>
                     </a-table-column>
-                    <a-table-column title="ID" data-index="id" :width="70"></a-table-column>
+                    <a-table-column title="ID" data-index="id" :width="75" tooltip ellipsis></a-table-column>
                     <a-table-column title="类型" align="center" :width="70">
                         <template #cell="{ record }">
                             <a-tag v-if="record.type == 1" bordered size="small" color="purple">目录</a-tag>
@@ -168,7 +177,7 @@
                         <a-radio-group type="button" :disabled="!!addFrom.id" v-model="addFrom.type"
                             @change="typeChange">
                             <a-radio v-for="item in menuType" :key="item.value" :value="item.value">{{ item.name
-                                }}</a-radio>
+                            }}</a-radio>
                         </a-radio-group>
                     </a-form-item>
                     <a-form-item field="parentId" label="上级菜单" validate-trigger="blur" :disabled="!!addFrom.id">
@@ -318,8 +327,7 @@
 <script setup lang="ts">
 //import MenuItemIcon from "@/layout/components/Menu/menu-item-icon.vue";
 import SApiPermission from "@/components/s-api-permission/index.vue";
-// import { getMenuListAPI } from "@/api/modules/system/index";
-import { type MenuItem, getMenuListAPI, addMenuAPI, updateMenuAPI, deleteMenuAPI } from "@/api/menu";
+import { type MenuItem, getMenuListAPI, addMenuAPI, updateMenuAPI, deleteMenuAPI, exportMenuAPI, importMenuAPI } from "@/api/menu";
 import useGlobalProperties from "@/hooks/useGlobalProperties";
 import { deepClone, getPascalCase } from "@/utils";
 const proxy = useGlobalProperties();
@@ -332,7 +340,7 @@ const form = ref({
     path: "",
     permission: ""
 });
-
+const selectedKeys = ref<number[]>([]);
 // 存储所有菜单数据
 const allMenuList = ref<MenuItem[]>([]);
 // 显示的菜单数据（经过筛选）
@@ -399,7 +407,7 @@ const performSearch = () => {
 };
 
 
-
+// 重置查询条件
 const onReset = () => {
     form.value = { id: "", name: "", hide: "", disable: "", path: "", permission: "" };
     // 重置后显示所有数据
@@ -661,7 +669,87 @@ const onApiPermissionSuccess = () => {
     getMenuList();
 };
 
-getMenuList();
+
+
+// 导出菜单
+const onExport = async () => {
+    //console.log(selectedKeys.value);
+    if (selectedKeys.value.length === 0) {
+        arcoMessage("warning", "请选择要导出的菜单");
+        return;
+    }
+    try {
+        const response: any = await exportMenuAPI({ menuIds: selectedKeys.value });
+
+        // 创建下载链接
+        const blob = new Blob([response], { type: 'application/json' });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `menu_export_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.json`;
+        link.click();
+        window.URL.revokeObjectURL(url);
+
+        // 导出成功
+        arcoMessage("success", "导出成功");
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+
+const fileInputRef = ref<HTMLInputElement | null>(null);
+// 导入菜单
+const onImport = () => {
+    // 如果元素不存在则创建
+    if (!fileInputRef.value) {
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = '.json';
+        fileInput.style.display = 'none';
+
+        // 添加change事件监听器
+        fileInput.addEventListener('change', async (event) => {
+            const target = event.target as HTMLInputElement;
+            if (target.files && target.files.length > 0) {
+                const file = target.files[0];
+
+                // 创建FormData对象
+                const formData = new FormData();
+                formData.append('file', file);
+
+                try {
+                    // 调用导入API
+                    await importMenuAPI(formData);
+
+                    // 导入成功后刷新菜单列表
+                    await getMenuList();
+
+                    // 显示成功消息
+                    arcoMessage("success", "菜单导入成功");
+                } catch (error) {
+                    console.error(error);
+                    arcoMessage("error", "菜单导入失败");
+                }
+
+                // 清空文件输入以允许选择相同文件
+                fileInput.value = '';
+            }
+        });
+
+        document.body.appendChild(fileInput);
+        fileInputRef.value = fileInput;
+    }
+
+    // 触发文件选择对话框
+    fileInputRef.value.click();
+};
+
+onMounted(() => {
+    getMenuList();
+});
+
+
 </script>
 
 <style lang="scss" scoped>

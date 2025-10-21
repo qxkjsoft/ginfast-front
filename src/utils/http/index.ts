@@ -211,10 +211,20 @@ class Http {
                 .then((response: any) => {
                     resolve(response);
                 })
-                .catch(error => {
+                .catch(async error => {
                     console.error("http.error:", error);
                     const { response } = error;
-                    Message.error(response?.data?.message || "服务器异常，请联系管理员");
+                    if (response && response.data instanceof Blob) {
+                        try {
+                            const text = await response.data.text();
+                            const json = JSON.parse(text);
+                            Message.error(json?.message || "导出失败");
+                        } catch (parseError) {
+                            console.error('Failed to parse blob as JSON:', parseError);
+                        }
+                    } else {
+                        Message.error(response?.data?.message || "服务器异常，请联系管理员");
+                    }
                     reject(error);
                 });
         });

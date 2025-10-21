@@ -26,6 +26,10 @@ export const useUserStore = defineStore("user", () => {
             getLogin(data)
                 .then(res => {
                     if (res?.code === 0) {
+                        // 清除 accessToken 、 refreshToken 及登录用户信息
+                        removeAccessToken();
+                        removeRefreshToken();
+                        removeLocalStorage(UserInfoKey);
                         // 登录成功后，设置 accessToken 和 refreshToken
                         setAccessToken(res?.data?.accessToken, res?.data?.accessTokenExpires);
                         setRefreshToken(res?.data?.refreshToken, res?.data?.refreshTokenExpires);
@@ -47,7 +51,7 @@ export const useUserStore = defineStore("user", () => {
         account.value.nickname = "";
         account.value.roles = [];
         account.value.permissions = [];
-        // 清除 accessToken 和 refreshToken
+        // 清除 accessToken 、 refreshToken 及登录用户信息
         removeAccessToken();
         removeRefreshToken();
         removeLocalStorage(UserInfoKey);

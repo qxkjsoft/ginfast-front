@@ -49,10 +49,6 @@ import { getCaptchaId } from "@/api/user";
 import { baseUrlApi } from "@/api/utils";
 import { useSystemStore } from "@/store/modules/system";
 
-/////////////////原有登录逻辑引入文件
-// import { loginAPI } from "@/api/modules/user/index";
-// import { useUserInfoStore } from "@/store/modules/user-info";
-// let userStores = useUserInfoStore();
 
 // 定义表单数据类型
 interface LoginForm {
@@ -127,20 +123,6 @@ const onLogin = async () => {
         // 设置字典
         useSystemStore().setDictData();
 
-        // // 旧的登录逻辑
-        // let res = await loginAPI(form.value);
-        // // 存储token
-        // await userStores.setToken(res.data.token);
-        // // 加载用户信息
-        // await userStores.setAccount();
-        // // 加载路由信息
-        // await routeStore.initSetRouter();
-
-        // arcoMessage("success", "登录成功");
-        // // 跳转首页
-        // router.replace("/home");
-        // // 设置字典
-        // useSystemStore().setDictData();
     } catch (error) {
         console.error("登录失败:", error);
         //arcoMessage("error", typeof error === "string" ? error : "登录失败，请检查用户名和密码");
