@@ -1,7 +1,6 @@
 import { http } from "@/utils/http";
 import { baseUrlApi } from "./utils";
 import { BaseResult } from "./types";
-import { Message } from "@arco-design/web-vue";
 // 操作日志数据模型
 export interface OperationLogItem {
     id: number;
