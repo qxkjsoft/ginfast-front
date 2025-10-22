@@ -23,8 +23,9 @@
                                 <a-col :span="24">
                                     <a-form-item field="systemLogo" label="系统Logo">
                                         <!-- 图片上传组件 -->
-                                        <ImageUpload v-model:image-url="configData.system.systemLogo"
-                                            :title="'上传系统Logo'" :accept="'.svg'" />
+                                        <ImageUpload :width="50" :height="50"
+                                            v-model:image-url="configData.system.systemLogo" :title="'上传系统Logo'"
+                                            :accept="'.svg'" />
                                         <template #extra>
                                             <div>显示在登录页面和系统导航栏的网站图标（建议 .svg 格式）</div>
                                         </template>
@@ -33,7 +34,7 @@
                                 <a-col :span="24">
                                     <a-form-item field="systemIcon" label="系统图标">
                                         <!-- 图片上传组件 -->
-                                        <ImageUpload :width="40" :height="40"
+                                        <ImageUpload :width="50" :height="50"
                                             v-model:image-url="configData.system.systemIcon" :title="'上传系统图标'"
                                             :accept="'.ico'" />
                                         <template #extra>
