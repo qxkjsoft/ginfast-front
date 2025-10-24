@@ -1,3 +1,4 @@
+import { Tenant } from './../../api/tenant';
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import pinia from "@/store";
@@ -16,7 +17,10 @@ export const useUserStore = defineStore("user", () => {
         username: userInfo?.username ?? "",
         nickname: userInfo?.nickname ?? "",
         roles: userInfo?.roles ?? [],
-        permissions: userInfo?.permissions ?? []
+        permissions: userInfo?.permissions ?? [],
+        tenantID: userInfo?.tenantID ?? 0,
+        tenantCode: userInfo?.tenantCode ?? "",
+
     });
 
     // action
@@ -85,6 +89,8 @@ export const useUserStore = defineStore("user", () => {
             account.value.avatar = handleUrl(data.avatar);
             account.value.roles = data.roles;
             account.value.permissions = data.permissions;
+            account.value.tenantID = data.tenantID;
+            account.value.tenantCode = data.tenantCode;
             setLocalStorage(UserInfoKey, data);
         }
         return data;

@@ -2,6 +2,13 @@
     <div>
         <div class="login_form_box">
             <a-form :rules="rules" :model="form" layout="vertical" @submit="onSubmit">
+                <a-form-item field="tenantCode" :hide-asterisk="true">
+                    <a-input v-model="form.tenantCode" allow-clear placeholder="租户编码">
+                        <template #prefix>
+                            <icon-home />
+                        </template>
+                    </a-input>
+                </a-form-item>
                 <a-form-item field="username" :hide-asterisk="true">
                     <a-input v-model="form.username" allow-clear placeholder="请输入账号">
                         <template #prefix>
@@ -52,6 +59,7 @@ import { useSystemStore } from "@/store/modules/system";
 
 // 定义表单数据类型
 interface LoginForm {
+    tenantCode: string;
     username: string;
     password: string;
     captchaValue: string | null;
@@ -65,6 +73,7 @@ const router = useRouter();
 // 响应式数据
 const loginLoading = ref(false);
 const form = ref<LoginForm>({
+    tenantCode: "",
     username: "",
     password: "",
     captchaValue: null,

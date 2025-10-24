@@ -32,6 +32,8 @@ export type ProfileResult = BaseResult<{
     roles: Array<number>;
     /** 按钮级别权限 */
     permissions: Array<string>;
+    tenantID: number;
+    tenantCode: string;
 }>;
 
 export type CaptchaIdResult = BaseResult<{

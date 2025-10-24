@@ -119,5 +119,6 @@ export default {
         ["file-manager"]: "file manager",
         ["api-management"]: "api management",
         ["plugin-example"]: "plugin example",
+        ["tenant"]: "tenant management",
     }
 };
