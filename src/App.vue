@@ -33,18 +33,45 @@ const initSysConfig = () => {
 
 // 设置网站图标
 const setFavicon = (iconUrl: string) => {
-    if (!iconUrl) return;
+    if (!iconUrl) {
+        // 如果没有传入图标，使用默认图标
+        setDefaultFavicon();
+        return;
+    }
 
-    // 移除现有的favicon
+    // 创建测试图片来验证图标是否可加载
+    const testImg = new Image();
+    testImg.onload = () => {
+        // 图标加载成功，移除现有的favicon并设置新图标
+        const links = document.querySelectorAll("link[rel='icon']");
+        links.forEach(link => {
+            link.remove();
+        });
+
+        const link = document.createElement('link');
+        link.rel = 'icon';
+        link.href = iconUrl;
+        document.head.appendChild(link);
+    };
+    testImg.onerror = () => {
+        // 图标加载失败，使用默认图标
+        console.warn(`图标加载失败: ${iconUrl}，使用默认图标`);
+        setDefaultFavicon();
+    };
+    testImg.src = iconUrl;
+};
+
+// 设置默认图标的辅助方法
+const setDefaultFavicon = () => {
+    const defaultIconUrl = 'src/assets/sys/default.ico';
     const links = document.querySelectorAll("link[rel='icon']");
     links.forEach(link => {
         link.remove();
     });
 
-    // 创建新的favicon链接
     const link = document.createElement('link');
     link.rel = 'icon';
-    link.href = iconUrl;
+    link.href = defaultIconUrl;
     document.head.appendChild(link);
 };
 

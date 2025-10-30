@@ -25,24 +25,27 @@
                 </a-form-item>
               </a-col>
               <a-col :span="6">
-                <a-button type="primary" @click="search">
-                  <template #icon>
-                    <icon-search />
-                  </template>
-                  查询
-                </a-button>
-                <a-button style="margin-left: 10px" @click="reset">
-                  <template #icon>
-                    <icon-refresh />
-                  </template>
-                  重置
-                </a-button>
-                <a-button type="primary" style="margin-left: 10px" @click="handleAdd" v-hasPerm="['system:tenant:add']">
-                  <template #icon>
-                    <icon-plus />
-                  </template>
-                  新增
-                </a-button>
+                <a-space wrap>
+                    <a-button type="primary" @click="search">
+                        <template #icon>
+                            <icon-search />
+                        </template>
+                        查询
+                    </a-button>
+                    <a-button @click="reset">
+                        <template #icon>
+                            <icon-refresh />
+                        </template>
+                        重置
+                    </a-button>
+                    <a-button type="primary" @click="handleAdd" v-hasPerm="['system:tenant:add']">
+                        <template #icon>
+                            <icon-plus />
+                        </template>
+                        新增
+                    </a-button>
+                </a-space>
+
               </a-col>
             </a-row>
           </a-form>
@@ -84,6 +87,10 @@
 					<template #icon><icon-edit /></template>
                     修改
                   </a-link>
+                  <a-link type="text" size="small" @click="handleAssignUser(record)" v-hasPerm="['system:tenant:assignUser']">
+                    <template #icon><icon-user /></template>
+                    分配用户
+                  </a-link>
                   <a-popconfirm content="确定要删除该租户吗?" @ok="handleDelete(record)" >
                     <a-link type="text" size="small" status="danger" v-hasPerm="['system:tenant:delete']">
 					<template #icon><icon-delete /></template>
@@ -121,6 +128,14 @@
         </a-form-item>
       </a-form>
     </a-modal>
+	
+    <!-- 用户分配弹窗 -->
+    <s-tenant-user 
+      v-model:visible="userAssignVisible" 
+      :tenant-id="currentRecord?.id" 
+      :tenant-name="currentRecord?.name"
+      @success="onUserAssignSuccess" 
+    />
   </div>
 </template>
 
@@ -129,6 +144,11 @@ import { ref, reactive, onMounted } from 'vue'
 import { Message } from '@arco-design/web-vue'
 import { getTenantList, addTenant, updateTenant, deleteTenant, getTenantById ,Tenant } from '@/api/tenant'
 import { formatTime } from "@/globals";
+// 引入用户分配组件
+import STenantUser from "@/components/s-tenant-user/index.vue";
+
+// 引入图标组件
+import { IconUser } from '@arco-design/web-vue/es/icon';
 
 const loading = ref(false)
 const renderData = ref<Tenant[]>([])
@@ -142,6 +162,9 @@ const modalVisible = ref(false)
 const modalTitle = ref('')
 const isEdit = ref(false)
 const currentRecord = ref<Tenant | null>(null)
+
+// 用户分配相关状态
+const userAssignVisible = ref(false)
 
 const modalFormModel = reactive({
   name: '',
@@ -241,6 +264,16 @@ const handleEdit = async (record: Tenant) => {
   }
 }
 
+// 分配用户
+const handleAssignUser = (record: Tenant) => {
+  currentRecord.value = record
+  userAssignVisible.value = true
+}
+
+// 用户分配成功回调
+const onUserAssignSuccess = () => {
+}
+
 const handleDelete = async (record: Tenant) => {
   try {
     await deleteTenant(record.id)
@@ -288,10 +321,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
-
-
 .general-card {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
-
 </style>

@@ -1,8 +1,9 @@
 <template>
     <div :class="layoutType == 'layoutHead' ? 'logo_head no-border' : 'logo_head'">
         <div class="logo_box" :class="(collapsed || layoutType == 'layoutHead') && 'padding-unset'">
-            <img v-if="sysLogo" :src="sysLogo" alt="系统logo" style="width: 32px; height: 32px;" />
-            <s-svg-icon v-else name="snow" :size="32" />
+            <!-- <img v-if="sysLogo" :src="sysLogo" alt="系统logo" style="width: 32px; height: 32px;" />
+            <s-svg-icon v-else name="snow" :size="32" /> -->
+            <LogoSvg :defaultImageUrl="sysLogo" :width="32" :height="32" />
             <span :class="isDark ? 'logo_title dark' : 'logo_title'" v-if="isTitle">{{ bannerTitle }}</span>
         </div>
     </div>
@@ -15,7 +16,7 @@ const themeStore = useThemeConfig();
 const { collapsed, asideDark, layoutType } = storeToRefs(themeStore);
 import { handleUrl } from "@/utils/app"
 import { useSysConfigStore } from "@/store/modules/sys-config";
-
+import LogoSvg from "@/components/s-logo/index.vue";
 
 // 获取系统配置
 const sysConfigStore = useSysConfigStore();

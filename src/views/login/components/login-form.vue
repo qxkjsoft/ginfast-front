@@ -3,7 +3,7 @@
         <div class="login_form_box">
             <a-form :rules="rules" :model="form" layout="vertical" @submit="onSubmit">
                 <a-form-item field="tenantCode" :hide-asterisk="true">
-                    <a-input v-model="form.tenantCode" allow-clear placeholder="租户编码">
+                    <a-input v-model="form.tenantCode" allow-clear placeholder="租户编码（不填则为账号默认租户）">
                         <template #prefix>
                             <icon-home />
                         </template>

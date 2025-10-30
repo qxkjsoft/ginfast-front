@@ -167,7 +167,7 @@ const rules = {
 const addFrom = ref<DivisionFormData>({
     parentId: 0,
     name: "",
-    sort: 1,
+    sort: 0,
     leader: "",
     phone: "",
     email: "",

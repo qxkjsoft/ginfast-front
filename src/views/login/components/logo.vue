@@ -1,7 +1,8 @@
 <template>
     <div class="banner_title">
-        <img v-if="sysLogo" :src="sysLogo" alt="系统logo" style="width: 40px; height: 40px;" />
-        <s-svg-icon v-else name="snow" size="40" />
+        <!-- <img v-if="sysLogo" :src="sysLogo" alt="系统logo" style="width: 40px; height: 40px;" />
+        <s-svg-icon v-else name="snow" size="40" /> -->
+        <LogoSvg :defaultImageUrl="sysLogo" :width="40" :height="40" />
         {{ bannerTitle }}
     </div>
 </template>
@@ -9,6 +10,8 @@
 import { handleUrl } from "@/utils/app"
 import { useSysConfigStore } from "@/store/modules/sys-config";
 import { storeToRefs } from "pinia";
+import LogoSvg from "@/components/s-logo/index.vue";
+
 // 获取系统配置
 const sysConfigStore = useSysConfigStore();
 const { systemConfig } = storeToRefs(sysConfigStore);

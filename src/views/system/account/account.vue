@@ -207,8 +207,10 @@ const search = () => {
     pagination.value.current = 1;
     getAccount();
 };
-
+// 添加一个标志位，用于标识是否在重置操作中
+const isResetting = ref(false);
 const reset = () => {
+    isResetting.value = true;
     form.value = {
         name: "",
         phone: "",
@@ -226,6 +228,10 @@ const reset = () => {
     // 重新加载完整的部门树
     filteredTreeData.value = treeData.value;
     getAccount();
+     // 延迟重置标志位，确保不会影响正常的树选择事件
+    setTimeout(() => {
+        isResetting.value = false;
+    }, 0);
 };
 
 // 新增
@@ -487,6 +493,10 @@ const getDivision = async () => {
 
 // 部门树选择事件处理
 const onSelectTree = (selectedKeys: any[]) => {
+     // 如果正在重置操作中，不执行后续逻辑
+    if (isResetting.value) {
+        return;
+    }
     // 获取选中部门及其子部门的ID集合
     if (selectedKeys.length > 0 && treeData.value) {
         // 获取选中的节点

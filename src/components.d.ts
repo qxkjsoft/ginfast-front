@@ -11,6 +11,7 @@ declare module 'vue' {
     'Index copy': typeof import('./components/s-layout-search/index copy.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SAddUserModal: typeof import('./components/s-add-user-modal/index.vue')['default']
     SApiPermission: typeof import('./components/s-api-permission/index.vue')['default']
     SBarcodeDraw: typeof import('./components/s-barcode-draw/index.vue')['default']
     SCodeView: typeof import('./components/s-code-view/index.vue')['default']
@@ -21,6 +22,7 @@ declare module 'vue' {
     SLangProvider: typeof import('./components/s-lang-provider/index.vue')['default']
     SLayoutSearch: typeof import('./components/s-layout-search/index.vue')['default']
     SLayoutTools: typeof import('./components/s-layout-tools/index.vue')['default']
+    SLogo: typeof import('./components/s-logo/index.vue')['default']
     SMainTransition: typeof import('./components/s-main-transition/index.vue')['default']
     SPinyinPro: typeof import('./components/s-pinyin-pro/index.vue')['default']
     SQrcodeDraw: typeof import('./components/s-qrcode-draw/index.vue')['default']
@@ -28,6 +30,7 @@ declare module 'vue' {
     SSelectIcon: typeof import('./components/s-select-icon/index.vue')['default']
     SSvgAndIcon: typeof import('./components/s-svg-and-icon/index.vue')['default']
     SSvgIcon: typeof import('./components/s-svg-icon/index.vue')['default']
+    STenantUser: typeof import('./components/s-tenant-user/index.vue')['default']
     SVerifyCode: typeof import('./components/s-verify-code/index.vue')['default']
   }
 }

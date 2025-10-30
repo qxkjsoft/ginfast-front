@@ -1,4 +1,3 @@
-import { Tenant } from './../../api/tenant';
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import pinia from "@/store";

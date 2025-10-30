@@ -31,6 +31,8 @@ export const getRolesAPI = () => {
     return http.request<RolesResult>("get", baseUrlApi("sysRole/getRoles"));
 };
 
+
+
 //根据角色ID获取角色菜单权限
 export const getUserPermissionAPI = (roleId: number) => {
     return http.request<UserPermissionResult>("get", baseUrlApi(`sysRole/getUserPermission/${roleId}`));

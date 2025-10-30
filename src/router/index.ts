@@ -64,7 +64,12 @@ router.beforeEach(async (to: any, _: any, next: any) => {
         try {
             // 并行获取用户信息和路由信息
             await Promise.all([useUserStoreHook().getUserInfo(), routeStore.initSetRouter()]);
-
+            
+            if (!routeTree.value.length) {
+                console.warn("路由初始化失败，routeTree为空");
+                // 跳转到401页面
+                return next("/401");
+            }
             // 判断是否是动态路由
             const { isDynamicRoute } = useRoutingMethod();
             if (isDynamicRoute(to.path)) {
