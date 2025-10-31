@@ -21,7 +21,6 @@ const initSysConfig = () => {
     const sysConfigStore = useSysConfigStore();
     // 获取系统配置，不等待完成，避免阻塞应用启动
     sysConfigStore.getConfig().then(() => {
-        //console.log("系统图标:", sysConfigStore.systemIcon);
         // 设置网站图标
         setFavicon(sysConfigStore.systemIcon);
         // 设置网站标题

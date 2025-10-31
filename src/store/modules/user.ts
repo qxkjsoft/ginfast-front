@@ -83,10 +83,10 @@ export const useUserStore = defineStore("user", () => {
         const { data } = await getProfileAPI();
         if (data?.id) {
             account.value.id = data.id;
-            account.value.username = data.username;
-            account.value.nickname = data.nickname;
+            account.value.username = data.userName;
+            account.value.nickname = data.nickName;
             account.value.avatar = handleUrl(data.avatar);
-            account.value.roles = data.roles;
+            account.value.roles = data.roleIDs;
             account.value.permissions = data.permissions;
             account.value.tenantID = data.tenantID;
             account.value.tenantCode = data.tenantCode;

@@ -9,7 +9,8 @@ export interface SystemConfig {
     systemName: string;
     systemCopyright: string;
     systemRecordNo: string;
-
+    defaultusername: string;
+    defaultpassword: string;
 }
 
 

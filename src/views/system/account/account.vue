@@ -31,16 +31,11 @@
                         <template #icon><icon-refresh /></template>
                         <span>重置</span>
                     </a-button>
+                    <a-button type="primary" @click="onAdd" v-hasPerm="['system:account:add']">
+                        <template #icon><icon-plus /></template>
+                        <span>新增</span>
+                    </a-button>
                 </a-space>
-
-                <a-row>
-                    <a-space wrap>
-                        <a-button type="primary" @click="onAdd" v-hasPerm="['system:account:add']">
-                            <template #icon><icon-plus /></template>
-                            <span>新增</span>
-                        </a-button>
-                    </a-space>
-                </a-row>
 
                 <a-table row-key="id" :data="accountList" :bordered="{ cell: true }" :loading="loading"
                     :scroll="{ x: '120%', y: '85%' }" :pagination="pagination" :selected-keys="selectedKeys"
@@ -49,21 +44,21 @@
                         <!-- <a-table-column title="序号" :width="64">
                             <template #cell="cell">{{ cell.rowIndex + 1 }}</template>
         </a-table-column> -->
-                        <a-table-column title="ID" data-index="id" :width="64"></a-table-column>
-                        <a-table-column title="用户名称" data-index="userName"></a-table-column>
-                        <a-table-column title="昵称" data-index="nickName"></a-table-column>
-                        <a-table-column title="性别" data-index="sex" align="center">
+                        <a-table-column title="ID" data-index="id" :width="70" align="center"></a-table-column>
+                        <a-table-column title="用户名称" data-index="userName" :width="150"></a-table-column>
+                        <a-table-column title="昵称" data-index="nickName" :width="150"></a-table-column>
+                        <a-table-column title="性别" data-index="sex" align="center" :width="60">
                             <template #cell="{ record }">
                                 <a-tag bordered size="small" color="arcoblue" v-if="record.sex == 1">男</a-tag>
                                 <a-tag bordered size="small" color="red" v-else-if="record.sex == 0">女</a-tag>
                                 <a-tag bordered size="small" v-else>未知</a-tag>
                             </template>
                         </a-table-column>
-                        <a-table-column title="部门" data-index="deptId">
+                        <a-table-column title="部门" data-index="deptId" :width="150">
                             <template #cell="{ record }">{{ record.department ? record.department.name : ""
                                 }}</template>
                         </a-table-column>
-                        <a-table-column title="手机号" data-index="phone" :width="180"></a-table-column>
+                        <a-table-column title="手机号" data-index="phone" :width="150"></a-table-column>
                         <a-table-column title="状态" :width="100" align="center">
                             <template #cell="{ record }">
                                 <a-tag bordered size="small" color="arcoblue" v-if="record.status === 1">启用</a-tag>
@@ -71,7 +66,7 @@
                             </template>
                         </a-table-column>
                         <a-table-column title="描述" data-index="description" :ellipsis="true"
-                            :tooltip="true"></a-table-column>
+                            :tooltip="true" :width="150"></a-table-column>
                         <a-table-column title="创建时间" data-index="createdAt" :width="180">
                             <template #cell="{ record }">
                                 {{ record.createdAt ? formatTime(record.createdAt) : "" }}</template>
@@ -89,14 +84,6 @@
                                             <span>删除</span>
                                         </a-link>
                                     </a-popconfirm>
-                                    <a-tooltip content="用户详情">
-                                        <a-link status="success" @click="onDetail(record)"
-                                            v-hasPerm="['system:account:details']">
-                                            <template #icon>
-                                                <icon-more />
-                                            </template>
-                                        </a-link>
-                                    </a-tooltip>
                                 </a-space>
                             </template>
                         </a-table-column>
@@ -108,7 +95,7 @@
         <a-modal width="40%" v-model:visible="open" @close="afterClose" :on-before-ok="handleOk" @cancel="afterClose">
             <template #title> {{ title }} </template>
             <div>
-                <a-form ref="formRef" auto-label-width :rules="rules" :model="addFrom">
+                <a-form ref="formRef" auto-label-width :rules="dynamicRules" :model="addFrom">
                     <a-row>
                         <a-col :span="12">
                             <a-form-item field="userName" label="用户名称" validate-trigger="blur">
@@ -134,10 +121,10 @@
                         </a-col>
                     </a-row>
                     <a-row>
-                        <a-col :span="12" v-if="formType == 0">
+                        <a-col :span="12" >
                             <a-form-item field="password" label="密码" validate-trigger="blur">
                                 <a-input-password v-model="addFrom.password" :defaultVisibility="true"
-                                    placeholder="请输入密码" allow-clear />
+                                    :placeholder="formType == 0 ? '请输入密码' : '输入新密码，留空则不修改'" allow-clear />
                             </a-form-item>
                         </a-col>
                         <a-col :span="12">
@@ -235,8 +222,11 @@ const reset = () => {
 };
 
 // 新增
+const formType = ref(0); // 0新增 1修改
 const open = ref(false);
-const rules = {
+    
+// 基础规则
+const baseRules: Record<string, any> = {
     userName: [
         {
             required: true,
@@ -253,12 +243,6 @@ const rules = {
         {
             required: true,
             message: "请选择性别"
-        }
-    ],
-    password: [
-        {
-            required: true,
-            message: "请输入密码"
         }
     ],
     deptId: [
@@ -280,6 +264,33 @@ const rules = {
         }
     ]
 };
+
+// 动态计算规则
+const dynamicRules = computed(() => {
+    const rules: Record<string, any> = { ...baseRules };
+    
+    // 根据表单类型设置密码规则
+    if (formType.value === 0) {
+        // 新增时密码必填
+        rules.password = [
+            {
+                required: true,
+                message: "请输入密码"
+            }
+        ];
+    } else {
+        // 编辑时密码非必填
+        rules.password = [
+            {
+                required: false,
+                message: "请输入密码"
+            }
+        ];
+    }
+    
+    return rules;
+});
+
 const addFrom = ref<any>({
     userName: "",
     nickName: "",
@@ -292,7 +303,7 @@ const addFrom = ref<any>({
     status: 1,
     description: ""
 });
-const formType = ref(0); // 0新增 1修改
+
 const title = ref("");
 const formRef = ref();
 const onAdd = () => {
@@ -351,17 +362,7 @@ const onDelete = async (row: any) => {
     } catch (error) { }
 };
 
-const onDetail = (row: any) => {
-    console.log(row);
 
-    router.push({
-        path: "/system/userinfo",
-        query: {
-            id: row.id,
-            userName: row.userName
-        }
-    });
-};
 
 const loading = ref(false);
 const pagination = ref({
@@ -543,6 +544,7 @@ onMounted(() => {
         flex-direction: column;
         width: 250px;
         height: 100%;
+        flex-shrink: 0; // 防止被压缩
 
         .tree-box {
             flex: 1;
@@ -553,6 +555,7 @@ onMounted(() => {
 
     .right-box {
         flex: 1;
+        min-width: 0; // 防止 flex 子元素溢出
     }
 }
 </style>

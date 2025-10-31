@@ -36,7 +36,7 @@ const emit = defineEmits(["refresh"]);
 const proxy = useGlobalProperties();
 const data = defineModel() as any;
 const form = ref({
-    id: "",
+    // id: "",
     password: "",
     phone: "",
     email: ""
@@ -62,7 +62,7 @@ const onSubmit = ({ errors }: ArcoDesign.ArcoSubmit) => {
 watch(
     () => data.value,
     () => {
-        form.value.id = data.value.id;
+        //form.value.id = data.value.id;
         form.value.phone = data.value.phone;
         form.value.email = data.value.email;
     }

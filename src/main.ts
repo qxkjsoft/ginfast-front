@@ -15,7 +15,8 @@ import directives from "@/directives/index";
 // 同步加载核心依赖
 import ArcoVue from "@arco-design/web-vue";
 import ArcoVueIcon from "@arco-design/web-vue/es/icon";
-import "@arco-design/web-vue/dist/arco.css";
+// import "@arco-design/web-vue/dist/arco.css";
+import '@arco-themes/vue-gi-demo/css/arco.css';
 import i18n from "@/lang/index";
 
 

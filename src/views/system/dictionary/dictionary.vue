@@ -33,18 +33,19 @@
             <a-table row-key="id" :data="dictList" :bordered="{ cell: true }" :loading="loading"
                 :scroll="{ x: '100%', y: '100%', minWidth: 1000 }" :pagination="pagination">
                 <template #columns>
-                    <a-table-column title="序号" :width="64">
+                    <!-- <a-table-column title="序号" :width="64">
                         <template #cell="cell">{{ cell.rowIndex + 1 }}</template>
-                    </a-table-column>
-                    <a-table-column title="字典名称" data-index="name"></a-table-column>
-                    <a-table-column title="字典编码" data-index="code"></a-table-column>
+                    </a-table-column> -->
+                    <a-table-column title="ID" data-index="id" :width="70" align="center"></a-table-column>
+                    <a-table-column title="字典名称" data-index="name" :width="150"></a-table-column>
+                    <a-table-column title="字典编码" data-index="code" :width="150"></a-table-column>
                     <a-table-column title="状态" :width="100" align="center">
                         <template #cell="{ record }">
                             <a-tag bordered size="small" color="arcoblue" v-if="record.status === 1">启用</a-tag>
                             <a-tag bordered size="small" color="red" v-else>禁用</a-tag>
                         </template>
                     </a-table-column>
-                    <a-table-column title="描述" data-index="description" :ellipsis="true"
+                    <a-table-column title="描述" data-index="description" :ellipsis="true" :width="150"
                         :tooltip="true"></a-table-column>
                     <a-table-column title="创建时间" data-index="createTime" :width="180"></a-table-column>
                     <a-table-column title="操作" :width="280" align="center" :fixed="'right'">

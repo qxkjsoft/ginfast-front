@@ -11,6 +11,9 @@ importers:
       '@arco-design/color':
         specifier: ^0.4.0
         version: 0.4.0
+      '@arco-themes/vue-gi-demo':
+        specifier: ^0.0.51
+        version: 0.0.51(@arco-design/web-vue@2.57.0(vue@3.5.15(typescript@5.8.3)))
       '@codemirror/lang-javascript':
         specifier: ^6.2.2
         version: 6.2.4
@@ -268,6 +271,11 @@ packages:
 
   '@arco-plugins/vite-vue@1.4.5':
     resolution: {integrity: sha512-2pJ9mpZP9mRD7NGZwRsZTS9C/US5ilEBBUqxN5Qgnd3Td50u9apJVKAABCZjG2K2eHiyZg7Fd9XhgHJXVJJmsw==}
+
+  '@arco-themes/vue-gi-demo@0.0.51':
+    resolution: {integrity: sha512-8ud9gI2mRzcY/zvcYNJoPDZU2qI5DPRhfSQpd5sfOYsgl/YN0sDWEv5BpHJ5eQmprrBsZCfYo2NIq47qb0EtrA==}
+    peerDependencies:
+      '@arco-design/web-vue': ^2.56.0
 
   '@babel/code-frame@7.27.1':
     resolution: {integrity: sha512-cjQ7ZlQ0Mv3b47hABuTevyTuYN4i+loJKGeV9flcCgIK37cCXRh+L1bd3iBHlynerhQ7BhCkn2BPbQUL+rGqFg==}
@@ -5000,6 +5008,10 @@ snapshots:
       '@types/node': 16.18.126
     transitivePeerDependencies:
       - supports-color
+
+  '@arco-themes/vue-gi-demo@0.0.51(@arco-design/web-vue@2.57.0(vue@3.5.15(typescript@5.8.3)))':
+    dependencies:
+      '@arco-design/web-vue': 2.57.0(vue@3.5.15(typescript@5.8.3))
 
   '@babel/code-frame@7.27.1':
     dependencies:

@@ -34,9 +34,9 @@
                 :pagination="pagination" @page-change="onPageChange" @page-size-change="onPageSizeChange"
                 :scroll="{ x: '100%', y: '100%', minWidth: 1000 }">
                 <template #columns>
-                    <a-table-column title="ID" data-index="id" :width="80"></a-table-column>
-                    <a-table-column title="API标题" data-index="title"></a-table-column>
-                    <a-table-column title="API路径" data-index="path"></a-table-column>
+                    <a-table-column title="ID" data-index="id" :width="70" align="center"></a-table-column>
+                    <a-table-column title="API标题" data-index="title" :width="150" ellipsis tooltip></a-table-column>
+                    <a-table-column title="API路径" data-index="path" :width="200" ellipsis tooltip></a-table-column>
                     <a-table-column title="请求方法" :width="100" align="center">
                         <template #cell="{ record }">
                             <a-tag :color="getMethodColor(record.method)">{{ record.method }}</a-tag>

@@ -5,8 +5,7 @@
                 <a-row align="center">
                     <a-col :span="2">
                         <div>
-                            <a-avatar :size="100" @click="showAvatarUpload" trigger-type="mask">
-                                <img alt="avatar" :src="userInfo.avatar" />
+                            <a-avatar :size="100" @click="showAvatarUpload" trigger-type="mask" :imageUrl="userInfo.avatar">
                                 <template #trigger-icon>
                                     <IconEdit />
                                 </template>
@@ -18,13 +17,13 @@
                             <a-descriptions :data="detail" :column="4" title="用户资料" :align="{ label: 'right' }">
                                 <template #value="{ value, data }">
                                     <span v-if="data.key === 'roles'">
-                                        {{Array.isArray(value) && value.map((curr: any) => curr.name).join(",")}}
+                                        {{Array.isArray(value) && value.map((curr: any) => curr.name).join(",") || '-'}}
                                     </span>
                                     <span v-else-if="data.key == 'status'">
                                         {{ value === 1 ? "启用" : "禁用" }}
                                     </span>
                                     <span v-else-if="data.key == 'sex'">
-                                        {{ value === 1 ? "男" : "女" }}
+                                        {{ getSexName(value) }}
                                     </span>
                                     <span v-else-if="data.key == 'createTime'">
                                         {{ formatTime(value) }}
@@ -95,7 +94,7 @@ import SecuritySettings from "@/views/system/userinfo/components/security-settin
 
 import useGlobalProperties from "@/hooks/useGlobalProperties";
 import { useRouteConfigStore } from "@/store/modules/route-config";
-import { type AccountDetail, getAccountDetailAPI, uploadAvatarAPI } from "@/api/user";
+import { type AccountDetail, type ProfileItem,  getAccountDetailAPI, uploadAvatarAPI, getProfileAPI } from "@/api/user";
 import { formatTime } from "@/globals";
 import { IconEdit } from '@arco-design/web-vue/es/icon';
 // 裁剪组件
@@ -269,17 +268,19 @@ const refresh = () => {
 };
 
 const loading = ref<boolean>(false);
-const userInfo = ref<AccountDetail>({} as AccountDetail);
+const userInfo = ref<ProfileItem>({} as ProfileItem);
 const getUserInfo = async () => {
     try {
         loading.value = true;
-        let params = {
-            id: route.query.id ? route.query.id : ""
-        };
-        let data = await getAccountDetailAPI(params.id);
+        // let params = {
+        //     id: route.query.id ? route.query.id : ""
+        // };
+        //let data = await getAccountDetailAPI(params.id);
+        let data = await getProfileAPI();
         userInfo.value = data.data;
         // 处理头像URL
         userInfo.value.avatar = handleUrl(userInfo.value.avatar);
+
         const userMap = {
             userName: userInfo.value.userName,
             nickName: userInfo.value.nickName,
@@ -292,6 +293,7 @@ const getUserInfo = async () => {
             createTime: userInfo.value.createdAt,
             description: userInfo.value.description
         };
+
         detail.value.forEach((item: Detail) => {
             if (userMap.hasOwnProperty(item.key)) {
                 item.value = (userMap as any)[item.key];
@@ -301,6 +303,15 @@ const getUserInfo = async () => {
         loading.value = false;
     }
 };
+
+
+const sexOption = ref(dictFilter("gender"));
+const getSexName = (sex: number) => {
+    const sexItem = sexOption.value.find((item: any) => item.value === sex);
+    return sexItem ? sexItem.name : '-';
+}
+
+
 
 getUserInfo();
 routerStore.setTabsTitle(`用户${route.query.userName ? " - " + route.query.userName : "信息"}`);

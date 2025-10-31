@@ -3,7 +3,7 @@
         <div class="logo_box" :class="(collapsed || layoutType == 'layoutHead') && 'padding-unset'">
             <!-- <img v-if="sysLogo" :src="sysLogo" alt="系统logo" style="width: 32px; height: 32px;" />
             <s-svg-icon v-else name="snow" :size="32" /> -->
-            <LogoSvg :defaultImageUrl="sysLogo" :width="32" :height="32" />
+            <LogoSvg :imageUrl="sysLogo" :width="32" :height="32" />
             <span :class="isDark ? 'logo_title dark' : 'logo_title'" v-if="isTitle">{{ bannerTitle }}</span>
         </div>
     </div>

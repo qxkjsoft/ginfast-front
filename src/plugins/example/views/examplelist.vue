@@ -21,9 +21,9 @@
                 :bordered="{ wrapper: true, cell: true }" @page-change="handlePageChange"
                 @page-size-change="handlePageSizeChange">
                 <template #columns>
-                    <a-table-column title="ID" data-index="id" />
-                    <a-table-column title="名称" data-index="name" />
-                    <a-table-column title="描述" data-index="description" />
+                    <a-table-column title="ID" data-index="id" :width="70" align="center" />
+                    <a-table-column title="名称" data-index="name"  :width="150"  ellipsis tooltip/>
+                    <a-table-column title="描述" data-index="description"  :width="200"  ellipsis tooltip  />
                     <a-table-column title="操作" :width="200">
                         <template #cell="{ record }">
                             <a-space>

@@ -24,7 +24,7 @@
                         :style="{ width: typeof width === 'number' ? width + 'px' : width, height: typeof height === 'number' ? height + 'px' : height }">
                         <div class="arco-upload-picture-card-text">
                             <IconPlus />
-                            <div style="margin-top: 10px; font-weight: 600">{{ title }}</div>
+                            <div style="font-weight: 600">{{ title }}</div>
                         </div>
                     </div>
                 </div>

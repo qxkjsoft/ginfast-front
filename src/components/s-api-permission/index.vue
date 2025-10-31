@@ -1,5 +1,5 @@
 <template>
-    <a-drawer :visible="visible" :width="800" @ok="handleOk" @cancel="handleCancel" :title="title"
+    <a-drawer :visible="visible" :width="900" @ok="handleOk" @cancel="handleCancel" :title="title"
         :ok-loading="loading">
         <div class="api-permission-container">
             <!-- 搜索区域 -->

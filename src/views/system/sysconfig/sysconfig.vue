@@ -24,7 +24,7 @@
                                     <a-form-item field="systemLogo" label="系统Logo">
                                         <!-- 图片上传组件 -->
                                         <ImageUpload :width="50" :height="50"
-                                            v-model:image-url="configData.system.systemLogo" :title="'上传系统Logo'"
+                                            v-model:image-url="configData.system.systemLogo" :title="'系统Logo'"
                                             :accept="'.svg'" />
                                         <template #extra>
                                             <div>显示在登录页面和系统导航栏的网站图标（建议 .svg 格式）</div>
@@ -35,7 +35,7 @@
                                     <a-form-item field="systemIcon" label="系统图标">
                                         <!-- 图片上传组件 -->
                                         <ImageUpload :width="50" :height="50"
-                                            v-model:image-url="configData.system.systemIcon" :title="'上传系统图标'"
+                                            v-model:image-url="configData.system.systemIcon" :title="'系统图标'"
                                             :accept="'.ico'" />
                                         <template #extra>
                                             <div>浏览器标签页显示的网站图标（建议 .ico 格式）</div>
@@ -65,6 +65,25 @@
                                         <a-input v-model="configData.system.systemRecordNo" placeholder="请输入备案号" />
                                         <template #extra>
                                             <div>工信部 ICP 备案编号 如：粤ICP备12345678号</div>
+                                        </template>
+                                    </a-form-item>
+                                </a-col>
+                            </a-row>
+                            <a-row>
+                                <a-col :span="12">
+                                    <a-form-item field="defaultusername" label="默认用户名">
+                                        <a-input v-model="configData.system.defaultusername" placeholder="请输入默认用户名" />
+                                        <template #extra>
+                                            <div>系统默认登录用户名</div>
+                                        </template>
+                                    </a-form-item>
+                                </a-col>
+                                
+                                <a-col :span="12">
+                                    <a-form-item field="defaultpassword" label="默认密码">
+                                        <a-input-password v-model="configData.system.defaultpassword" placeholder="请输入默认密码" />
+                                        <template #extra>
+                                            <div>系统默认登录密码</div>
                                         </template>
                                     </a-form-item>
                                 </a-col>

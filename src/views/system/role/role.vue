@@ -31,8 +31,8 @@
             <a-table row-key="id" :data="displayRoleList" :bordered="{ cell: true }" :loading="loading"
                 :pagination="false" :scroll="{ x: '100%', y: '100%', minWidth: 1000 }">
                 <template #columns>
-                    <a-table-column title="角色名称" data-index="name"></a-table-column>
-                    <a-table-column title="ID" data-index="id" :width="70"></a-table-column>
+                    <a-table-column title="角色名称" data-index="name" :width="150"></a-table-column>
+                    <a-table-column title="ID" data-index="id" :width="70" align="center"></a-table-column>
                     <a-table-column title="排序" data-index="sort" :width="100" align="center"></a-table-column>
                     <a-table-column title="状态" :width="100" align="center">
                         <template #cell="{ record }">
@@ -41,7 +41,7 @@
                         </template>
                     </a-table-column>
                     <a-table-column title="描述" data-index="description" :ellipsis="true"
-                        :tooltip="true"></a-table-column>
+                        :tooltip="true" :width="150"></a-table-column>
                     <a-table-column title="创建时间" data-index="createdAt" :width="180">
                         <template #cell="{ record }">
                             {{ record.createdAt ? formatTime(record.createdAt) : ""}}

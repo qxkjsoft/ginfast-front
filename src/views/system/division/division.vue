@@ -31,14 +31,14 @@
             <a-table ref="tableRef" :data="displayDivisionList" default-expand-all-rows :bordered="{ cell: true }"
                 row-key="id" :pagination="false" :loading="loading">
                 <template #columns>
-                    <a-table-column title="部门名称">
+                    <a-table-column title="ID" data-index="id" :width="70" align="center"></a-table-column>
+                    <a-table-column title="部门名称" :width="150">
                         <template #cell="{ record }">
                             {{ record.name }}
                         </template>
                     </a-table-column>
-                    <a-table-column title="ID" data-index="id" :width="100" align="center"></a-table-column>
                     <a-table-column title="排序" data-index="sort" :width="100" align="center"></a-table-column>
-                    <a-table-column title="启用状态" align="center">
+                    <a-table-column title="启用状态" align="center" :width="90">
                         <template #cell="{ record }">
                             <a-space>
                                 <a-tag bordered size="small" color="arcoblue" v-if="record.status">启用</a-tag>
@@ -46,12 +46,12 @@
                             </a-space>
                         </template>
                     </a-table-column>
-                    <a-table-column title="描述" data-index="describe" :ellipsis="true" :tooltip="true"></a-table-column>
-                    <a-table-column title="创建时间" data-index="createdAt" :ellipsis="true" :tooltip="true">
+                    <a-table-column title="描述" data-index="describe" :ellipsis="true" :tooltip="true" :width="150"></a-table-column>
+                    <a-table-column title="创建时间" data-index="createdAt" :ellipsis="true" :tooltip="true" :width="180">
                         <template #cell="{ record }">{{ record.createdAt ? formatTime(record.createdAt) : ""
                         }}</template>
                     </a-table-column>
-                    <a-table-column title="操作" align="center" :fixed="'right'">
+                    <a-table-column title="操作" align="center" :fixed="'right'" :width="280">
                         <template #cell="{ record }">
                             <a-space>
                                 <a-link v-hasPerm="['system:division:edit']" @click="onUpdate(record)">

@@ -18,29 +18,24 @@
                     <template #icon><icon-refresh /></template>
                     <span>重置</span>
                 </a-button>
+                <a-upload :custom-request="handleUpload" :show-file-list="false" :disabled="uploadLoading"
+                    v-hasPerm="['system:affix:upload']">
+                    <template #upload-button>
+                        <a-button type="primary" :loading="uploadLoading">
+                            <template #icon><icon-plus /></template>
+                            <span>上传文件</span>
+                        </a-button>
+                    </template>
+                </a-upload>
             </a-space>
-
-            <a-row>
-                <a-space wrap>
-                    <a-upload :custom-request="handleUpload" :show-file-list="false" :disabled="uploadLoading"
-                        v-hasPerm="['system:affix:upload']">
-                        <template #upload-button>
-                            <a-button type="primary" :loading="uploadLoading">
-                                <template #icon><icon-plus /></template>
-                                <span>上传文件</span>
-                            </a-button>
-                        </template>
-                    </a-upload>
-                </a-space>
-            </a-row>
-
             <a-table row-key="id" :data="affixList" :bordered="{ cell: true }" :loading="loading"
                 :scroll="{ x: '100%', y: '75%' }" :pagination="pagination" @page-change="handlePageChange"
                 @page-size-change="handlePageSizeChange">
                 <template #columns>
-                    <a-table-column title="序号" :width="64">
+                    <!-- <a-table-column title="序号" :width="64">
                         <template #cell="cell">{{ cell.rowIndex + 1 }}</template>
-                    </a-table-column>
+                    </a-table-column> -->
+                    <a-table-column title="ID" data-index="id" :width="70" align="center"></a-table-column>
                     <a-table-column title="文件名" data-index="name" :ellipsis="true" tooltip
                         :width="200"></a-table-column>
                     <a-table-column title="文件类型" data-index="ftype" :width="90">
@@ -364,8 +359,6 @@ onMounted(() => {
 }
 
 .search-box {
-    margin-bottom: $padding;
-    padding: $padding;
     background: $color-bg-1;
     border-radius: $radius-box-1;
 }

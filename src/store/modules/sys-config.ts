@@ -22,7 +22,9 @@ const sysConfigStore = () => {
         systemIcon: "",
         systemName: "",
         systemCopyright: "",
-        systemRecordNo: ""
+        systemRecordNo: "",
+        defaultusername: "",
+        defaultpassword: ""
     });
 
     // 安全配置数据
@@ -109,7 +111,9 @@ const sysConfigStore = () => {
             systemIcon: "",
             systemName: "",
             systemCopyright: "",
-            systemRecordNo: ""
+            systemRecordNo: "",
+            defaultusername: "",
+            defaultpassword: ""
         };
 
         safeConfig.value = {

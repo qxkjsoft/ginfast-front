@@ -51,37 +51,37 @@
           </a-form>
         </a-col>
       </a-row>
-      <a-row style="margin-top: 20px">
+      <a-row>
         <a-col :span="24">
           <a-table row-key="id" :loading="loading" :data="renderData" :pagination="pagination" @page-change="pageChange"
             @page-size-change="pageSizeChange">
             <template #columns>
-              <a-table-column title="ID" data-index="id" />
-              <a-table-column title="租户名称" data-index="name" />
-              <a-table-column title="租户编码" data-index="code" />
-              <a-table-column title="描述" data-index="description">
+              <a-table-column title="ID" data-index="id" :width="70" align="center"></a-table-column>
+              <a-table-column title="租户名称" data-index="name" :ellipsis="true" tooltip :width="150"></a-table-column>
+              <a-table-column title="租户编码" data-index="code" :width="150"></a-table-column>
+              <a-table-column title="描述" data-index="description"  :ellipsis="true" tooltip :width="150">
                 <template #cell="{ record }">
                   {{ record.description || '-' }}
                 </template>
               </a-table-column>
-              <a-table-column title="域名" data-index="domain">
+              <a-table-column title="域名" data-index="domain" :ellipsis="true" tooltip :width="150">
                 <template #cell="{ record }">
                   {{ record.domain || '-' }}
                 </template>
               </a-table-column>
-              <a-table-column title="状态" data-index="status">
+              <a-table-column title="状态" data-index="status" :width="70" align="center">
                 <template #cell="{ record }">
                   <a-tag :color="record.status === 1 ? 'green' : 'red'">
                     {{ record.status === 1 ? '启用' : '停用' }}
                   </a-tag>
                 </template>
               </a-table-column>
-              <a-table-column title="创建时间" data-index="createdAt">
+              <a-table-column title="创建时间" data-index="createdAt" :width="180" >
                 <template #cell="{ record }">
                    {{ record.createdAt ? formatTime(record.createdAt) : ""}}
                 </template>
               </a-table-column>
-              <a-table-column title="操作">
+              <a-table-column title="操作" :width="200">
                 <template #cell="{ record }">
                   <a-link type="text" size="small" @click="handleEdit(record)" v-hasPerm="['system:tenant:edit']">
 					<template #icon><icon-edit /></template>

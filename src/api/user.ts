@@ -20,21 +20,33 @@ export type RefreshTokenResult = BaseResult<{
     refreshTokenExpires: number;
 }>;
 
-export type ProfileResult = BaseResult<{
+
+export type ProfileItem = {
     id: number;
     /** 头像 */
     avatar: string;
     /** 用户名 */
-    username: string;
+    userName: string;
     /** 昵称 */
-    nickname: string;
+    nickName: string;
     /** 当前登录用户的角色 */
-    roles: Array<number>;
+    roleIDs: Array<number>;
     /** 按钮级别权限 */
     permissions: Array<string>;
     tenantID: number;
     tenantCode: string;
-}>;
+    /** 性别 */
+    sex: string;
+    status: number;
+    email: string;
+    phone: string;
+    createdAt: string;
+    description: string;
+    roles: Array<RoleItem>;
+    department: DivisionItem;
+}
+
+export type ProfileResult = BaseResult<ProfileItem>;
 
 export type CaptchaIdResult = BaseResult<{
     captchaId: string;
@@ -125,9 +137,14 @@ export const getAccountDetailAPI = (id: number) => {
     return http.request<AccountDetailResult>("get", baseUrlApi(`users/${id}`));
 };
 
-// 修改用户的密码、手机、邮箱
+// 修改单前登录用户的密码、手机、邮箱
 export const updateAccountAPI = (param: any) => {
     return http.request<BaseResult>("put", baseUrlApi(`users/updateAccount`), { data: param });
+};
+
+// 修改当前登录用户的基本信息
+export const updateBasicInfoAPI = (param: any) => {
+    return http.request<BaseResult>("put", baseUrlApi(`users/updateBasicInfo`), { data: param });
 };
 
 // 上传用户头像

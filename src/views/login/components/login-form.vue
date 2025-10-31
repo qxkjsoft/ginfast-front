@@ -51,12 +51,16 @@
 import { useRouter } from "vue-router";
 import { useRouteConfigStore } from "@/store/modules/route-config";
 import { useUserStoreHook } from "@/store/modules/user";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { getCaptchaId } from "@/api/user";
 import { baseUrlApi } from "@/api/utils";
 import { useSystemStore } from "@/store/modules/system";
+import { useSysConfigStore } from "@/store/modules/sys-config";
 
-
+import { storeToRefs } from "pinia";
+// 获取系统配置
+const sysConfigStore = useSysConfigStore();
+const { systemConfig } = storeToRefs(sysConfigStore);
 // 定义表单数据类型
 interface LoginForm {
     tenantCode: string;
@@ -79,6 +83,7 @@ const form = ref<LoginForm>({
     captchaValue: null,
     captchaId: ""
 });
+
 
 // 表单验证规则
 const rules = ref({
@@ -160,6 +165,18 @@ const refreshCaptcha = () => {
         );
     }
 };
+
+// 监听系统配置变化，自动更新默认账号密码
+watch(systemConfig, (newConfig) => {
+    if (newConfig) {
+        if (newConfig.defaultusername) {
+            form.value.username = newConfig.defaultusername;
+        }
+        if (newConfig.defaultpassword) {
+            form.value.password = newConfig.defaultpassword;
+        }
+    }
+}, { immediate: true });
 
 // 组件挂载时的初始化
 onMounted(async () => {

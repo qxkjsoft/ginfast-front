@@ -52,7 +52,7 @@
                 :row-selection="{ type: 'checkbox', showCheckedAll: true }" @page-change="handlePageChange"
                 @page-size-change="handlePageSizeChange">
                 <template #columns>
-                    <a-table-column title="ID" data-index="id" :width="80"></a-table-column>
+                    <a-table-column title="ID" data-index="id" :width="80" align="center"></a-table-column>
                     <a-table-column title="用户名" data-index="username" :width="120"></a-table-column>
                     <a-table-column title="操作模块" data-index="module" :width="150"></a-table-column>
                     <a-table-column title="操作类型" :width="100">

@@ -96,10 +96,10 @@ GinFast/
 
 ```bash
 # GitHub
-git clone https://github.com/qxkjsoft/ginfast-front.git
+git clone https://github.com/qxkjsoft/ginfast-ui.git
 
 # 进入项目目录
-cd ginfast-front
+cd ginfast-ui
 ```
 
 ### 安装依赖

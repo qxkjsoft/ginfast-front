@@ -1,8 +1,6 @@
 <template>
     <div class="banner_title">
-        <!-- <img v-if="sysLogo" :src="sysLogo" alt="系统logo" style="width: 40px; height: 40px;" />
-        <s-svg-icon v-else name="snow" size="40" /> -->
-        <LogoSvg :defaultImageUrl="sysLogo" :width="40" :height="40" />
+        <LogoSvg :imageUrl="sysLogo" :width="40" :height="40" />
         {{ bannerTitle }}
     </div>
 </template>
