@@ -174,7 +174,7 @@ import { getAccountListAPI, addAccountAPI, editAccountAPI, deleteAccountAPI } fr
 import { deepClone } from "@/utils";
 import { formatTime } from "@/globals";
 
-const router = useRouter();
+
 const openState = ref(dictFilter("status"));
 const sexOption = ref(dictFilter("gender"));
 const form = ref({

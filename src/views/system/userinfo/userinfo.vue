@@ -94,7 +94,7 @@ import SecuritySettings from "@/views/system/userinfo/components/security-settin
 
 import useGlobalProperties from "@/hooks/useGlobalProperties";
 import { useRouteConfigStore } from "@/store/modules/route-config";
-import { type AccountDetail, type ProfileItem,  getAccountDetailAPI, uploadAvatarAPI, getProfileAPI } from "@/api/user";
+import { type ProfileItem,  uploadAvatarAPI, getProfileAPI } from "@/api/user";
 import { formatTime } from "@/globals";
 import { IconEdit } from '@arco-design/web-vue/es/icon';
 // 裁剪组件
