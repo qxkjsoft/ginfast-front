@@ -329,6 +329,7 @@ const getDict = async () => {
         const params: DictListParams = {
             page: currentPage.value,
             limit: pageSize.value,
+            order: "id desc",
             ...form.value
         };
         const res = await getDictListAPI(params);

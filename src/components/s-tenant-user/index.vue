@@ -5,6 +5,7 @@
     :hide-cancel="true"
     ok-text="关闭"
     @ok="handleCancel"
+    @cancel="handleCancel"
     :title="title"
     :ok-loading="loading"
   >

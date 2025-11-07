@@ -271,6 +271,7 @@ const getAffixList = async () => {
     const params = {
         pageNum: pagination.value.current,
         pageSize: pagination.value.pageSize,
+        order: "id desc",
         ...form.value
     };
 

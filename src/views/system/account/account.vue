@@ -381,6 +381,7 @@ const getAccount = async () => {
     const params: any = {
         pageNum: pagination.value.current,
         pageSize: pagination.value.pageSize,
+        order: "id desc",
         ...form.value
     };
 

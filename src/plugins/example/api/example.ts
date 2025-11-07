@@ -22,19 +22,25 @@ export interface ExampleListParams {
 }
 
 
+export type ExampleResult = BaseResult<ExampleData>;
 
 export const getExampleList = (params: ExampleListParams) => {
     return http.request<ExampleListResult>("get", baseUrlApi("plugins/example/list"), { params });
 };
 
-export const createExampleData = (data: Omit<ExampleData, 'id'>) => {
+export const createExample = (data: Omit<ExampleData, 'id'>) => {
     return http.request<ExampleData>("post", baseUrlApi("plugins/example/add"), { data });
 };
 
-export const updateExampleData = (data: Partial<ExampleData>) => {
+export const updateExample= (data: Partial<ExampleData>) => {
     return http.request<ExampleData>("put", baseUrlApi(`plugins/example/edit`), { data });
 };
 
-export const deleteExampleData = (id: number) => {
-    return http.request<void>("delete", baseUrlApi(`plugins/example/delete`), { data: { id } });
+export const deleteExample = (id: number) => {
+    return http.request<BaseResult>("delete", baseUrlApi(`plugins/example/delete`), { data: { id } });
+};
+
+
+export const getExample = (id: number) => {
+    return http.request<ExampleResult>("get", baseUrlApi(`plugins/example/${id}`));
 };

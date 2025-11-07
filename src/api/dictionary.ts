@@ -43,6 +43,7 @@ export type AllDictsResult = BaseResult<{
 export interface DictListParams {
   page?: number;
   limit?: number;
+  order?: string;
   name?: string;
   code?: string;
   status?: number;

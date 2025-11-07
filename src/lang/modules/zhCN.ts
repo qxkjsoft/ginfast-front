@@ -120,5 +120,6 @@ export default {
         ["api-management"]: "接口管理",
         ["plugin-example"]: "插件示例",
         ["tenant"]: "租户管理",
+        ["codegen"]: "代码生成",
     },
 };

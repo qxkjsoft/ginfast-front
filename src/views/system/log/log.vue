@@ -191,6 +191,7 @@ const getLogList = async () => {
         const params: any = {
             pageNum: pagination.current,
             pageSize: pagination.pageSize,
+            order: "id desc",
             username: form.value.username,
             module: form.value.module,
             operation: form.value.operation,

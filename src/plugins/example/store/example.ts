@@ -1,11 +1,12 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import type { ExampleData, ExampleListParams, ExampleListResult } from '../api/example';
+import type { ExampleData, ExampleListParams, ExampleListResult, ExampleResult } from '../api/example';
 import {
     getExampleList,
-    createExampleData,
-    updateExampleData,
-    deleteExampleData,
+    createExample,
+    updateExample,
+    deleteExample,
+    getExample
 } from '../api/example';
 
 
@@ -66,7 +67,7 @@ export const useExamplePluginStore = defineStore('example-plugin', () => {
 
     const createData = async (data: Omit<ExampleData, 'id'>) => {
         try {
-            const response = await createExampleData(data);
+            const response = await createExample(data);
             return response;
         } catch (error) {
             throw error;
@@ -75,7 +76,7 @@ export const useExamplePluginStore = defineStore('example-plugin', () => {
 
     const updateData = async (data: Partial<ExampleData>) => {
         try {
-            const response = await updateExampleData(data);
+            const response = await updateExample(data);
             return response;
         } catch (error) {
             throw error;
@@ -84,7 +85,7 @@ export const useExamplePluginStore = defineStore('example-plugin', () => {
 
     const deleteData = async (id: number) => {
         try {
-            await deleteExampleData(id);
+            await deleteExample(id);
             dataList.value = dataList.value.filter((item: ExampleData) => item.id !== id);
             // 减少总数
             total.value = Math.max(0, total.value - 1);
@@ -93,6 +94,16 @@ export const useExamplePluginStore = defineStore('example-plugin', () => {
         }
     };
 
+    // 根据ID获取用户详情
+    const getDetail = async (id: number) : Promise<ExampleResult> => {
+        try {
+            const response = await getExample(id);
+            return response;
+        } catch (error) {
+            throw error;
+        }
+    };
+    
     // 重置搜索条件
     const resetSearchParams = () => {
         searchParams.value = {};
@@ -122,5 +133,6 @@ export const useExamplePluginStore = defineStore('example-plugin', () => {
         updateData,
         deleteData,
         resetSearchParams,
+        getDetail
     };
 });

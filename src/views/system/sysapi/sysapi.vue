@@ -194,6 +194,7 @@ const getSysApiList = async () => {
         const params = {
             pageNum: pagination.current,
             pageSize: pagination.pageSize,
+            order: "id desc",
             ...form.value
         };
         const { data } = await getSysApiListAPI(params);

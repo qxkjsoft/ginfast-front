@@ -1,5 +1,5 @@
 <template>
-    <div class="example-plugin-container">
+    <div class="example-plugin-container snow-fill">
         <a-card title="示例插件列表" :loading="loading">
             <template #extra>
                 <a-space>
@@ -69,6 +69,7 @@ const {
     createData,
     updateData,
     deleteData,
+    getDetail,
     resetSearchParams
 } = exampleStore;
 const { dataList, loading, total, currentPage, pageSize } = storeToRefs(exampleStore);
@@ -147,8 +148,11 @@ const handleCreate = () => {
 };
 
 // 编辑数据
-const handleEdit = (record: ExampleData) => {
-    Object.assign(editingData, record);
+const handleEdit = async (record: ExampleData) => {
+    // 获取详情
+    const detail = await getDetail(record.id);
+    // 赋值给编辑数据
+    Object.assign(editingData, detail.data);
     modalVisible.value = true;
 };
 
@@ -203,14 +207,6 @@ onMounted(async () => {
 
 <style scoped lang="scss">
 .example-plugin-container {
-    padding: 20px;
 
-    :deep(.arco-card) {
-        border-radius: 4px;
-    }
-
-    :deep(.arco-table-th) {
-        background-color: var(--color-fill-2);
-    }
 }
 </style>

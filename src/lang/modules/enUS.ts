@@ -120,5 +120,6 @@ export default {
         ["api-management"]: "api management",
         ["plugin-example"]: "plugin example",
         ["tenant"]: "tenant management",
+        ["codegen"]: "code generation",
     }
 };
