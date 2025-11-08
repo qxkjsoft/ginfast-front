@@ -9,7 +9,8 @@ export interface DatabaseInfo {
 
 /** 表信息 */
 export interface TableInfo {
-  name: string;
+  tableName: string;
+  tableComment: string;
 }
 
 /** 字段信息 */
