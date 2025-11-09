@@ -39,7 +39,11 @@
           <a-table-column title="模块名称" data-index="moduleName" :width="150"></a-table-column>
           <a-table-column title="描述" data-index="describe" :ellipsis="true" :width="200"
             :tooltip="true"></a-table-column>
-          <a-table-column title="创建时间" data-index="createdAt" :width="180"></a-table-column>
+          <a-table-column title="创建时间" data-index="createdAt" :width="180" align="center">
+            <template #cell="{ record }">
+              {{ record.createdAt ? formatTime(record.createdAt) : '-' }}
+            </template>
+          </a-table-column>
           <a-table-column title="操作" :width="150" align="center" :fixed="'right'">
             <template #cell="{ record }">
               <a-space>
@@ -97,7 +101,7 @@ import {
   type SysGenListParams 
 } from "@/api/sysgen";
 import { getTables, type TableInfo } from "@/api/syscodegen";
-
+import { formatTime } from "@/globals";
 // 查询表单
 const form = ref<SysGenListParams>({
   name: "",
