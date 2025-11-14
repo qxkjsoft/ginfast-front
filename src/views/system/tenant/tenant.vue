@@ -3,20 +3,20 @@
         <a-card class="general-card">
             <a-row>
                 <a-col :span="24">
-                    <a-form :model="formModel" :label-col-props="{ span: 6 }" :wrapper-col-props="{ span: 18 }"
+                    <a-form :model="formModel" :layout="layoutMode.layout" :label-col-props="{ span: 6 }" :wrapper-col-props="{ span: 18 }"
                         label-align="left" auto-label-width>
                         <a-row :gutter="16">
-                            <a-col :span="6">
+                            <a-col :span="isMobile ? 24 : 6">
                                 <a-form-item field="name" label="租户名称">
                                     <a-input v-model="formModel.name" placeholder="请输入租户名称" allow-clear />
                                 </a-form-item>
                             </a-col>
-                            <a-col :span="6">
+                            <a-col :span="isMobile ? 24 : 6">
                                 <a-form-item field="code" label="租户编码">
                                     <a-input v-model="formModel.code" placeholder="请输入租户编码" allow-clear />
                                 </a-form-item>
                             </a-col>
-                            <a-col :span="6">
+                            <a-col :span="isMobile ? 24 : 6">
                                 <a-form-item field="status" label="状态">
                                     <a-select v-model="formModel.status" placeholder="请选择状态" allow-clear>
                                         <a-option :value="1">启用</a-option>
@@ -24,7 +24,7 @@
                                     </a-select>
                                 </a-form-item>
                             </a-col>
-                            <a-col :span="6">
+                            <a-col :span="isMobile ? 24 : 6">
                                 <a-space wrap>
                                     <a-button type="primary" @click="search">
                                         <template #icon>
@@ -82,7 +82,7 @@
                                     {{ record.createdAt ? formatTime(record.createdAt) : "" }}
                                 </template>
                             </a-table-column>
-                            <a-table-column title="操作" :width="200">
+                            <a-table-column title="操作" :width="240" :fixed="isMobile ? '' : 'right'">
                                 <template #cell="{ record }">
                                     <a-link type="text" size="small" @click="handleEdit(record)"
                                         v-hasPerm="['system:tenant:edit']">
@@ -110,8 +110,8 @@
         </a-card>
 
         <!-- 新增/编辑弹窗 -->
-        <a-modal v-model:visible="modalVisible" :title="modalTitle" @ok="handleOk" @cancel="handleCancel">
-            <a-form ref="formRef" :model="modalFormModel" :rules="rules">
+        <a-modal :width="layoutMode.width" v-model:visible="modalVisible" :title="modalTitle" @ok="handleOk" @cancel="handleCancel">
+            <a-form ref="formRef" :layout="layoutMode.layout" :model="modalFormModel" :rules="rules">
                 <a-form-item field="name" label="租户名称">
                     <a-input v-model="modalFormModel.name" placeholder="请输入租户名称" />
                 </a-form-item>
@@ -149,6 +149,22 @@ import STenantUser from "@/components/s-tenant-user/index.vue";
 
 // 引入图标组件
 import { IconUser } from '@arco-design/web-vue/es/icon';
+import { useDevicesSize } from "@/hooks/useDevicesSize";
+const { isMobile } = useDevicesSize();
+const layoutMode = computed(() => {
+  let info = {
+    mobile: {
+      width: "95%",
+      layout: "vertical"
+    },
+    desktop: {
+      width: "40%",
+      layout: "horizontal"
+    }
+  };
+  return isMobile.value ? info.mobile : info.desktop;
+});
+
 
 const loading = ref(false)
 const renderData = ref<Tenant[]>([])

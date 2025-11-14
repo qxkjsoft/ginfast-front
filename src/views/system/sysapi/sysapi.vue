@@ -53,7 +53,7 @@
                         <template #cell="{ record }">{{ record.createdAt ? formatTime(record.createdAt) : ""
                             }}</template>
                     </a-table-column>
-                    <a-table-column title="操作" :width="200" align="center" :fixed="'right'">
+                    <a-table-column title="操作" :width="200" align="center" :fixed="isMobile ? '' : 'right'">
                         <template #cell="{ record }">
                             <a-space>
                                 <a-link @click="onUpdate(record)" v-hasPerm="['system:api:edit']">
@@ -73,10 +73,10 @@
             </a-table>
         </div>
 
-        <a-modal width="40%" v-model:visible="open" @close="afterClose" :on-before-ok="handleOk" @cancel="afterClose">
+        <a-modal :width="layoutMode.width" v-model:visible="open" @close="afterClose" :on-before-ok="handleOk" @cancel="afterClose">
             <template #title> {{ title }} </template>
             <div>
-                <a-form ref="formRef" auto-label-width :rules="rules" :model="addFrom">
+                <a-form ref="formRef" :layout="layoutMode.layout" auto-label-width :rules="rules" :model="addFrom">
                     <a-form-item field="title" label="API标题" validate-trigger="blur">
                         <a-input v-model="addFrom.title" placeholder="请输入API标题" allow-clear />
                     </a-form-item>
@@ -113,6 +113,24 @@ import {
 } from "@/api/sysapi";
 import { Message } from "@arco-design/web-vue";
 import { formatTime } from "@/globals";
+import { useDevicesSize } from "@/hooks/useDevicesSize";
+const { isMobile } = useDevicesSize();
+const layoutMode = computed(() => {
+  let info = {
+    mobile: {
+      width: "95%",
+      layout: "vertical"
+    },
+    desktop: {
+      width: "40%",
+      layout: "horizontal"
+    }
+  };
+  return isMobile.value ? info.mobile : info.desktop;
+});
+
+
+
 // 查询表单
 const form = ref<SysApiListParams>({
     title: "",

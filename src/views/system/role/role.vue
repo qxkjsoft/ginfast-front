@@ -47,7 +47,7 @@
                             {{ record.createdAt ? formatTime(record.createdAt) : ""}}
                         </template>
                     </a-table-column>
-                    <a-table-column title="操作" :width="350" align="center" :fixed="'right'">
+                    <a-table-column title="操作" :width="350" align="center" :fixed="isMobile ? '' : 'right'">
                         <template #cell="{ record }">
                             <a-space size="mini">
                                 <a-link v-hasPerm="['system:role:addRoleMenu']" status="warning"
@@ -79,10 +79,10 @@
             </a-table>
         </div>
 
-        <a-modal width="40%" v-model:visible="open" @close="afterClose" :on-before-ok="handleOk" @cancel="afterClose">
+        <a-modal :width="layoutMode.width" v-model:visible="open" @close="afterClose" :on-before-ok="handleOk" @cancel="afterClose">
             <template #title> {{ title }} </template>
             <div>
-                <a-form ref="formRef" auto-label-width :rules="rules" :model="addFrom">
+                <a-form ref="formRef" :layout="layoutMode.layout" auto-label-width :rules="rules" :model="addFrom">
                     <a-form-item field="parentId" label="父级角色" validate-trigger="blur">
                         <a-tree-select v-model="addFrom.parentId" :data="flattenRoleList" placeholder="请选择父级角色"
                             allow-clear allow-search :field-names="{
@@ -113,7 +113,7 @@
             </div>
         </a-modal>
 
-        <a-drawer :visible="drawerOpen" :width="500" @ok="drawerOk" @cancel="drawerCancel">
+        <a-drawer :visible="drawerOpen" :width="layoutMode.width" @ok="drawerOk" @cancel="drawerCancel">
             <template #title> 分配权限 </template>
             <div>
                 <a-card>
@@ -166,9 +166,23 @@ import {
 import { deepClone } from "@/utils";
 import useGlobalProperties from "@/hooks/useGlobalProperties";
 import { formatTime } from "@/globals";
-
 import DataScope from "@/views/system/role/components/datascope.vue";
 import { Modal } from '@arco-design/web-vue';
+import { useDevicesSize } from "@/hooks/useDevicesSize";
+const { isMobile } = useDevicesSize();
+const layoutMode = computed(() => {
+  let info = {
+    mobile: {
+      width: "95%",
+      layout: "vertical"
+    },
+    desktop: {
+      width: "40%",
+      layout: "horizontal"
+    }
+  };
+  return isMobile.value ? info.mobile : info.desktop;
+});
 const proxy = useGlobalProperties();
 const openState = ref(dictFilter("status"));
 const form = ref({
@@ -423,7 +437,7 @@ const onDataScope = (row: any) => {
     const dataScopeRef = ref<InstanceType<typeof DataScope> | null>(null)
     Modal.confirm({
         title: "数据权限",
-        width: "500px",
+        width: layoutMode.value.width,
         content: () => h(DataScope, {
             ref: dataScopeRef,
             title: row.name,

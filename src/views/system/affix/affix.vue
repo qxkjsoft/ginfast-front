@@ -32,9 +32,6 @@
                 :scroll="{ x: '100%', y: '75%' }" :pagination="pagination" @page-change="handlePageChange"
                 @page-size-change="handlePageSizeChange">
                 <template #columns>
-                    <!-- <a-table-column title="序号" :width="64">
-                        <template #cell="cell">{{ cell.rowIndex + 1 }}</template>
-                    </a-table-column> -->
                     <a-table-column title="ID" data-index="id" :width="70" align="center"></a-table-column>
                     <a-table-column title="文件名" data-index="name" :ellipsis="true" tooltip
                         :width="200"></a-table-column>
@@ -63,7 +60,7 @@
                         <template #cell="{ record }">{{ record.createdAt ? formatTime(record.createdAt) : ""
                             }}</template>
                     </a-table-column>
-                    <a-table-column title="操作" :width="320" align="center" :fixed="'right'">
+                    <a-table-column title="操作" :width="320" align="center" :fixed="isMobile ? '' : 'right'">
                         <template #cell="{ record }">
                             <a-space>
                                 <a-link @click="onDownload(record)" v-hasPerm="['system:affix:download']">
@@ -92,11 +89,11 @@
         </div>
 
         <!-- 重命名对话框 -->
-        <a-modal width="40%" v-model:visible="renameModalVisible" @close="afterRenameClose"
+        <a-modal :width="layoutMode.width" v-model:visible="renameModalVisible" @close="afterRenameClose"
             :on-before-ok="handleRenameOk">
             <template #title> 重命名文件 </template>
             <div>
-                <a-form ref="renameFormRef" auto-label-width :rules="renameRules" :model="renameForm">
+                <a-form ref="renameFormRef" :layout="layoutMode.layout" auto-label-width :rules="renameRules" :model="renameForm">
                     <a-form-item field="name" label="文件名" validate-trigger="blur">
                         <a-input v-model="renameForm.name" placeholder="请输入文件名" allow-clear />
                     </a-form-item>
@@ -117,6 +114,21 @@ import {
 import { formatTime } from "@/globals";
 import { Message } from "@arco-design/web-vue";
 import { handleUrl, copyTextToClipboard } from "@/utils/app";
+import { useDevicesSize } from "@/hooks/useDevicesSize";
+const { isMobile } = useDevicesSize();
+const layoutMode = computed(() => {
+  let info = {
+    mobile: {
+      width: "95%",
+      layout: "vertical"
+    },
+    desktop: {
+      width: "40%",
+      layout: "horizontal"
+    }
+  };
+  return isMobile.value ? info.mobile : info.desktop;
+});
 
 // 搜索表单
 const form = ref({

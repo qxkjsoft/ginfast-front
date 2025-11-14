@@ -1,101 +1,107 @@
 <template>
     <div class="snow-fill">
         <div class="snow-fill-inner container">
-            <div class="left-box">
-                <a-input v-model="deptSearchKeyword" placeholder="请输入部门名称" @input="onDeptSearch" @clear="onDeptSearch"
-                    allow-clear>
-                    <template #prefix>
-                        <icon-search />
-                    </template>
-                </a-input>
-                <div class="tree-box">
-                    <a-tree ref="treeRef" :field-names="fieldNames" :data="filteredTreeData" show-line
-                        @select="onSelectTree">
-                    </a-tree>
-                </div>
-            </div>
-            <div class="right-box">
-                <a-space wrap>
-                    <a-input v-model="form.name" placeholder="请输入用户名称" allow-clear />
-                    <a-input v-model="form.phone" placeholder="请输入手机号码" allow-clear />
-                    <a-select placeholder="用户状态" v-model="form.status" style="width: 120px" allow-clear>
-                        <a-option v-for="item in openState" :key="item.value" :value="item.value">{{ item.name
-                        }}</a-option>
-                    </a-select>
-                    <a-range-picker v-model="form.createTime" show-time format="YYYY-MM-DD HH:mm" allow-clear />
-                    <a-button type="primary" @click="search">
-                        <template #icon><icon-search /></template>
-                        <span>查询</span>
-                    </a-button>
-                    <a-button @click="reset">
-                        <template #icon><icon-refresh /></template>
-                        <span>重置</span>
-                    </a-button>
-                    <a-button type="primary" @click="onAdd" v-hasPerm="['system:account:add']">
-                        <template #icon><icon-plus /></template>
-                        <span>新增</span>
-                    </a-button>
-                </a-space>
 
-                <a-table row-key="id" :data="accountList" :bordered="{ cell: true }" :loading="loading"
-                    :scroll="{ x: '120%', y: '85%' }" :pagination="pagination" :selected-keys="selectedKeys"
-                    @select="select" @select-all="selectAll" @page-change="handlePageChange">
-                    <template #columns>
-                        <!-- <a-table-column title="序号" :width="64">
-                            <template #cell="cell">{{ cell.rowIndex + 1 }}</template>
-        </a-table-column> -->
-                        <a-table-column title="ID" data-index="id" :width="70" align="center"></a-table-column>
-                        <a-table-column title="用户名称" data-index="userName" :width="150"></a-table-column>
-                        <a-table-column title="昵称" data-index="nickName" :width="150"></a-table-column>
-                        <a-table-column title="性别" data-index="sex" align="center" :width="60">
-                            <template #cell="{ record }">
-                                <a-tag bordered size="small" color="arcoblue" v-if="record.sex == 1">男</a-tag>
-                                <a-tag bordered size="small" color="red" v-else-if="record.sex == 0">女</a-tag>
-                                <a-tag bordered size="small" v-else>未知</a-tag>
+
+            <s-fold-page :width="280">
+                <template #sider> 
+                    <div class="left-box">
+                        <a-input v-model="deptSearchKeyword" placeholder="请输入部门名称" @input="onDeptSearch" @clear="onDeptSearch"
+                            allow-clear>
+                            <template #prefix>
+                                <icon-search />
                             </template>
-                        </a-table-column>
-                        <a-table-column title="部门" data-index="deptId" :width="150">
-                            <template #cell="{ record }">{{ record.department ? record.department.name : ""
-                                }}</template>
-                        </a-table-column>
-                        <a-table-column title="手机号" data-index="phone" :width="150"></a-table-column>
-                        <a-table-column title="状态" :width="100" align="center">
-                            <template #cell="{ record }">
-                                <a-tag bordered size="small" color="arcoblue" v-if="record.status === 1">启用</a-tag>
-                                <a-tag bordered size="small" color="red" v-else>禁用</a-tag>
+                        </a-input>
+                        <div class="tree-box">
+                            <a-tree ref="treeRef" :field-names="fieldNames" :data="filteredTreeData" show-line
+                                @select="onSelectTree">
+                            </a-tree>
+                        </div>
+                    </div>
+                </template>
+
+                <template #content>
+                    <div class="right-box">
+                        <a-space wrap>
+                            <a-input v-model="form.name" placeholder="请输入用户名称" allow-clear />
+                            <a-input v-model="form.phone" placeholder="请输入手机号码" allow-clear />
+                            <a-select placeholder="用户状态" v-model="form.status" style="width: 120px" allow-clear>
+                                <a-option v-for="item in openState" :key="item.value" :value="item.value">{{ item.name
+                                }}</a-option>
+                            </a-select>
+                            <a-range-picker v-model="form.createTime" show-time format="YYYY-MM-DD HH:mm" allow-clear />
+                            <a-button type="primary" @click="search">
+                                <template #icon><icon-search /></template>
+                                <span>查询</span>
+                            </a-button>
+                            <a-button @click="reset">
+                                <template #icon><icon-refresh /></template>
+                                <span>重置</span>
+                            </a-button>
+                            <a-button type="primary" @click="onAdd" v-hasPerm="['system:account:add']">
+                                <template #icon><icon-plus /></template>
+                                <span>新增</span>
+                            </a-button>
+                        </a-space>
+
+                        <a-table row-key="id" :data="accountList" :bordered="{ cell: true }" :loading="loading"
+                            :scroll="{ x: '120%', y: '85%' }" :pagination="pagination" :selected-keys="selectedKeys"
+                            @select="select" @select-all="selectAll" @page-change="handlePageChange">
+                            <template #columns>
+                                <a-table-column title="ID" data-index="id" :width="70" align="center"></a-table-column>
+                                <a-table-column title="用户名称" data-index="userName" :width="150"></a-table-column>
+                                <a-table-column title="昵称" data-index="nickName" :width="150"></a-table-column>
+                                <a-table-column title="性别" data-index="sex" align="center" :width="60">
+                                    <template #cell="{ record }">
+                                        <a-tag bordered size="small" color="arcoblue" v-if="record.sex == 1">男</a-tag>
+                                        <a-tag bordered size="small" color="red" v-else-if="record.sex == 0">女</a-tag>
+                                        <a-tag bordered size="small" v-else>未知</a-tag>
+                                    </template>
+                                </a-table-column>
+                                <a-table-column title="部门" data-index="deptId" :width="150">
+                                    <template #cell="{ record }">{{ record.department ? record.department.name : ""
+                                        }}</template>
+                                </a-table-column>
+                                <a-table-column title="手机号" data-index="phone" :width="150"></a-table-column>
+                                <a-table-column title="状态" :width="100" align="center">
+                                    <template #cell="{ record }">
+                                        <a-tag bordered size="small" color="arcoblue" v-if="record.status === 1">启用</a-tag>
+                                        <a-tag bordered size="small" color="red" v-else>禁用</a-tag>
+                                    </template>
+                                </a-table-column>
+                                <a-table-column title="描述" data-index="description" :ellipsis="true"
+                                    :tooltip="true" :width="150"></a-table-column>
+                                <a-table-column title="创建时间" data-index="createdAt" :width="180">
+                                    <template #cell="{ record }">
+                                        {{ record.createdAt ? formatTime(record.createdAt) : "" }}</template>
+                                </a-table-column>
+                                <a-table-column title="操作" :width="200" align="center" :fixed="isMobile ? '' : 'right'">
+                                    <template #cell="{ record }">
+                                        <a-space>
+                                            <a-link @click="onUpdate(record)" v-hasPerm="['system:account:edit']">
+                                                <template #icon><icon-edit /></template>
+                                                <span>修改</span>
+                                            </a-link>
+                                            <a-popconfirm type="warning" content="确定删除该账号吗?" @ok="onDelete(record)">
+                                                <a-link status="danger" v-hasPerm="['system:account:delete']">
+                                                    <template #icon><icon-delete /></template>
+                                                    <span>删除</span>
+                                                </a-link>
+                                            </a-popconfirm>
+                                        </a-space>
+                                    </template>
+                                </a-table-column>
                             </template>
-                        </a-table-column>
-                        <a-table-column title="描述" data-index="description" :ellipsis="true"
-                            :tooltip="true" :width="150"></a-table-column>
-                        <a-table-column title="创建时间" data-index="createdAt" :width="180">
-                            <template #cell="{ record }">
-                                {{ record.createdAt ? formatTime(record.createdAt) : "" }}</template>
-                        </a-table-column>
-                        <a-table-column title="操作" :width="200" align="center" :fixed="'right'">
-                            <template #cell="{ record }">
-                                <a-space>
-                                    <a-link @click="onUpdate(record)" v-hasPerm="['system:account:edit']">
-                                        <template #icon><icon-edit /></template>
-                                        <span>修改</span>
-                                    </a-link>
-                                    <a-popconfirm type="warning" content="确定删除该账号吗?" @ok="onDelete(record)">
-                                        <a-link status="danger" v-hasPerm="['system:account:delete']">
-                                            <template #icon><icon-delete /></template>
-                                            <span>删除</span>
-                                        </a-link>
-                                    </a-popconfirm>
-                                </a-space>
-                            </template>
-                        </a-table-column>
-                    </template>
-                </a-table>
-            </div>
+                        </a-table>
+                    </div>
+                </template>
+            </s-fold-page>
         </div>
 
-        <a-modal width="40%" v-model:visible="open" @close="afterClose" :on-before-ok="handleOk" @cancel="afterClose">
+        <a-modal :width="layoutMode.width" v-model:visible="open" @close="afterClose" :on-before-ok="handleOk" @cancel="afterClose">
             <template #title> {{ title }} </template>
             <div>
-                <a-form ref="formRef" auto-label-width :rules="dynamicRules" :model="addFrom">
+                <a-form ref="formRef" auto-label-width :layout="layoutMode.layout" :rules="dynamicRules" :model="addFrom">
                     <a-row>
                         <a-col :span="12">
                             <a-form-item field="userName" label="用户名称" validate-trigger="blur">
@@ -167,13 +173,26 @@
 </template>
 
 <script setup lang="ts">
-// import { getDivisionAPI, getAccountAPI, getRoleAPI } from "@/api/modules/system/index";
 import { getDivisionAPI } from "@/api/department";
 import { getRolesAPI } from "@/api/role";
 import { getAccountListAPI, addAccountAPI, editAccountAPI, deleteAccountAPI } from "@/api/user";
 import { deepClone } from "@/utils";
 import { formatTime } from "@/globals";
-
+import { useDevicesSize } from "@/hooks/useDevicesSize";
+const { isMobile } = useDevicesSize();
+const layoutMode = computed(() => {
+  let info = {
+    mobile: {
+      width: "95%",
+      layout: "vertical"
+    },
+    desktop: {
+      width: "40%",
+      layout: "horizontal"
+    }
+  };
+  return isMobile.value ? info.mobile : info.desktop;
+});
 
 const openState = ref(dictFilter("status"));
 const sexOption = ref(dictFilter("gender"));

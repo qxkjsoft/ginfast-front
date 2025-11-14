@@ -5,7 +5,7 @@
     :ok-loading="addUserLoading"
     :on-before-ok="handleAddUser"
     @close="handleCancel"
-    width="900px"
+    :width="props.width"
   >
     <div class="add-user-container">
       <!-- 搜索区域 -->
@@ -76,6 +76,7 @@ import { arcoMessage } from "@/globals";
 interface Props {
   visible: boolean;
   tenantId?: number;
+  width?: string;
 }
 
 interface Emits {
@@ -85,7 +86,8 @@ interface Emits {
 
 const props = withDefaults(defineProps<Props>(), {
   visible: false,
-  tenantId: 0
+  tenantId: 0,
+  width: "900px"
 });
 
 const emit = defineEmits<Emits>();

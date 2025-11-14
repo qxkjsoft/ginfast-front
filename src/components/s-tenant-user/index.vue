@@ -1,7 +1,7 @@
 <template>
   <a-drawer
     :visible="visible"
-    :width="900"
+    :width="layoutMode.width"
     :hide-cancel="true"
     ok-text="关闭"
     @ok="handleCancel"
@@ -13,7 +13,7 @@
       <!-- 操作区域 -->
       <a-card class="actions-card">
         <a-row justify="space-between" align="center">
-          <a-col :span="12">
+          <a-col :span="isMobile ? 24 : 12">
             <a-space>
               <a-button type="primary" @click="showAddUserModal">
                 <template #icon><icon-plus /></template>
@@ -21,7 +21,7 @@
               </a-button>
             </a-space>
           </a-col>
-          <a-col :span="12">
+          <a-col :span="isMobile ? 24 : 12">
             <a-space>
               <a-input
                 v-model="searchKeyword"
@@ -77,7 +77,7 @@
               {{ record.user?.tenant?.name }}
             </template>
           </a-table-column>
-          <a-table-column title="操作" :width="120" align="center">
+          <a-table-column title="操作" :width="120" align="center" :fixed="isMobile ? '' : 'right'">
             <template #cell="{ record }">
 				<template v-if="!record.isDefault">
 					<a-popconfirm content="确定要移除该用户吗?" @ok="removeUser(record)"  >
@@ -94,6 +94,7 @@
 
   <!-- 添加用户弹窗 -->
   <s-add-user-modal
+    :width="layoutMode.width"
     v-model:visible="addUserModalVisible"
     :tenant-id="tenantId"
     @success="handleAddUserSuccess"
@@ -103,12 +104,12 @@
   <a-modal
     :visible="roleModalVisible"
     :title="`为用户 ${currentUserInfo.userName} 分配角色`"
-    :width="600"
+    :width="layoutMode.width"
     @ok="handleRoleSubmit"
     @cancel="handleRoleCancel"
     :ok-loading="roleModalLoading"
   >
-    <a-form :model="roleForm" auto-label-width>
+    <a-form :model="roleForm" :layout="layoutMode.layout" auto-label-width>
       <a-form-item label="用户">
         {{ currentUserInfo.userName }} ({{ currentUserInfo.nickName }})
       </a-form-item>
@@ -146,6 +147,21 @@ import {
 } from "@/api/sysusertenant";
 import SAddUserModal from "@/components/s-add-user-modal/index.vue";
 import type { RoleItem } from "@/api/role";
+import { useDevicesSize } from "@/hooks/useDevicesSize";
+const { isMobile } = useDevicesSize();
+const layoutMode = computed(() => {
+  let info = {
+    mobile: {
+      width: "95%",
+      layout: "vertical"
+    },
+    desktop: {
+      width: "60%",
+      layout: "horizontal"
+    }
+  };
+  return isMobile.value ? info.mobile : info.desktop;
+});
 
 interface Props {
   visible: boolean;

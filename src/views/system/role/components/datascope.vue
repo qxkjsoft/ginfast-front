@@ -63,7 +63,9 @@
 <script setup lang='ts'>
 import { ref, reactive, onMounted } from 'vue'
 import { getDivisionAPI } from '@/api/department'
-//import type { DivisionItem } from '@/api/department'
+// 引入icon-question-circle-fill
+import { IconQuestionCircleFill } from '@arco-design/web-vue/es/icon'
+
 
 // 部门树节点接口定义
 interface DepartmentTreeNode {

@@ -58,7 +58,7 @@
             <a-table ref="tableRef" :data="displayMenuList" :loading="loading" row-key="id" column-resizable
                 :row-selection="{ type: 'checkbox', showCheckedAll: true }" v-model:selectedKeys="selectedKeys"
                 :bordered="{ cell: true }" show-empty-tree :pagination="false" size="medium"
-                :scroll="{ x: '150%', y: '93%' }">
+                :scroll="{ x: '100%', y: '85%' }">
                 <template #columns>
                     <a-table-column title="菜单名称" :width="150" tooltip ellipsis>
                         <template #cell="{ record }">
@@ -139,7 +139,7 @@
                             </a-space>
                         </template>
                     </a-table-column>
-                    <a-table-column title="操作" align="center" :width="280" :fixed="'right'">
+                    <a-table-column title="操作" align="center" :width="280"  :fixed="isMobile ? '' : 'right'">
                         <template #cell="{ record }">
                             <a-space>
                                 <a-link status="warning" @click="onAssignApi(record)"
@@ -168,11 +168,11 @@
             </a-table>
         </div>
 
-        <a-modal width="40%" v-model:visible="open" draggable @close="afterClose" :on-before-ok="handleOk"
+        <a-modal :width="layoutMode.width" v-model:visible="open" draggable @close="afterClose" :on-before-ok="handleOk"
             @cancel="afterClose">
             <template #title> {{ title }} </template>
             <div>
-                <a-form ref="formRef" auto-label-width :rules="rules" :model="addFrom">
+                <a-form ref="formRef" :layout="layoutMode.layout" auto-label-width :rules="rules" :model="addFrom">
                     <a-form-item field="type" label="菜单类型" validate-trigger="blur">
                         <a-radio-group type="button" :disabled="!!addFrom.id" v-model="addFrom.type"
                             @change="typeChange">
@@ -325,11 +325,28 @@
 </template>
 
 <script setup lang="ts">
-//import MenuItemIcon from "@/layout/components/Menu/menu-item-icon.vue";
 import SApiPermission from "@/components/s-api-permission/index.vue";
 import { type MenuItem, getMenuListAPI, addMenuAPI, updateMenuAPI, deleteMenuAPI, exportMenuAPI, importMenuAPI } from "@/api/menu";
 import useGlobalProperties from "@/hooks/useGlobalProperties";
 import { deepClone, getPascalCase } from "@/utils";
+import { useDevicesSize } from "@/hooks/useDevicesSize";
+const { isMobile } = useDevicesSize();
+const layoutMode = computed(() => {
+  let info = {
+    mobile: {
+      width: "95%",
+      layout: "vertical"
+    },
+    desktop: {
+      width: "40%",
+      layout: "horizontal"
+    }
+  };
+  return isMobile.value ? info.mobile : info.desktop;
+});
+
+
+
 const proxy = useGlobalProperties();
 const openState = ref(dictFilter("status"));
 const form = ref({

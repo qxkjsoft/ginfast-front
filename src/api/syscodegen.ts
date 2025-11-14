@@ -68,3 +68,12 @@ export const getTableColumns = (database: string, table: string) => {
     params: { database, table }
   });
 };
+
+
+export const generateCode = (genId: number) => {
+  return http.request<BaseResult<{
+    code: string;
+  }>>("post", baseUrlApi("codegen/generate"), {
+    data: { genId }
+  });
+};

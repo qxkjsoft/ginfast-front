@@ -32,6 +32,7 @@ import { storeToRefs } from "pinia";
 import Logo from "@/views/login/components/logo.vue";
 
 
+const { isMobile } = useDevicesSize();
 
 // 获取系统配置
 const sysConfigStore = useSysConfigStore();
@@ -125,6 +126,16 @@ const systemRecordNo = computed(() => {
             margin-left: 5px;
             font-size: $font-size-body-3;
             color: $color-text-4;
+        }
+    }
+    @media (max-width: 768px) {
+        .copyright-info {
+            flex-direction: column;
+            
+            .record-text {
+                margin-left: 0;
+                margin-top: 5px;
+            }
         }
     }
 }

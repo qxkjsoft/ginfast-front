@@ -9,6 +9,9 @@ import { useRouteConfigStore } from "@/store/modules/route-config";
 import { useRoutingMethod } from "@/hooks/useRoutingMethod";
 import { hasRefreshToken } from "@/utils/auth";
 import { useUserStoreHook } from "@/store/modules/user";
+import { useSystemStore } from "@/store/modules/system";
+
+
 /**
  * 创建vue的路由示例
  * @method createRouter(options: RouterOptions): Router
@@ -62,8 +65,8 @@ router.beforeEach(async (to: any, _: any, next: any) => {
     if (!routeTree.value.length) {
         const routeStore = useRouteConfigStore(pinia);
         try {
-            // 并行获取用户信息和路由信息
-            await Promise.all([useUserStoreHook().getUserInfo(), routeStore.initSetRouter()]);
+            // 并行获取用户信息、路由信息、字典数据
+            await Promise.all([useUserStoreHook().getUserInfo(), routeStore.initSetRouter(), useSystemStore().setDictData()]);
             
             if (!routeTree.value.length) {
                 console.warn("路由初始化失败，routeTree为空");

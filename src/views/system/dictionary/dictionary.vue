@@ -33,9 +33,6 @@
             <a-table row-key="id" :data="dictList" :bordered="{ cell: true }" :loading="loading"
                 :scroll="{ x: '100%', y: '100%', minWidth: 1000 }" :pagination="pagination">
                 <template #columns>
-                    <!-- <a-table-column title="序号" :width="64">
-                        <template #cell="cell">{{ cell.rowIndex + 1 }}</template>
-                    </a-table-column> -->
                     <a-table-column title="ID" data-index="id" :width="70" align="center"></a-table-column>
                     <a-table-column title="字典名称" data-index="name" :width="150"></a-table-column>
                     <a-table-column title="字典编码" data-index="code" :width="150"></a-table-column>
@@ -48,7 +45,7 @@
                     <a-table-column title="描述" data-index="description" :ellipsis="true" :width="150"
                         :tooltip="true"></a-table-column>
                     <a-table-column title="创建时间" data-index="createTime" :width="180"></a-table-column>
-                    <a-table-column title="操作" :width="280" align="center" :fixed="'right'">
+                    <a-table-column title="操作" :width="280" align="center"  :fixed="isMobile ? '' : 'right'">
                         <template #cell="{ record }">
                             <a-space>
                                 <a-link status="success" @click="onDictData(record)"
@@ -73,10 +70,10 @@
             </a-table>
         </div>
 
-        <a-modal v-model:visible="open" @close="afterClose" :on-before-ok="handleOk" @cancel="afterClose">
+        <a-modal :width="layoutMode.width" v-model:visible="open" @close="afterClose" :on-before-ok="handleOk" @cancel="afterClose">
             <template #title> {{ title }} </template>
             <div>
-                <a-form ref="formRef" auto-label-width :rules="rules" :model="addFrom">
+                <a-form ref="formRef" :layout="layoutMode.layout" auto-label-width :rules="rules" :model="addFrom">
                     <a-form-item field="name" label="字典名称" validate-trigger="blur">
                         <a-input v-model="addFrom.name" placeholder="请输入字典名称" allow-clear />
                     </a-form-item>
@@ -96,7 +93,7 @@
             </div>
         </a-modal>
 
-        <a-modal width="50%" v-model:visible="detailOpen" @ok="detailOk" ok-text="关闭" :hide-cancel="true">
+        <a-modal :width="layoutMode.width" v-model:visible="detailOpen" @ok="detailOk" ok-text="关闭" :hide-cancel="true">
             <template #title> 字典详情 </template>
             <div>
                 <a-row>
@@ -114,15 +111,15 @@
                         <a-table-column title="序号" :width="64">
                             <template #cell="cell">{{ cell.rowIndex + 1 }}</template>
                         </a-table-column>
-                        <a-table-column title="字典名" data-index="name"></a-table-column>
-                        <a-table-column title="字典值" data-index="value"></a-table-column>
+                        <a-table-column title="字典名" :width="120" data-index="name"></a-table-column>
+                        <a-table-column title="字典值" :width="120" data-index="value"></a-table-column>
                         <a-table-column title="状态" :width="100" align="center">
                             <template #cell="{ record }">
                                 <a-tag bordered size="small" color="arcoblue" v-if="record.status === 1">启用</a-tag>
                                 <a-tag bordered size="small" color="red" v-else>禁用</a-tag>
                             </template>
                         </a-table-column>
-                        <a-table-column title="操作" align="center" :fixed="'right'">
+                        <a-table-column title="操作" align="center" :width="200" :fixed="isMobile ? '' : 'right'">
                             <template #cell="{ record }">
                                 <a-space>
                                     <a-link @click="onDetailUpdate(record)" v-hasPerm="['system:dictitem:edit']">
@@ -143,11 +140,11 @@
             </div>
         </a-modal>
 
-        <a-modal v-model:visible="detailCaseOpen" @close="afterCloseDetail" @ok="handleOkDetail"
+        <a-modal :width="layoutMode.width" v-model:visible="detailCaseOpen" @close="afterCloseDetail" @ok="handleOkDetail"
             @cancel="afterCloseDetail">
             <template #title> {{ detailTitle }} </template>
             <div>
-                <a-form ref="detailFormRef" auto-label-width :rules="detaulRules" :model="deatilForm">
+                <a-form ref="detailFormRef" :layout="layoutMode.layout" auto-label-width :rules="detaulRules" :model="deatilForm">
                     <a-form-item field="name" label="字典名称" validate-trigger="blur">
                         <a-input v-model="deatilForm.name" placeholder="请输入字典名称" allow-clear />
                     </a-form-item>
@@ -185,6 +182,22 @@ import {
     type DictItemAddParams,
     type DictItemUpdateParams
 } from "@/api/dictionary";
+
+import { useDevicesSize } from "@/hooks/useDevicesSize";
+const { isMobile } = useDevicesSize();
+const layoutMode = computed(() => {
+  let info = {
+    mobile: {
+      width: "95%",
+      layout: "vertical"
+    },
+    desktop: {
+      width: "40%",
+      layout: "horizontal"
+    }
+  };
+  return isMobile.value ? info.mobile : info.desktop;
+});
 const openState = ref(dictFilter("status"));
 const form = ref<DictListParams>({
     name: "",

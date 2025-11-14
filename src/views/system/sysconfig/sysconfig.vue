@@ -18,7 +18,7 @@
                 <!-- 服务器配置 -->
                 <a-tab-pane key="server" title="服务器配置">
                     <a-card :bordered="false" class="mb-4">
-                        <a-form :model="configData.system" auto-label-width>
+                        <a-form :layout="layoutMode.layout" :model="configData.system" auto-label-width>
                             <a-row :gutter="24">
                                 <a-col :span="24">
                                     <a-form-item field="systemLogo" label="系统Logo">
@@ -43,7 +43,7 @@
                                     </a-form-item>
                                 </a-col>
 
-                                <a-col :span="12">
+                                <a-col :span="isMobile ? 24 : 12">
                                     <a-form-item field="systemName" label="系统名称">
                                         <a-input v-model="configData.system.systemName" placeholder="请输入系统名称" />
                                         <template #extra>
@@ -52,7 +52,7 @@
                                     </a-form-item>
                                 </a-col>
 
-                                <a-col :span="12">
+                                <a-col :span="isMobile ? 24 : 12">
                                     <a-form-item field="systemCopyright" label="版权信息">
                                         <a-input v-model="configData.system.systemCopyright" placeholder="请输入版权信息" />
                                         <template #extra>
@@ -60,7 +60,7 @@
                                         </template>
                                     </a-form-item>
                                 </a-col>
-                                <a-col :span="12">
+                                <a-col :span="isMobile ? 24 : 12">
                                     <a-form-item field="systemRecordNo" label="备案号">
                                         <a-input v-model="configData.system.systemRecordNo" placeholder="请输入备案号" />
                                         <template #extra>
@@ -70,7 +70,7 @@
                                 </a-col>
                             </a-row>
                             <a-row>
-                                <a-col :span="12">
+                                <a-col :span="isMobile ? 24 : 12">
                                     <a-form-item field="defaultusername" label="默认用户名">
                                         <a-input v-model="configData.system.defaultusername" placeholder="请输入默认用户名" />
                                         <template #extra>
@@ -79,7 +79,7 @@
                                     </a-form-item>
                                 </a-col>
                                 
-                                <a-col :span="12">
+                                <a-col :span="isMobile ? 24 : 12">
                                     <a-form-item field="defaultpassword" label="默认密码">
                                         <a-input-password v-model="configData.system.defaultpassword" placeholder="请输入默认密码" />
                                         <template #extra>
@@ -95,9 +95,9 @@
                 <!-- 验证码配置 -->
                 <a-tab-pane key="captcha" title="验证码配置">
                     <a-card :bordered="false" class="mb-4">
-                        <a-form :model="configData.captcha" auto-label-width>
+                        <a-form  :layout="layoutMode.layout" :model="configData.captcha" auto-label-width>
                             <a-row :gutter="24">
-                                <a-col :span="12">
+                                <a-col :span="isMobile ? 24 : 12">
                                     <a-form-item field="open" label="启用验证码">
                                         <a-switch v-model="configData.captcha.open">
                                             <template #checked>开启</template>
@@ -109,7 +109,7 @@
                             </a-row>
 
                             <a-row :gutter="24">
-                                <a-col :span="12">
+                                <a-col :span="isMobile ? 24 : 12">
                                     <a-form-item field="length" label="验证码长度">
                                         <a-input-number v-model="configData.captcha.length" :min="4" :max="8"
                                             placeholder="请输入验证码长度" />
@@ -127,9 +127,9 @@
                 <!-- 安全配置 -->
                 <a-tab-pane key="safe" title="安全配置">
                     <a-card :bordered="false" class="mb-4">
-                        <a-form :model="configData.safe" auto-label-width>
+                        <a-form :layout="layoutMode.layout" :model="configData.safe" auto-label-width>
                             <a-row :gutter="24">
-                                <a-col :span="12">
+                                <a-col :span="isMobile ? 24 : 12">
                                     <a-form-item field="loginLockThreshold" label="登录失败锁定阈值(次)">
                                         <a-input-number v-model="configData.safe.loginLockThreshold" :min="0" :max="10"
                                             placeholder="请输入登录失败次数" />
@@ -138,7 +138,7 @@
                                         </template>
                                     </a-form-item>
                                 </a-col>
-                                <a-col :span="12">
+                                <a-col :span="isMobile ? 24 : 12">
                                     <a-form-item field="loginLockExpire" label="登录失败次数缓存时间(秒)">
                                         <a-input-number v-model="configData.safe.loginLockExpire" :min="1" :max="1440"
                                             placeholder="请输入缓存时间" />
@@ -147,7 +147,7 @@
                                         </template>
                                     </a-form-item>
                                 </a-col>
-                                <a-col :span="12">
+                                <a-col :span="isMobile ? 24 : 12">
                                     <a-form-item field="loginLockDuration" label="账号锁定时长(秒)">
                                         <a-input-number v-model="configData.safe.loginLockDuration" :min="1" :max="1440"
                                             placeholder="请输入锁定时长" />
@@ -156,7 +156,7 @@
                                         </template>
                                     </a-form-item>
                                 </a-col>
-                                <a-col :span="12">
+                                <a-col :span="isMobile ? 24 : 12">
                                     <a-form-item field="minPasswordLength" label="密码最小长度">
                                         <a-input-number v-model="configData.safe.minPasswordLength" :min="6" :max="32"
                                             placeholder="请输入密码最小长度" />
@@ -165,7 +165,7 @@
                                         </template>
                                     </a-form-item>
                                 </a-col>
-                                <a-col :span="12">
+                                <a-col :span="isMobile ? 24 : 12">
                                     <a-form-item field="requireSpecialChar" label="密码必须包含特殊字符">
                                         <a-switch v-model="configData.safe.requireSpecialChar">
                                             <template #checked>是</template>
@@ -189,9 +189,24 @@
 import { ref, onMounted } from 'vue';
 import { useSysConfigStore } from '@/store/modules/sys-config';
 // 引入图片上传组件
-import ImageUpload from './components/ImageUpload.vue';
+import ImageUpload from './components/image-upload.vue';
+import { useDevicesSize } from "@/hooks/useDevicesSize";
+const { isMobile } = useDevicesSize();
+const layoutMode = computed(() => {
+  let info = {
+    mobile: {
+      width: "95%",
+      layout: "vertical"
+    },
+    desktop: {
+      width: "40%",
+      layout: "horizontal"
+    }
+  };
+  return isMobile.value ? info.mobile : info.desktop;
+});
 
-//const proxy = useGlobalProperties();
+
 const activeTab = ref('server');
 
 // 使用系统配置 store

@@ -1,10 +1,10 @@
 <template>
-    <a-drawer :visible="visible" :width="900" @ok="handleOk" @cancel="handleCancel" :title="title"
+    <a-drawer :visible="visible" :width="layoutMode.width" @ok="handleOk" @cancel="handleCancel" :title="title"
         :ok-loading="loading">
         <div class="api-permission-container">
             <!-- 搜索区域 -->
             <a-card class="search-card">
-                <a-form :model="searchForm" layout="inline" auto-label-width>
+                <a-form layout="inline" :model="searchForm"  auto-label-width>
                     <a-form-item field="title" label="API标题">
                         <a-input v-model="searchForm.title" placeholder="请输入API标题" allow-clear style="width: 180px"
                             @keyup.enter="handleSearch" />
@@ -82,7 +82,7 @@
                         </template>
                     </a-table-column>
                     <a-table-column title="API分组" data-index="apiGroup" :width="150" ellipsis tooltip></a-table-column>
-                    <a-table-column title="创建时间" data-index="createdAt" :width="160">
+                    <a-table-column title="创建时间" data-index="createdAt" :width="170">
                         <template #cell="{ record }">
                             {{ formatDate(record.createdAt) }}
                         </template>
@@ -95,7 +95,21 @@
 
 <script setup lang="ts">
 import { getSysApiListAPI, getMenuApisAPI, setMenuApisAPI, type SysApiItem, type SysApiListParams } from "@/api/sysapi";
-
+import { useDevicesSize } from "@/hooks/useDevicesSize";
+const { isMobile } = useDevicesSize();
+const layoutMode = computed(() => {
+  let info = {
+    mobile: {
+      width: "95%",
+      layout: "vertical"
+    },
+    desktop: {
+      width: "60%",
+      layout: "horizontal"
+    }
+  };
+  return isMobile.value ? info.mobile : info.desktop;
+});
 interface Props {
     visible: boolean;
     menuId?: number;

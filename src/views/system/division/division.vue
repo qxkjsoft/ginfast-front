@@ -51,7 +51,7 @@
                         <template #cell="{ record }">{{ record.createdAt ? formatTime(record.createdAt) : ""
                         }}</template>
                     </a-table-column>
-                    <a-table-column title="操作" align="center" :fixed="'right'" :width="280">
+                    <a-table-column title="操作" align="center" :fixed="isMobile ? '' : 'right'"  :width="280">
                         <template #cell="{ record }">
                             <a-space>
                                 <a-link v-hasPerm="['system:division:edit']" @click="onUpdate(record)">
@@ -77,10 +77,10 @@
             </a-table>
         </div>
 
-        <a-modal width="40%" v-model:visible="open" @close="afterClose" :on-before-ok="handleOk" @cancel="afterClose">
+        <a-modal :width="layoutMode.width" v-model:visible="open" @close="afterClose" :on-before-ok="handleOk" @cancel="afterClose">
             <template #title> {{ title }} </template>
             <div>
-                <a-form ref="formRef" auto-label-width :rules="rules" :model="addFrom">
+                <a-form ref="formRef" :layout="layoutMode.layout" auto-label-width :rules="rules" :model="addFrom">
                     <a-form-item field="parentId" label="上级部门" validate-trigger="blur">
                         <a-tree-select v-model="addFrom.parentId"
                             :data="[{ id: 0, name: '无上级部门', children: null }, ...allDivisionList]" :field-names="{
@@ -148,6 +148,21 @@ import {
     type DivisionFormData
 } from "@/api/department";
 import { formatTime } from "@/globals";
+import { useDevicesSize } from "@/hooks/useDevicesSize";
+const { isMobile } = useDevicesSize();
+const layoutMode = computed(() => {
+  let info = {
+    mobile: {
+      width: "95%",
+      layout: "vertical"
+    },
+    desktop: {
+      width: "40%",
+      layout: "horizontal"
+    }
+  };
+  return isMobile.value ? info.mobile : info.desktop;
+});
 // 新增
 const open = ref(false);
 const rules = {

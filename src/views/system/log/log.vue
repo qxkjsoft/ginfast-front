@@ -89,7 +89,7 @@
                     <a-table-column title="操作时间" data-index="createdAt" :width="180">
                         <template #cell="{ record }">{{ formatTime(record.createdAt) }}</template>
                     </a-table-column>
-                    <a-table-column title="操作" :width="120" align="center" :fixed="'right'">
+                    <a-table-column title="操作" :width="120" align="center" :fixed="isMobile ? '' : 'right'">
                         <template #cell="{ record }">
                             <a-link @click="viewDetail(record)">详情</a-link>
                         </template>
@@ -99,7 +99,7 @@
         </div>
 
         <!-- 详情弹窗 -->
-        <a-modal v-model:visible="detailVisible" :width="800" :footer="false" @close="detailVisible = false">
+        <a-modal v-model:visible="detailVisible" :width="layoutMode.width" :footer="false" @close="detailVisible = false">
             <template #title>操作日志详情</template>
             <a-descriptions :column="1" bordered size="medium">
                 <a-descriptions-item label="ID">{{ currentLog.id }}</a-descriptions-item>
@@ -152,6 +152,21 @@ import {
 } from "@/api/log";
 import useGlobalProperties from "@/hooks/useGlobalProperties";
 import { formatTime } from "@/globals";
+import { useDevicesSize } from "@/hooks/useDevicesSize";
+const { isMobile } = useDevicesSize();
+const layoutMode = computed(() => {
+  let info = {
+    mobile: {
+      width: "95%",
+      layout: "vertical"
+    },
+    desktop: {
+      width: "40%",
+      layout: "horizontal"
+    }
+  };
+  return isMobile.value ? info.mobile : info.desktop;
+});
 
 const proxy = useGlobalProperties();
 

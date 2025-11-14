@@ -3,18 +3,18 @@
         <a-spin :loading="loading" tip="loading...">
             <a-card :bordered="false">
                 <a-row align="center">
-                    <a-col :span="2">
-                        <div>
-                            <a-avatar :size="100" @click="showAvatarUpload" trigger-type="mask" :imageUrl="userInfo.avatar">
+                    <a-col :span="isMobile ? 24 : 2">
+                        <div class="avatar-container" :class="{ 'mobile-avatar': isMobile }">
+                            <a-avatar :size="isMobile ? 80 : 100" @click="showAvatarUpload" trigger-type="mask" :imageUrl="userInfo.avatar">
                                 <template #trigger-icon>
                                     <IconEdit />
                                 </template>
                             </a-avatar>
                         </div>
                     </a-col>
-                    <a-col :span="22">
+                    <a-col :span="isMobile ? 24 : 22">
                         <a-space direction="vertical" size="large">
-                            <a-descriptions :data="detail" :column="4" title="用户资料" :align="{ label: 'right' }">
+                            <a-descriptions :data="detail" :column="isMobile ? 1 : 4" title="用户资料" :align="{ label: isMobile ? 'left' : 'right' }">
                                 <template #value="{ value, data }">
                                     <span v-if="data.key === 'roles'">
                                         {{Array.isArray(value) && value.map((curr: any) => curr.name).join(",") || '-'}}
@@ -52,10 +52,10 @@
         </a-spin>
 
         <!-- 头像裁剪模态框 -->
-        <a-modal v-model:visible="avatarModalVisible" title="上传头像" :width="600" :footer="false" draggable
+        <a-modal v-model:visible="avatarModalVisible" title="上传头像" :width="isMobile ? '95%' : 600" :footer="false" draggable
             @close="resetAvatarUpload">
-            <a-row :gutter="20">
-                <a-col :span="14" style="width: 200px; height: 200px">
+            <a-row :gutter="isMobile ? 0 : 20">
+                <a-col :span="isMobile ? 24 : 14" :style="isMobile ? 'width: 100%; height: 200px' : 'width: 200px; height: 200px'">
                     <VueCropper ref="cropperRef" :img="cropperOptions.img" :info="true"
                         :auto-crop="cropperOptions.autoCrop" :auto-crop-width="cropperOptions.autoCropWidth"
                         :auto-crop-height="cropperOptions.autoCropHeight" :fixed-box="cropperOptions.fixedBox"
@@ -63,7 +63,7 @@
                         :can-move="cropperOptions.canMove" :output-type="cropperOptions.outputType"
                         :output-size="cropperOptions.outputSize" @real-time="handleRealTime" />
                 </a-col>
-                <a-col :span="10">
+                <a-col :span="isMobile ? 24 : 10" :class="{ 'mobile-preview': isMobile }">
                     <div class="avatar-preview">
                         <h4>预览</h4>
                         <div class="preview-container">
@@ -97,6 +97,8 @@ import { useRouteConfigStore } from "@/store/modules/route-config";
 import { type ProfileItem,  uploadAvatarAPI, getProfileAPI } from "@/api/user";
 import { formatTime } from "@/globals";
 import { IconEdit } from '@arco-design/web-vue/es/icon';
+import { useDevicesSize } from "@/hooks/useDevicesSize";
+const { isMobile } = useDevicesSize();
 // 裁剪组件
 import { VueCropper } from 'vue-cropper'
 import 'vue-cropper/dist/index.css'
@@ -114,6 +116,7 @@ interface Detail {
 const type = ref("rounded");
 const size = ref("medium");
 const activeTabs = ref(route.query.type || "1");
+
 
 // 头像裁剪相关
 const avatarModalVisible = ref(false);
@@ -322,6 +325,16 @@ routerStore.setTabsTitle(`用户${route.query.userName ? " - " + route.query.use
     margin-top: $padding;
 }
 
+.avatar-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    &.mobile-avatar {
+        margin-bottom: 16px;
+    }
+}
+
 .avatar-preview {
     text-align: center;
 
@@ -346,6 +359,20 @@ routerStore.setTabsTitle(`用户${route.query.userName ? " - " + route.query.use
         margin-top: 10px;
         font-size: 12px;
         color: #999;
+    }
+}
+
+.mobile-preview {
+    margin-top: 20px;
+}
+
+// 移动端适配
+@media (max-width: 768px) {
+    .avatar-preview {
+        .preview-container {
+            width: 120px;
+            height: 120px;
+        }
     }
 }
 </style>
