@@ -2,14 +2,44 @@
     <div class="snow-fill">
         <a-card :loading="loading">
                 <a-space wrap>
-                    <!-- ID精确查询 (EQ/NE) --><a-input-number v-model="searchForm.stuId" placeholder="请输入ID" style="width: 240px;" />
-                    <!-- 姓名模糊查询 -->
+                    <!-- 查询表单-->
+                    <!-- ID精确查询 -->
+                    <a-input-number v-model="searchForm.stuId" placeholder="请输入ID" style="width: 240px;" />
+                    <!-- 姓名模糊查询（仅非数值类型支持） -->
                     <a-input-search v-model="searchForm.stuName" placeholder="请输入姓名搜索" style="width: 240px;" @search="handleSearch" allow-clear />
-                    <!-- 年龄大小比较 --><a-input-number v-model="searchForm.age" placeholder="请输入年龄" style="width: 240px;" />
-                    <!-- 性别精确查询 (EQ/NE) --><a-input v-model="searchForm.gender" placeholder="请输入性别搜索" style="width: 240px;" />
-                    <!-- 地址精确查询 (EQ/NE) --><a-input v-model="searchForm.address" placeholder="请输入地址搜索" style="width: 240px;" />
-                    <!-- 创建时间范围查询 -->
-                    <a-range-picker v-model="searchForm.createdAtRange"  style="width: 240px;" @change="handleSearch" />
+                    <!-- 年龄数值类型不支持模糊查询，使用精确查询 -->
+                    <a-input-number v-model="searchForm.age" placeholder="请输入年龄" style="width: 240px;" @change="handleSearch" />
+                    <!-- 性别选择框查询（radio/select/checkbox统一使用select） -->
+                    <a-select v-model="searchForm.gender" placeholder="请选择性别" style="width: 240px;" :options="genderOption" allow-clear>
+                        <template #label="{ data }">
+                            <div>{{ data.name }}</div>
+                        </template>
+                        <template #option="{ data }">
+                            <div>{{ data.name }}</div>
+                        </template>
+                    </a-select>
+                    <!--  邮箱选择框查询（radio/select/checkbox统一使用select） -->
+                    <a-select v-model="searchForm.email" placeholder="请选择 邮箱" style="width: 240px;" :options="emailOption" allow-clear>
+                        <template #label="{ data }">
+                            <div>{{ data.name }}</div>
+                        </template>
+                        <template #option="{ data }">
+                            <div>{{ data.name }}</div>
+                        </template>
+                    </a-select>
+                    <!-- 地址选择框查询（radio/select/checkbox统一使用select） -->
+                    <a-select v-model="searchForm.address" placeholder="请选择地址" style="width: 240px;" :options="addressOption" allow-clear>
+                        <template #label="{ data }">
+                            <div>{{ data.name }}</div>
+                        </template>
+                        <template #option="{ data }">
+                            <div>{{ data.name }}</div>
+                        </template>
+                    </a-select>
+                    <!-- 创建时间范围查询（日期类型专用） -->
+                    <a-range-picker v-model="searchForm.createdAtRange" style="width: 240px;" @change="handleSearch" />
+                    <!-- 租户ID字段精确查询 -->
+                    <a-input-number v-model="searchForm.tenantId" placeholder="请输入租户ID字段" style="width: 240px;" />
                     <a-button type="primary" @click="handleSearch">查询</a-button>
                     <a-button @click="handleReset">重置</a-button>
                     <a-button type="primary" @click="handleCreate" v-hasPerm="['plugins:testbookteststudents:add']">
@@ -69,6 +99,13 @@
                 </a-form-item>
                 <a-form-item field="admissionDate" label="入学日期"><a-date-picker value-format="YYYY-MM-DDTHH:mm:ss[Z]" v-model="editingData.admissionDate" placeholder="请选择入学日期" />
                 </a-form-item>
+                <a-form-item field="email" label=" 邮箱"><a-checkbox-group 
+                        :modelValue="editingData.email ? JSON.parse(editingData.email) : []"
+                        @update:modelValue="(val: any) => editingData.email = val.length > 0 ? JSON.stringify(val) : undefined" :options="emailOption"><template #label="{ data }">
+                            <div>{{ data.name }}</div>
+                        </template>
+                    </a-checkbox-group>
+                </a-form-item>
                 <a-form-item field="address" label="地址">
                     <a-select v-model="editingData.address" placeholder="请选择地址" :options="addressOption">
                         <template #label="{ data }">
@@ -91,6 +128,7 @@ import type { TestStudentsData } from '../api/teststudents';
 import { storeToRefs } from 'pinia';
 const genderOption = ref(dictFilter("gender"));
 const classNameOption = ref(dictFilter("class"));
+const emailOption = ref(dictFilter("status"));
 const addressOption = ref(dictFilter("status"));
 const testStudentsStore = useTestStudentsPluginStore();
 const {
@@ -112,8 +150,10 @@ const searchForm = reactive({
     stuName: '',
     age: undefined,
     gender: '',
+    email: '',
     address: '',
     createdAtRange: [],
+    tenantId: undefined,
 });
 
 const editingData = reactive<Partial<TestStudentsData>>({
@@ -163,11 +203,17 @@ const loadData = async (pageNum: number = currentPage.value, pageSizeVal: number
     if (searchForm.gender) {
         params.gender = searchForm.gender;
     }
+    if (searchForm.email) {
+        params.email = searchForm.email;
+    }
     if (searchForm.address) {
         params.address = searchForm.address;
     }
     if (searchForm.createdAtRange && searchForm.createdAtRange.length === 2) {
         params.createdAt = searchForm.createdAtRange;
+    }
+    if (searchForm.tenantId) {
+        params.tenantId = searchForm.tenantId;
     }
     await fetchDataList(params);
 };
@@ -193,8 +239,10 @@ const handleReset = () => {
     searchForm.stuName = '';
     searchForm.age = undefined;
     searchForm.gender = '';
+    searchForm.email = '';
     searchForm.address = '';
     searchForm.createdAtRange = [];
+    searchForm.tenantId = undefined;
     resetSearchParams();
     loadData(1);
 };

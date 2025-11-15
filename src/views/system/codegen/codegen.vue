@@ -46,10 +46,12 @@
                                     <template #icon><icon-edit /></template>
                                     <span>配置</span>
                                 </a-link>
-                                <a-link @click="onGenCode(record)">
-                                    <template #icon><icon-code /></template>
-                                    <span>生成代码</span>
-                                </a-link>
+                                <a-popconfirm type="warning" content="确定生成代码吗?" @ok="onGenCode(record)">
+                                    <a-link>
+                                        <template #icon><icon-code /></template>
+                                        <span>生成代码</span>
+                                    </a-link>
+                                </a-popconfirm>
                                 <a-popconfirm type="warning" content="确定删除该账号吗?" @ok="onDelete(record)">
                                     <a-link status="danger">
                                         <template #icon><icon-delete /></template>

@@ -18,7 +18,7 @@
                                 </a-form-item>
                             </a-col>
                             <a-col :span="12">
-                                <a-form-item label="文件名称/结构体前缀" field="fileName"
+                                <a-form-item label="文件及结构体前缀" field="fileName"
                                     :rules="[{ required: true, message: '文件名称不能为空' }]">
                                     <a-input v-model="editForm.fileName" placeholder="请输入文件名称" />
                                 </a-form-item>
