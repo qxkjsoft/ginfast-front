@@ -73,7 +73,8 @@
                                     :tooltip="true" :width="150"></a-table-column>
                                 <a-table-column title="创建时间" data-index="createdAt" :width="180">
                                     <template #cell="{ record }">
-                                        {{ record.createdAt ? formatTime(record.createdAt) : "" }}</template>
+                                        {{ record.createdAt ? formatTime(record.createdAt) : "" }}
+                                    </template>
                                 </a-table-column>
                                 <a-table-column title="操作" :width="200" align="center" :fixed="isMobile ? '' : 'right'">
                                     <template #cell="{ record }">

@@ -5,7 +5,7 @@
                     <!-- 查询表单-->
                     <!-- 主键ID精确查询 -->
                     <a-input-number v-model="searchForm.tcId" placeholder="请输入主键ID" style="width: 240px;" />
-                    <!-- 教师姓名模糊查询 -->
+                    <!-- 教师姓名模糊查询（仅非数值类型支持） -->
                     <a-input-search v-model="searchForm.tcName" placeholder="请输入教师姓名搜索" style="width: 240px;" @search="handleSearch" allow-clear />
                     <!-- 工号精确查询 -->
                     <a-input v-model="searchForm.employeeId" placeholder="请输入工号" style="width: 240px;" />
@@ -69,8 +69,16 @@
                     <a-table-column title="所教学科" data-index="subject"  :width="150"  ellipsis tooltip/>
                     <a-table-column title="职称" data-index="title"  :width="150"  ellipsis tooltip/>
                     <a-table-column title="状态：0-离职 1-在职" data-index="status"  :width="150"  ellipsis tooltip/>
-                    <a-table-column title="入职日期" data-index="hireDate"  :width="150"  ellipsis tooltip/>
-                    <a-table-column title="出生日期" data-index="birthDate"  :width="150"  ellipsis tooltip/>
+                    <a-table-column title="入职日期" data-index="hireDate"  :width="150"  ellipsis tooltip>
+                        <template #cell="{ record }">
+                            {{ record['hireDate'] ? formatTime(record['hireDate']) : "" }}
+                        </template>
+                    </a-table-column>
+                    <a-table-column title="出生日期" data-index="birthDate"  :width="150"  ellipsis tooltip>
+                        <template #cell="{ record }">
+                            {{ record['birthDate'] ? formatTime(record['birthDate']) : "" }}
+                        </template>
+                    </a-table-column>
                     <a-table-column title="操作" :width="200">
                         <template #cell="{ record }">
                             <a-space>
@@ -148,6 +156,7 @@ import { ref, reactive, computed, onMounted } from 'vue';
 import { useTestTeacherPluginStore } from '../store/testteacher';
 import type { TestTeacherData } from '../api/testteacher';
 import { storeToRefs } from 'pinia';
+import { formatTime } from '@/globals';
 const genderOption = ref(dictFilter("gender"));
 const statusOption = ref(dictFilter("status"));
 const birthDateOption = ref(dictFilter("testStart"));

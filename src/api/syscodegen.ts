@@ -69,7 +69,11 @@ export const getTableColumns = (database: string, table: string) => {
   });
 };
 
-
+/**
+ * 生成代码
+ * @param genId 生成任务ID
+ * @returns 生成的代码
+ */
 export const generateCode = (genId: number) => {
   return http.request<BaseResult<{
     code: string;
@@ -77,3 +81,4 @@ export const generateCode = (genId: number) => {
     data: { genId }
   });
 };
+

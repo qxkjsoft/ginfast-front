@@ -126,6 +126,7 @@ import { ref, reactive, computed, onMounted } from 'vue';
 import { useTestStudentsPluginStore } from '../store/teststudents';
 import type { TestStudentsData } from '../api/teststudents';
 import { storeToRefs } from 'pinia';
+import { formatTime } from '@/globals';
 const genderOption = ref(dictFilter("gender"));
 const classNameOption = ref(dictFilter("class"));
 const emailOption = ref(dictFilter("status"));

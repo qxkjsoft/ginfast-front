@@ -23,6 +23,14 @@
                                     <a-input v-model="editForm.fileName" placeholder="请输入文件名称" />
                                 </a-form-item>
                             </a-col>
+                            <a-col :span="12">
+                                <a-form-item label="是否覆盖" field="isCover">
+                                    <a-checkbox :model-value="Boolean(editForm.isCover)"
+                                        @update:model-value="editForm.isCover = $event ? 1 : 0">
+                                        是否覆盖已存在的文件
+                                    </a-checkbox>
+                                </a-form-item>
+                            </a-col>
                             <a-col :span="24">
                                 <a-form-item label="描述" field="describe"
                                     :rules="[{ required: true, message: '描述不能为空' }]">
@@ -205,6 +213,7 @@ const editForm = ref<SysGenItem>({
     moduleName: "",
     fileName: "",
     describe: "",
+    isCover: 0,
     createdAt: "",
     updatedAt: "",
     deletedAt: null,
@@ -231,6 +240,7 @@ const loadConfigDetail = async () => {
     try {
         const res = await getSysGenByIdAPI(props.recordId);
         if (res.data) {
+            res.data.isCover = Number(res.data.isCover);
             editForm.value = res.data;
         }
     } catch (error) {
@@ -285,6 +295,7 @@ const handleCancel = () => {
         moduleName: "",
         fileName: "",
         describe: "",
+        isCover: 0,
         createdAt: "",
         updatedAt: "",
         deletedAt: null,

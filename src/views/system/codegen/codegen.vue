@@ -39,7 +39,7 @@
                             {{ record.createdAt ? formatTime(record.createdAt) : '-' }}
                         </template>
                     </a-table-column>
-                    <a-table-column title="操作" :width="200" align="center" :fixed="isMobile ? '' : 'right'">
+                    <a-table-column title="操作" :width="280" align="center" :fixed="isMobile ? '' : 'right'">
                         <template #cell="{ record }">
                             <a-space>
                                 <a-link @click="onEdit(record)">
@@ -50,6 +50,12 @@
                                     <a-link>
                                         <template #icon><icon-code /></template>
                                         <span>生成代码</span>
+                                    </a-link>
+                                </a-popconfirm>
+                                <a-popconfirm type="warning" content="确定同步字段信息吗?" @ok="onRefreshFields(record)">
+                                    <a-link>
+                                        <template #icon><icon-refresh /></template>
+                                        <span>同步</span>
                                     </a-link>
                                 </a-popconfirm>
                                 <a-popconfirm type="warning" content="确定删除该账号吗?" @ok="onDelete(record)">
@@ -101,6 +107,7 @@ import {
     getSysGenListAPI,
     batchInsertSysGenAPI,
     deleteSysGenAPI,
+    refreshFields,
     type SysGenItem,
     type SysGenListParams,
 } from "@/api/sysgen";
@@ -298,6 +305,18 @@ const onGenCode = async (record: SysGenItem) => {
         arcoMessage("success", "代码生成成功");
     } catch (error) {
         console.error("代码生成失败:", error);
+    }
+}
+
+// 同步字段
+const onRefreshFields = async (record: SysGenItem) => {
+    try {
+        await refreshFields(record.id);
+        arcoMessage("success", "字段同步成功");
+        getSysGenList(); // 刷新列表
+    } catch (error) {
+        console.error("字段同步失败:", error);
+        arcoMessage("error", "字段同步失败");
     }
 }
 

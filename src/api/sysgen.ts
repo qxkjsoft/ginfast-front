@@ -9,6 +9,7 @@ export interface SysGenItem {
     moduleName: string;
     fileName: string;
     describe: string;
+    isCover: number;
     createdAt: string;
     updatedAt: string;
     deletedAt: string | null;
@@ -115,4 +116,16 @@ export const updateSysGenAPI = (data: SysGenItem) => {
  */
 export const deleteSysGenAPI = (id: number) => {
     return http.request<BaseResult<string>>("delete", baseUrlApi(`sysGen/${id}`));
+};
+
+
+/**
+ * 根据ID刷新字段信息
+ * @param genId 生成任务ID
+ * @returns 刷新后的字段列表
+ */
+export const refreshFields = (genId: number) => {
+  return http.request<BaseResult>("put", baseUrlApi("sysGen/refreshFields"), {
+    data: { id : genId }
+  });
 };
