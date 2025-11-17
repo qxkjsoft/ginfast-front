@@ -25,9 +25,15 @@
                             </a-col>
                             <a-col :span="12">
                                 <a-form-item label="是否覆盖" field="isCover">
-                                    <a-checkbox :model-value="Boolean(editForm.isCover)"
-                                        @update:model-value="editForm.isCover = $event ? 1 : 0">
+                                    <a-checkbox v-model="editForm.isCover">
                                         是否覆盖已存在的文件
+                                    </a-checkbox>
+                                </a-form-item>
+                            </a-col>
+                            <a-col :span="12">
+                                <a-form-item label="是否生成菜单" field="isMenu">
+                                    <a-checkbox v-model="editForm.isMenu">
+                                        是否生成菜单
                                     </a-checkbox>
                                 </a-form-item>
                             </a-col>
@@ -213,7 +219,8 @@ const editForm = ref<SysGenItem>({
     moduleName: "",
     fileName: "",
     describe: "",
-    isCover: 0,
+    isCover: false,
+    isMenu: false,
     createdAt: "",
     updatedAt: "",
     deletedAt: null,
@@ -240,7 +247,6 @@ const loadConfigDetail = async () => {
     try {
         const res = await getSysGenByIdAPI(props.recordId);
         if (res.data) {
-            res.data.isCover = Number(res.data.isCover);
             editForm.value = res.data;
         }
     } catch (error) {
@@ -261,7 +267,7 @@ const handleEdit = async () => {
         arcoMessage("error", errorMessage);
         return false;
     }
-    console.log("editForm", editForm.value)
+    //console.log("editForm", editForm.value)
     editLoading.value = true;
     try {
         const res = await updateSysGenAPI(editForm.value);
@@ -295,7 +301,8 @@ const handleCancel = () => {
         moduleName: "",
         fileName: "",
         describe: "",
-        isCover: 0,
+        isCover: false,
+        isMenu: false,
         createdAt: "",
         updatedAt: "",
         deletedAt: null,

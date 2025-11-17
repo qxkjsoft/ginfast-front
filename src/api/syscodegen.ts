@@ -38,6 +38,21 @@ export type ColumnsResponse = BaseResult<{
   columns: ColumnInfo[];
 }>;
 
+
+
+export type PreviewCodeResponse = BaseResult<{
+  preview: {
+      "model": string,
+      "modelparam": string,
+      "controller": string,
+      "service": string,
+      "routes": string,
+      "init": string,
+      "frontendApi": string,
+      "frontendStore": string,
+      "frontendView": string
+  };
+}>
 /**
  * 获取数据库列表
  * @returns 数据库列表
@@ -82,3 +97,12 @@ export const generateCode = (genId: number) => {
   });
 };
 
+
+/**
+ * 预览
+ */
+export const previewCode = (genId: number) => {
+  return http.request<PreviewCodeResponse>("get", baseUrlApi("codegen/preview"), {
+    params: { genId }
+  });
+};
