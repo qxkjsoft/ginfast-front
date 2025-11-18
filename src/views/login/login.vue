@@ -32,7 +32,6 @@ import { storeToRefs } from "pinia";
 import Logo from "@/views/login/components/logo.vue";
 
 
-const { isMobile } = useDevicesSize();
 
 // 获取系统配置
 const sysConfigStore = useSysConfigStore();
