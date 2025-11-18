@@ -180,7 +180,7 @@
                             }}</a-radio>
                         </a-radio-group>
                     </a-form-item>
-                    <a-form-item field="parentId" label="上级菜单" validate-trigger="blur" :disabled="!!addFrom.id">
+                    <a-form-item field="parentId" label="上级菜单" validate-trigger="blur" >
                         <a-tree-select v-model="addFrom.parentId" :data="menuTree" :field-names="{
                             key: 'id',
                             title: 'i18n',
