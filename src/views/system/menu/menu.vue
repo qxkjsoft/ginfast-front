@@ -310,7 +310,7 @@
                         </a-switch>
                     </a-form-item>
                     <a-form-item field="sort" label="排序" validate-trigger="blur">
-                        <a-input-number v-model="addFrom.sort" :step="1" :precision="0" :min="1" :max="9999"
+                        <a-input-number v-model="addFrom.sort" :step="1" :precision="0" :min="0" :max="9999"
                             :style="{ width: '120px' }" placeholder="请输入" mode="button" class="input-demo" />
                     </a-form-item>
                 </a-form>

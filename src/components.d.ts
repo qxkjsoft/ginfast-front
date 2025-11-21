@@ -17,6 +17,7 @@ declare module 'vue' {
     ACheckbox: typeof import('@arco-design/web-vue')['Checkbox']
     ACol: typeof import('@arco-design/web-vue')['Col']
     AConfigProvider: typeof import('@arco-design/web-vue')['ConfigProvider']
+    ADatePicker: typeof import('@arco-design/web-vue')['DatePicker']
     ADescriptions: typeof import('@arco-design/web-vue')['Descriptions']
     ADescriptionsItem: typeof import('@arco-design/web-vue')['DescriptionsItem']
     ADivider: typeof import('@arco-design/web-vue')['Divider']

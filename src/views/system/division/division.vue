@@ -83,7 +83,8 @@
                 <a-form ref="formRef" :layout="layoutMode.layout" auto-label-width :rules="rules" :model="addFrom">
                     <a-form-item field="parentId" label="上级部门" validate-trigger="blur">
                         <a-tree-select v-model="addFrom.parentId"
-                            :data="[{ id: 0, name: '无上级部门', children: null }, ...allDivisionList]" :field-names="{
+                            :data="[{ id: 0, name: '无上级部门', children: null }, ...allDivisionList]" 
+                            :field-names="{
                                 key: 'id',
                                 title: 'name',
                                 children: 'children'
