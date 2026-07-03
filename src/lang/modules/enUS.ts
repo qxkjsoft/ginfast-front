@@ -99,6 +99,7 @@ export default {
         ["role"]: "role",
         ["menu"]: "menu",
         ["division"]: "division",
+        ["area-manage"]: "Administrative Division",
         ["dictionary"]: "dictionary",
         ["log"]: "log",
         ["about"]: "about",

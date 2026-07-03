@@ -1,4 +1,6 @@
 import { http } from "@/utils/http";
+import { baseUrlApi } from "./utils";
+import { BaseResult } from "./types";
 
 /**
  * 地区数据项接口
@@ -8,12 +10,16 @@ export interface AreaItem {
   value: string;
   /** 地区名称 */
   label: string;
-  /** 级别（1:省/直辖市, 2:市, 3:区/县） */
-  level: string;
+  /** 级别（1:省/直辖市, 2:市, 3:区/县, 4:街道） */
+  level?: number | string;
   /** 父级编码 */
-  parent: string;
+  parent?: string;
+  /** 排序 */
+  sort?: number;
   /** 子级地区 */
-  children?: AreaItem[];
+  children?: AreaItem[] | null;
+  /** id（来自数据库） */
+  id?: number;
 }
 
 /**
@@ -21,55 +27,76 @@ export interface AreaItem {
  */
 export type AreaResult = AreaItem[];
 
-// 内存缓存：已加载的地区数据
+/**
+ * 地区列表结果类型
+ */
+export type AreaListResult = BaseResult<{
+  list: AreaItem[];
+}>;
+
+/**
+ * 搜索结果项（含完整路径）
+ */
+export interface AreaSearchItem {
+  id?: number;
+  value: string;
+  label: string;
+  level?: number | string;
+  parent?: string;
+  sort?: number;
+  pathText: string;
+}
+
+/**
+ * 新增/编辑地区表单数据
+ */
+export interface AreaFormData {
+  id?: number;
+  value?: string;
+  label: string;
+  parent?: string;
+  sort?: number;
+}
+
+// 内存缓存：已加载的地区数据（供 select-area 组件使用完整树）
 let areaDataCache: AreaItem[] | null = null;
 
 // Promise 缓存：正在进行的请求
 let areaDataPromise: Promise<AreaItem[]> | null = null;
 
 /**
- * 获取地区数据
- * 从服务器获取地区数据，并实现缓存机制避免重复请求
- * 
- * @returns Promise<AreaItem[]> 地区数据数组
+ * 获取完整地区树（供级联选择器使用）
+ * 从后端 /sysArea/tree 获取完整树，并实现缓存避免重复请求
+ *
+ * @returns Promise<AreaItem[]> 完整地区树
  */
 export async function getAreaData(): Promise<AreaItem[]> {
-  // 如果已有缓存，直接返回
   if (areaDataCache) {
     return areaDataCache;
   }
-
-  // 如果正在请求，返回同一个 Promise（避免并发请求）
   if (areaDataPromise) {
     return areaDataPromise;
   }
-
-  // 发起请求并缓存 Promise
-  areaDataPromise = fetchAreaDataFromServer()
+  areaDataPromise = fetchAreaTreeFromServer()
     .then((data) => {
       areaDataCache = data;
-      areaDataPromise = null; // 请求完成后清除 Promise 缓存
+      areaDataPromise = null;
       return data;
     })
     .catch((error) => {
-      areaDataPromise = null; // 请求失败后清除 Promise 缓存
+      areaDataPromise = null;
       throw error;
     });
-
   return areaDataPromise;
 }
 
 /**
- * 从服务器获取地区数据
- * 
- * @returns Promise<AreaItem[]> 地区数据数组
+ * 从后端获取完整地区树
  */
-async function fetchAreaDataFromServer(): Promise<AreaItem[]> {
-  const url = import.meta.env.VITE_APP_BASE_URL + "/public/area/area.json";
-  
+async function fetchAreaTreeFromServer(): Promise<AreaItem[]> {
   try {
-    const data = await http.request<AreaItem[]>("get", url);
-    return data;
+    const res = await http.request<AreaListResult>("get", baseUrlApi("sysArea/tree"));
+    return res.data.list || [];
   } catch (error) {
     console.error("获取地区数据失败:", error);
     throw error;
@@ -78,15 +105,12 @@ async function fetchAreaDataFromServer(): Promise<AreaItem[]> {
 
 /**
  * 根据地区编码路径查找地区信息
- * 
+ *
  * @param areaData 地区数据数组
  * @param path 地区编码路径数组（如 ["11", "1101", "110101"]）
  * @returns AreaItem[] 匹配的地区信息数组
  */
-export function findAreaByPath(
-  areaData: AreaItem[],
-  path: string[]
-): AreaItem[] {
+export function findAreaByPath(areaData: AreaItem[], path: string[]): AreaItem[] {
   const result: AreaItem[] = [];
   let currentLevel = areaData;
 
@@ -105,9 +129,73 @@ export function findAreaByPath(
 
 /**
  * 清除地区数据缓存
- * 用于强制重新加载数据
  */
 export function clearAreaDataCache(): void {
   areaDataCache = null;
   areaDataPromise = null;
 }
+
+/**
+ * 刷新地区数据缓存：清空缓存后立即从后端重新拉取完整树
+ * 返回最新的地区树数据
+ */
+export async function refreshAreaData(): Promise<AreaItem[]> {
+  areaDataCache = null;
+  areaDataPromise = null;
+  return await getAreaData();
+}
+
+// ============ 地区管理 CRUD API ============
+
+/**
+ * 获取根节点列表（懒加载入口）
+ */
+export const getAreaListAPI = () => {
+  return http.request<AreaListResult>("get", baseUrlApi("sysArea/list"));
+};
+
+/**
+ * 获取指定节点的直接子节点（懒加载）
+ */
+export const getAreaChildrenAPI = (value: string) => {
+  return http.request<AreaListResult>("get", baseUrlApi(`sysArea/children/${value}`));
+};
+
+/**
+ * 搜索地区（返回扁平列表+完整路径）
+ */
+export const searchAreaAPI = (keyword: string) => {
+  return http.request<BaseResult<{ list: AreaSearchItem[] }>>("get", baseUrlApi("sysArea/search"), {
+    params: { keyword }
+  });
+};
+
+/**
+ * 新增地区
+ */
+export const addAreaAPI = (data: AreaFormData) => {
+  return http.request<BaseResult>("post", baseUrlApi("sysArea/add"), { data });
+};
+
+/**
+ * 更新地区
+ */
+export const updateAreaAPI = (data: AreaFormData) => {
+  return http.request<BaseResult>("put", baseUrlApi("sysArea/edit"), { data });
+};
+
+/**
+ * 删除地区
+ */
+export const deleteAreaAPI = (value: string) => {
+  return http.request<BaseResult>("delete", baseUrlApi("sysArea/delete"), {
+    data: { value }
+  });
+};
+
+/**
+ * 初始化行政区划数据（从 area.json 导入）
+ */
+export const initAreaDataAPI = () => {
+  return http.request<BaseResult<{ count: number }>>("post", baseUrlApi("sysArea/initData"));
+};

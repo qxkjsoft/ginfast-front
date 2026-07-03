@@ -99,6 +99,7 @@ export default {
         ["role"]: "角色管理",
         ["menu"]: "菜单管理",
         ["division"]: "部门管理",
+        ["area-manage"]: "行政区划",
         ["dictionary"]: "字典管理",
         ["log"]: "系统日志",
         ["about"]: "关于项目",

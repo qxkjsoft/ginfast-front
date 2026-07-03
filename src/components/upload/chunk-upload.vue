@@ -142,34 +142,42 @@ const props = defineProps({
         type: String,
         default: "[]"
     },
+    // 接受的文件类型，例如：".jpg,.png,.pdf" 或 "*" 表示接受所有类型
     accept: {
         type: String,
         default: "*"
     },
+    // 最大上传文件数量
     maxCount: {
         type: Number,
         default: 10
     },
+    // 单个文件最大大小（字节），0 表示使用环境变量或默认值
     maxFileSize: {
         type: Number,
-        default: 0 // 0表示使用环境变量或默认值
+        default: 0
     },
+    // 分片上传时每片的大小（字节），0 表示使用环境变量或默认值
     chunkSize: {
         type: Number,
-        default: 0 // 0表示使用环境变量或默认值
+        default: 0
     },
+    // 并发上传的分片数量，0 表示使用环境变量或默认值
     concurrency: {
         type: Number,
         default: 0
     },
+    // 分片上传失败时的最大重试次数，0 表示使用环境变量或默认值
     maxRetry: {
         type: Number,
         default: 0
     },
+    // 大文件阈值（字节），超过此大小的文件将使用分片上传，0 表示使用环境变量或默认值
     largeFileThreshold: {
         type: Number,
         default: 0
     },
+    // 是否自动开始上传，true 表示选择文件后自动上传，false 表示需要手动触发上传
     autoStart: {
         type: Boolean,
         default: true

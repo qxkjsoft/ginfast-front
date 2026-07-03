@@ -14,6 +14,7 @@ declare module 'vue' {
     ABreadcrumbItem: typeof import('@arco-design/web-vue')['BreadcrumbItem']
     AButton: typeof import('@arco-design/web-vue')['Button']
     ACard: typeof import('@arco-design/web-vue')['Card']
+    ACascader: typeof import('@arco-design/web-vue')['Cascader']
     ACheckbox: typeof import('@arco-design/web-vue')['Checkbox']
     ACheckboxGroup: typeof import('@arco-design/web-vue')['CheckboxGroup']
     ACol: typeof import('@arco-design/web-vue')['Col']
@@ -79,6 +80,7 @@ declare module 'vue' {
     AUpload: typeof import('@arco-design/web-vue')['Upload']
     AWatermark: typeof import('@arco-design/web-vue')['Watermark']
     ChunkUpload: typeof import('./components/upload/chunk-upload.vue')['default']
+    copy: typeof import('./components/s-layout-search/index copy.vue')['default']
     FileUpload: typeof import('./components/upload/file-upload.vue')['default']
     ImageUpload: typeof import('./components/upload/image-upload.vue')['default']
     'Index copy': typeof import('./components/s-layout-search/index copy.vue')['default']
@@ -112,6 +114,7 @@ declare module 'vue' {
     SSvgIcon: typeof import('./components/s-svg-icon/index.vue')['default']
     STenantUser: typeof import('./components/s-tenant-user/index.vue')['default']
     SVerifyCode: typeof import('./components/s-verify-code/index.vue')['default']
+    Tree: typeof import('./components/select-area/tree.vue')['default']
     WangEditor: typeof import('./components/wang-editor/index.vue')['default']
   }
 }

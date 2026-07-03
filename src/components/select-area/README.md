@@ -1,6 +1,6 @@
 # SelectArea 地区选择组件
 
-基于 Arco Design Vue 的 `a-cascader` 封装的地区选择组件，支持省/市/区/县/乡镇四级联动选择。
+基于 Arco Design Vue 封装的地区选择组件集，支持省/市/区/县/乡镇四级联动选择，提供级联选择、多选、树形选择三种模式。
 
 ## 特性
 
@@ -8,18 +8,21 @@
 - 🔍 支持搜索地区名称和编码
 - 💾 内置数据缓存机制，避免重复请求
 - 🔄 支持双向绑定（v-model）
-- ✅ 支持单选和多选模式
+- ✅ 支持单选、多选、树形选择三种模式
 - 🎨 完全兼容 Arco Design Vue 样式规范
 - ⚡ TypeScript 支持
 
 ## 组件说明
 
-本目录包含两个组件：
+本目录包含三个组件：
 
-| 组件 | 文件 | 说明 |
-|------|------|------|
-| SelectArea | [`index.vue`](index.vue) | 单选模式组件，绑定值为逗号分隔的字符串 |
-| SelectAreaMultiple | [`multiple.vue`](multiple.vue) | 多选模式组件，绑定值为数组 |
+| 组件 | 文件 | 绑定值 | 适用场景 |
+|------|------|------|------|
+| SelectArea | [`index.vue`](index.vue) | 逗号分隔的路径字符串 | 业务表单中选择地区（如用户所在地区） |
+| SelectAreaMultiple | [`multiple.vue`](multiple.vue) | 路径字符串数组 | 业务表单中多选地区（如负责多个地区） |
+| AreaTreeSelect | [`tree.vue`](tree.vue) | 单个地区编码 | 选择单个地区节点（如选择上级地区、父级编码） |
+
+> **选型建议**：需要选择"一个地区作为业务值"时用 SelectArea / SelectAreaMultiple；需要选择"单个节点"（如父级编码）时用 AreaTreeSelect。
 
 ## 单选组件 (SelectArea)
 
@@ -84,6 +87,124 @@ const areaCodes = ref<string[]>([]);
 | 事件名 | 说明 | 参数 |
 |--------|------|------|
 | update:modelValue | 值变化时触发 | `(value: string[])` |
+
+## 树形选择组件 (AreaTreeSelect)
+
+基于 `a-tree-select` 封装，绑定值为**单个地区编码**，适用于选择父级节点等场景。
+
+### 与级联组件的区别
+
+| | SelectArea（级联） | AreaTreeSelect（树形） |
+|------|------|------|
+| 底层组件 | `a-cascader` | `a-tree-select` |
+| 绑定值 | 路径字符串 `"51,5101,510104"` | 单编码 `"510104"` |
+| 交互方式 | 列表式逐级展开 | 树形下拉，可搜索 |
+| 典型场景 | 选地区作为业务值 | 选父级节点/编码 |
+
+### 基础用法
+
+```vue
+<template>
+  <area-tree-select v-model="parentCode" />
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue';
+import AreaTreeSelect from '@/components/select-area/tree.vue';
+
+// 绑定值为单个地区编码
+const parentCode = ref('');
+</script>
+```
+
+### API
+
+#### Props
+
+| 参数 | 说明 | 类型 | 默认值 |
+|------|------|------|--------|
+| modelValue | 绑定值，单个地区编码 | `string \| undefined` | `undefined` |
+| maxLevel | 可选最大层级（1省/2市/3区县/4街道） | `number` | `3` |
+| placeholder | 占位提示文本 | `string` | `'请选择上级地区'` |
+| defaultExpandAll | 下拉面板打开时是否默认展开全部节点 | `boolean` | `false` |
+
+#### Events
+
+| 事件名 | 说明 | 参数 |
+|--------|------|------|
+| update:modelValue | 值变化时触发 | `(value: string)` |
+
+### 自定义可选层级
+
+通过 `maxLevel` 控制可选深度，超出层级的子节点会被剥离：
+
+```vue
+<!-- 仅可选到市级（1-2级） -->
+<area-tree-select v-model="cityCode" :max-level="2" />
+
+<!-- 可选到街道（完整4级） -->
+<area-tree-select v-model="townCode" :max-level="4" />
+```
+
+| maxLevel | 可选范围 | 说明 |
+|------|------|------|
+| 1 | 仅省级 | 只能选择省/直辖市 |
+| 2 | 省、市 | 最多选到市级 |
+| 3（默认） | 省、市、区县 | 最多选到区/县 |
+| 4 | 省、市、区县、街道 | 完整四级可选 |
+
+### 默认展开全部节点
+
+通过 `default-expand-all` 控制下拉面板打开时是否展开所有节点（默认折叠）：
+
+```vue
+<!-- 默认折叠：点击展开按钮逐级展开 -->
+<area-tree-select v-model="parentCode" />
+
+<!-- 默认展开：打开面板即显示全部层级 -->
+<area-tree-select v-model="parentCode" :default-expand-all="true" />
+```
+
+> **提示**：节点数量较多时（如 maxLevel=3 约 3000+ 节点），开启默认展开会产生较多 DOM，建议仅在层级较少（如 maxLevel=2）时启用。
+
+### 在表单中选择上级地区
+
+```vue
+<template>
+  <a-form>
+    <a-form-item label="上级地区" field="parent">
+      <area-tree-select v-model="form.parent" :max-level="3" placeholder="留空则为顶级地区" />
+    </a-form-item>
+  </a-form>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue';
+import AreaTreeSelect from '@/components/select-area/tree.vue';
+
+const form = ref({
+  parent: ''
+});
+</script>
+```
+
+### 预设默认值
+
+绑定值直接为地区编码，组件自动回显对应中文标签：
+
+```vue
+<template>
+  <area-tree-select v-model="parentCode" />
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue';
+import AreaTreeSelect from '@/components/select-area/tree.vue';
+
+// 预设：成都市（编码 5101）
+const parentCode = ref('5101');
+</script>
+```
 
 ## 单选组件示例
 
@@ -225,13 +346,24 @@ const refreshData = () => {
 
 **注意**：多选组件的绑定值不需要任何转换，直接使用数组格式。支持四级联动选择（省/市/区/县/乡镇）。
 
+### 树形选择组件绑定值格式
+
+树形选择组件的 `modelValue` 是**单个地区编码**（非路径）：
+
+```
+省: "11"
+市: "1101"
+区/县: "110101"
+乡镇: "110101001"
+```
+
 ### 地区数据结构
 
 ```typescript
 interface AreaItem {
   value: string;      // 地区编码
   label: string;      // 地区名称
-  level: string;      // 级别（1:省/直辖市, 2:市, 3:区/县）
+  level: number;      // 级别（1:省/直辖市, 2:市, 3:区/县）
   parent: string;     // 父级编码
   children?: AreaItem[]; // 子级地区
 }
@@ -239,10 +371,10 @@ interface AreaItem {
 
 ## 数据源
 
-组件从以下地址获取地区数据：
+组件通过 `@/api/area` 的 `getAreaData()` 获取地区数据，内部调用公开接口：
 
 ```
-import.meta.env.VITE_APP_BASE_URL + "/public/area/area.json"
+GET /api/sysArea/tree
 ```
 
 数据格式示例：
@@ -406,10 +538,10 @@ const handleSubmit = () => {
 ```
 ## 注意事项
 
-1. 组件需要服务器端提供 `/public/area/area.json` 接口
+1. 组件依赖后端公开接口 `/api/sysArea/tree` 提供行政区划数据（无需认证）
 2. 数据量较大，首次加载可能需要一些时间
-3. 组件使用 `path-mode` 模式，返回完整的地区路径编码
-4. 支持选择任意级别的地区（省、市、区/县、乡镇）
-5. 单选组件绑定值为字符串（逗号分隔），多选组件绑定值为数组
+3. SelectArea / SelectAreaMultiple 使用 `path-mode` 模式，返回完整的地区路径编码
+4. AreaTreeSelect 绑定值为单个地区编码，通过 `maxLevel` 控制可选层级
+5. 单选组件绑定值为字符串（逗号分隔），多选组件绑定值为数组，树形组件绑定值为单编码
 6. 多选组件的值无需转换，直接使用数组格式即可
-7. 支持四级联动选择，可通过 `level` 属性控制选择级数（1-4级）
+7. 三个组件共享同一份全局数据缓存（`getAreaData()`），仅首次加载发起请求
