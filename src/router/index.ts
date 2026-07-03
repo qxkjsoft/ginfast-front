@@ -64,7 +64,7 @@ router.beforeEach(async (to: any, _: any, next: any) => {
     if (!routeTree.value.length) {
 
         try {
-            // 获取用户信息、路由信息、字典数据
+            // 获取用户信息、路由信息(初始化)、字典数据
             await Promise.all([useUserStoreHook().getUserInfo(), routeStore.initSetRouter()]);
             useSystemStore().setDictData().catch((err: Error) => {
                 console.warn("字典数据加载失败:", err);

@@ -457,7 +457,7 @@ const onDataScope = (row: any) => {
             if (dataScopeRef.value) {
                 const formData = dataScopeRef.value.getFormData()
                 //console.log(formData)
-                if (!formData.dataScope || (formData.dataScope === '2' && formData.checkedKeys.length === 0)) {
+                if (formData.dataScope === '2' && formData.checkedKeys.length === 0) {
                     arcoMessage("error", "请选择权限范围");
                     return false;
                 }

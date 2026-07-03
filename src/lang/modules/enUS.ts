@@ -151,5 +151,6 @@ export default {
         ["tenant"]: "tenant management",
         ["codegen"]: "code generation",
         ["plugins-manager"]: "plugins manager",
+        ["params-manager"]: "params manager",
     }
 };

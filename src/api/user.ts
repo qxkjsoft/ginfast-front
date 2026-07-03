@@ -107,7 +107,11 @@ export const logout = () => {
 
 /** 刷新token */
 export const refreshTokenApi = (refreshToken: string) => {
-    return http.request<RefreshTokenResult>("post", baseUrlApi("refreshToken"), { data: { refreshToken } });
+    return http.request<RefreshTokenResult>("post", baseUrlApi("refreshToken"), {
+        data: {
+            refreshToken,
+        }
+    });
 };
 
 /** 获取登录用户信息 */

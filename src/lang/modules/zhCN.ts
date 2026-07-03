@@ -151,5 +151,6 @@ export default {
         ["tenant"]: "租户管理",
         ["codegen"]: "代码生成",
         ["plugins-manager"]: "插件管理",
+        ["params-manager"]: "参数管理",
     },
 };

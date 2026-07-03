@@ -1,6 +1,6 @@
 <template>
-    <div class="snow-fill">
-        <div class="snow-fill-inner">
+    <div class="snow-page">
+        <div class="snow-inner">
             <s-layout-tools>
                 <template #left>
                     <a-space wrap>
@@ -63,7 +63,7 @@
             <a-table ref="tableRef" :data="displayMenuList" :loading="loading" row-key="id" column-resizable
                 :row-selection="{ type: 'checkbox', showCheckedAll: true }" v-model:selectedKeys="selectedKeys"
                 :bordered="{ cell: true }" show-empty-tree :pagination="false" size="medium"
-                :scroll="{ x: '100%', y: '85%' }">
+                :scroll="{ x: '100%', y: '100%' }">
                 <template #columns>
                     <a-table-column title="菜单名称" :width="150" tooltip ellipsis>
                         <template #cell="{ record }">

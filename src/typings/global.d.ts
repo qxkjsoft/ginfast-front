@@ -4,7 +4,7 @@ declare namespace Menu {
   interface MenuOptions {
     id: string;
     parentId: string;
-    fullPath?: stirng;
+    fullPath?: string;
     path: string;
     name: string;
     redirect?: string;
@@ -20,6 +20,7 @@ declare namespace Menu {
     affix: boolean;
     link?: string;
     iframe?: boolean;
+    isFull?: boolean;
     roles: Array<string>;
     icon?: string;
     svgIcon?: string;
