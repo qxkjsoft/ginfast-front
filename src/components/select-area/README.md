@@ -14,15 +14,16 @@
 
 ## 组件说明
 
-本目录包含三个组件：
+本目录包含四个组件：
 
 | 组件 | 文件 | 绑定值 | 适用场景 |
 |------|------|------|------|
 | SelectArea | [`index.vue`](index.vue) | 逗号分隔的路径字符串 | 业务表单中选择地区（如用户所在地区） |
 | SelectAreaMultiple | [`multiple.vue`](multiple.vue) | 路径字符串数组 | 业务表单中多选地区（如负责多个地区） |
 | AreaTreeSelect | [`tree.vue`](tree.vue) | 单个地区编码 | 选择单个地区节点（如选择上级地区、父级编码） |
+| AreaTreeSelectMultiple | [`tree-multiple.vue`](tree-multiple.vue) | 地区编码数组 | 树形多选多个地区节点（checkbox，父子独立） |
 
-> **选型建议**：需要选择"一个地区作为业务值"时用 SelectArea / SelectAreaMultiple；需要选择"单个节点"（如父级编码）时用 AreaTreeSelect。
+> **选型建议**：需要选择"一个地区作为业务值"时用 SelectArea / SelectAreaMultiple；需要选择"单个节点"（如父级编码）时用 AreaTreeSelect；需要树形勾选多个节点（父子独立）时用 AreaTreeSelectMultiple。
 
 ## 单选组件 (SelectArea)
 
@@ -79,7 +80,7 @@ const areaCodes = ref<string[]>([]);
 
 | 参数 | 说明 | 类型 | 默认值 |
 |------|------|------|--------|
-| modelValue | 绑定值，地区编码数组 | `string[] \| undefined` | `undefined` |
+| modelValue | 绑定值，逗号分隔的路径字符串数组 | `string[] \| undefined` | `undefined` |
 | level | 地区选择级数 | `number` | `3` |
 
 #### Events
@@ -203,6 +204,112 @@ import AreaTreeSelect from '@/components/select-area/tree.vue';
 
 // 预设：成都市（编码 5101）
 const parentCode = ref('5101');
+</script>
+```
+
+## 树形多选组件 (AreaTreeSelectMultiple)
+
+基于 `a-tree-select` 封装，开启 `tree-checkable` + `tree-check-strictly`，绑定值为**地区编码数组**，适用于树形勾选多个节点的场景。
+
+### 与单选树形组件的区别
+
+| | AreaTreeSelect（单选） | AreaTreeSelectMultiple（多选） |
+|------|------|------|
+| 绑定值 | 单编码 `"510104"` | 编码数组 `["5101", "510104"]` |
+| 交互方式 | 点击节点选中 | checkbox 勾选 |
+| 父子关系 | — | **严格独立**（互不影响） |
+| 典型场景 | 选择父级节点 | 勾选多个地区节点 |
+
+> **关于严格模式**：本组件采用 `tree-check-strictly`，父子节点勾选完全独立——勾选父节点不会自动勾选子节点，反之亦然。绑定值可包含任意层级的节点编码。
+
+### 基础用法
+
+```vue
+<template>
+  <area-tree-select-multiple v-model="selectedCodes" />
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue';
+import AreaTreeSelectMultiple from '@/components/select-area/tree-multiple.vue';
+
+// 绑定值为地区编码数组
+const selectedCodes = ref<string[]>([]);
+</script>
+```
+
+### API
+
+#### Props
+
+| 参数 | 说明 | 类型 | 默认值 |
+|------|------|------|--------|
+| modelValue | 绑定值，选中的地区编码数组 | `string[] \| undefined` | `undefined` |
+| maxLevel | 可选最大层级（1省/2市/3区县/4街道） | `number` | `3` |
+| placeholder | 占位提示文本 | `string` | `'请选择地区'` |
+| defaultExpandAll | 下拉面板打开时是否默认展开全部节点 | `boolean` | `false` |
+
+#### Events
+
+| 事件名 | 说明 | 参数 |
+|--------|------|------|
+| update:modelValue | 值变化时触发 | `(value: string[])` |
+
+### 自定义可选层级
+
+通过 `maxLevel` 控制可选深度，超出层级的子节点会被剥离：
+
+```vue
+<!-- 仅可选到市级（1-2级） -->
+<area-tree-select-multiple v-model="cityCodes" :max-level="2" />
+
+<!-- 可选到街道（完整4级） -->
+<area-tree-select-multiple v-model="townCodes" :max-level="4" />
+```
+
+| maxLevel | 可选范围 | 说明 |
+|------|------|------|
+| 1 | 仅省级 | 只能选择省/直辖市 |
+| 2 | 省、市 | 最多选到市级 |
+| 3（默认） | 省、市、区县 | 最多选到区/县 |
+| 4 | 省、市、区县、街道 | 完整四级可选 |
+
+### 预设默认值
+
+绑定值直接为地区编码数组，组件自动回显对应中文标签：
+
+```vue
+<template>
+  <area-tree-select-multiple v-model="selectedCodes" />
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue';
+import AreaTreeSelectMultiple from '@/components/select-area/tree-multiple.vue';
+
+// 预设：成都市、锦江区
+const selectedCodes = ref<string[]>(['5101', '510104']);
+</script>
+```
+
+### 在表单中多选地区
+
+```vue
+<template>
+  <a-form>
+    <a-form-item label="负责地区" field="areas">
+      <area-tree-select-multiple v-model="form.areas" :max-level="3" placeholder="请选择负责地区" />
+    </a-form-item>
+  </a-form>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue';
+import AreaTreeSelectMultiple from '@/components/select-area/tree-multiple.vue';
+
+const form = ref({
+  areas: [] as string[]
+});
 </script>
 ```
 
@@ -545,3 +652,4 @@ const handleSubmit = () => {
 5. 单选组件绑定值为字符串（逗号分隔），多选组件绑定值为数组，树形组件绑定值为单编码
 6. 多选组件的值无需转换，直接使用数组格式即可
 7. 三个组件共享同一份全局数据缓存（`getAreaData()`），仅首次加载发起请求
+8. AreaTreeSelectMultiple 采用 `tree-check-strictly` 严格模式，父子节点勾选独立互不影响

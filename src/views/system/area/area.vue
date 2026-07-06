@@ -168,6 +168,17 @@
                     请在上方选择一个地区
                 </div>
             </div>
+            <div>
+                <h4>树形多选 (AreaTreeSelectMultiple)</h4>
+                <area-tree-select-multiple v-model="demoTreeValues" />
+                <div v-if="demoTreeValues.length" style="margin-top: 8px">
+                    选中的值:
+                    <a-tag v-for="v in demoTreeValues" :key="v" style="margin: 2px">{{ v }}</a-tag>
+                </div>
+                <div v-else style="margin-top: 8px; color: var(--color-text-3); font-size: 12px;">
+                    请在上方选择地区（可多选，父子独立）
+                </div>
+            </div>
         </a-modal>
     </div>
 </template>
@@ -189,6 +200,7 @@ import {
 import AreaTreeSelect from "@/components/select-area/tree.vue";
 import SelectArea from "@/components/select-area/index.vue";
 import SelectAreaMultiple from "@/components/select-area/multiple.vue";
+import AreaTreeSelectMultiple from "@/components/select-area/tree-multiple.vue";
 import { useDevicesSize } from "@/hooks/useDevicesSize";
 const { isMobile } = useDevicesSize();
 const layoutMode = computed(() => {
@@ -203,11 +215,19 @@ const layoutMode = computed(() => {
 const loading = ref(false);
 const areaList = ref<AreaItem[]>([]);
 
+// 按业务层级标记叶子节点：level=4（街道）即末级，供 Arco Table 隐藏展开图标
+const markLeafNodes = (list: AreaItem[]) => {
+    list.forEach((item) => {
+        item.isLeaf = Number(item.level) >= 4;
+    });
+    return list;
+};
+
 const getRootList = async () => {
     loading.value = true;
     try {
         const res = await getAreaListAPI();
-        areaList.value = res.data.list || [];
+        areaList.value = markLeafNodes(res.data.list || []);
     } catch (error) {
         console.error("获取地区列表失败:", error);
         arcoMessage("error", "获取地区列表失败");
@@ -220,7 +240,7 @@ const getRootList = async () => {
 const loadMore = async (record: AreaItem, done: (children?: AreaItem[]) => void) => {
     try {
         const res = await getAreaChildrenAPI(record.value);
-        done(res.data.list || []);
+        done(markLeafNodes(res.data.list || []));
     } catch {
         done([]);
     }
@@ -407,7 +427,7 @@ const reloadChildren = async (parentValue: string) => {
         const res = await getAreaChildrenAPI(parentValue);
         const parentNode = findNodeByValue(areaList.value, parentValue);
         if (parentNode) {
-            parentNode.children = res.data.list || [];
+            parentNode.children = markLeafNodes(res.data.list || []);
         }
     } catch (error) {
         console.error("刷新子节点失败:", error);
@@ -445,11 +465,13 @@ const demoVisible = ref(false);
 const demoAreaValue = ref("");
 const demoAreaValues = ref<string[]>([]);
 const demoTreeValue = ref("");
+const demoTreeValues = ref<string[]>([]);
 
 const resetDemo = () => {
     demoAreaValue.value = "";
     demoAreaValues.value = [];
     demoTreeValue.value = "";
+    demoTreeValues.value = [];
 };
 
 onMounted(() => {

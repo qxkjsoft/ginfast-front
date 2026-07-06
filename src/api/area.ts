@@ -20,6 +20,8 @@ export interface AreaItem {
   children?: AreaItem[] | null;
   /** id（来自数据库） */
   id?: number;
+  /** 是否为叶子节点（供 Arco Table 隐藏展开图标，前端按 level 标记） */
+  isLeaf?: boolean;
 }
 
 /**

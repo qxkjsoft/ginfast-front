@@ -14,7 +14,7 @@
                             <a-col :span="12">
                                 <a-form-item label="目录/模块" field="moduleName"
                                     :rules="[{ required: true, message: '模块名称不能为空' }]">
-                                    <a-input v-model="editForm.moduleName" placeholder="请输入模块名称" />
+                                    <a-input v-model="editForm.moduleName" placeholder="请输入模块名称，支持路径如 test/admin" />
                                 </a-form-item>
                             </a-col>
                             <a-col :span="12">
