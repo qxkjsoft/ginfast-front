@@ -23,6 +23,11 @@
                 </template>
                 <template #right>
                     <a-space wrap>
+                        <a-button type="primary" status="success" @click="syncVisible = true"
+                            v-hasPerm="['system:api:sync']">
+                            <template #icon><icon-sync /></template>
+                            <span>同步路由</span>
+                        </a-button>
                         <a-button type="primary" @click="onAdd" v-hasPerm="['system:api:add']">
                             <template #icon><icon-plus /></template>
                             <span>新增</span>
@@ -95,6 +100,9 @@
                 </a-form>
             </div>
         </a-modal>
+
+        <!-- 路由同步预览弹窗 -->
+        <SysApiSyncModal v-model:visible="syncVisible" @success="getSysApiList" />
     </div>
 </template>
 
@@ -111,6 +119,7 @@ import {
     type SysApiUpdateParams,
     type SysApiDeleteParams
 } from "@/api/sysapi";
+import SysApiSyncModal from "./components/sysapi-sync-modal.vue";
 import { Message } from "@arco-design/web-vue";
 import { formatTime } from "@/globals";
 import { useDevicesSize } from "@/hooks/useDevicesSize";
@@ -324,6 +333,9 @@ const onDelete = async (row: SysApiItem) => {
         Message.error("删除失败");
     }
 };
+
+// ===== 路由同步 =====
+const syncVisible = ref(false);
 
 // 初始化
 onMounted(() => {
