@@ -52,6 +52,16 @@
                             <span>导入</span>
                         </a-button>
 
+                        <a-button type="primary" status="warning" @click="onBackup" v-hasPerm="['system:menu:export']">
+                            <template #icon><icon-save /></template>
+                            <span>菜单备份</span>
+                        </a-button>
+
+                        <a-button type="outline" status="warning" @click="onRestore" v-hasPerm="['system:menu:import']">
+                            <template #icon><icon-undo /></template>
+                            <span>菜单恢复</span>
+                        </a-button>
+
                         <a-button type="primary" status="danger" @click="onBatchDelete" v-hasPerm="['system:menu:delete']">
                             <template #icon><icon-delete /></template>
                             <span>批量删除</span>
@@ -410,12 +420,45 @@
                 </div>
             </div>
         </a-modal>
+
+        <!-- 菜单恢复弹窗 -->
+        <a-modal v-model:visible="restoreVisible" title="菜单恢复" width="600px" :footer="false" :mask-closable="false">
+            <div class="restore-content">
+                <a-alert type="warning" style="margin-bottom: 16px;">
+                    完全恢复将清空当前全部菜单，并从所选备份文件完整重建（角色的菜单授权会自动重新挂载）。建议恢复后重新登录以刷新路由。
+                </a-alert>
+                <a-table :data="backupList" :loading="backupLoading" :pagination="false" size="small"
+                    :bordered="{ cell: true }" row-key="filename" v-model:selectedKeys="restoreSelectedKeys"
+                    :row-selection="{ type: 'radio' }">
+                    <template #columns>
+                        <a-table-column title="备份文件" data-index="filename" tooltip ellipsis></a-table-column>
+                        <a-table-column title="大小" align="center" :width="90">
+                            <template #cell="{ record }">
+                                {{ formatFileSize(record.size) }}
+                            </template>
+                        </a-table-column>
+                        <a-table-column title="备份时间" align="center" :width="170">
+                            <template #cell="{ record }">
+                                {{ formatBackupTime(record.modTime) }}
+                            </template>
+                        </a-table-column>
+                    </template>
+                </a-table>
+                <div style="text-align: right; margin-top: 16px;">
+                    <a-space>
+                        <a-button @click="restoreVisible = false">取消</a-button>
+                        <a-button type="primary" status="danger" :disabled="!selectedBackupFilename"
+                            :loading="restoring" @click="onRestoreConfirm">恢复</a-button>
+                    </a-space>
+                </div>
+            </div>
+        </a-modal>
     </div>
 </template>
 
 <script setup lang="ts">
 import SApiPermission from "@/components/s-api-permission/index.vue";
-import { type MenuItem, getMenuListAPI, addMenuAPI, updateMenuAPI, deleteMenuAPI, exportMenuAPI, importMenuAPI, deleteMenusAPI, type ImportResult } from "@/api/menu";
+import { type MenuItem, getMenuListAPI, addMenuAPI, updateMenuAPI, deleteMenuAPI, exportMenuAPI, importMenuAPI, deleteMenusAPI, backupMenuAPI, getMenuBackupListAPI, restoreMenuAPI, type ImportResult, type MenuBackupFile } from "@/api/menu";
 import useGlobalProperties from "@/hooks/useGlobalProperties";
 import { deepClone, getPascalCase } from "@/utils";
 import { useDevicesSize } from "@/hooks/useDevicesSize";
@@ -955,6 +998,102 @@ const triggerImport = (overwrite: boolean) => {
 
     // 触发文件选择对话框
     fileInputRef.value.click();
+};
+
+// ==================== 菜单备份 ====================
+const onBackup = () => {
+    Modal.confirm({
+        title: "菜单备份",
+        content: "将当前全部菜单（含关联API）备份到服务器备份目录，文件名按时间生成。",
+        okText: "开始备份",
+        cancelText: "取消",
+        onOk: async () => {
+            try {
+                const response = await backupMenuAPI();
+                if (response.code === 0 && response.data) {
+                    arcoMessage("success", `备份成功：${response.data.filename}（共 ${response.data.menuCount} 个菜单）`);
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+    });
+};
+
+// ==================== 菜单恢复 ====================
+const restoreVisible = ref(false);
+const backupList = ref<MenuBackupFile[]>([]);
+const backupLoading = ref(false);
+const restoring = ref(false);
+const restoreSelectedKeys = ref<string[]>([]);
+
+// 当前选中的备份文件名
+const selectedBackupFilename = computed(() => restoreSelectedKeys.value[0] || "");
+
+// 加载服务器备份文件列表
+const loadBackupList = async () => {
+    try {
+        backupLoading.value = true;
+        const { data } = await getMenuBackupListAPI();
+        backupList.value = data || [];
+        if (!backupList.value.length) {
+            arcoMessage("warning", "服务器备份目录下暂无备份文件，请先备份");
+        }
+    } finally {
+        backupLoading.value = false;
+    }
+};
+
+// 打开恢复弹窗
+const onRestore = () => {
+    restoreSelectedKeys.value = [];
+    restoreVisible.value = true;
+    loadBackupList();
+};
+
+// 文件大小格式化
+const formatFileSize = (size: number) => {
+    if (size == null) return "-";
+    if (size < 1024) return `${size} B`;
+    if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
+    return `${(size / 1024 / 1024).toFixed(2)} MB`;
+};
+
+// 备份时间格式化（去掉毫秒和时区后缀）
+const formatBackupTime = (time: string) => {
+    if (!time) return "-";
+    return time.replace("T", " ").replace(/(\.\d+)?([+\-]\d{2}:\d{2}|Z)$/, "");
+};
+
+// 确认恢复
+const onRestoreConfirm = () => {
+    Modal.confirm({
+        title: "确认恢复菜单",
+        content: `将清空当前全部菜单，并从备份 ${selectedBackupFilename.value} 完整重建。该操作不可撤销，确定继续吗？`,
+        okText: "确认恢复",
+        cancelText: "取消",
+        okButtonProps: {
+            status: "danger"
+        },
+        onOk: async () => {
+            try {
+                restoring.value = true;
+                const response = await restoreMenuAPI({ filename: selectedBackupFilename.value });
+                if (response.code === 0 && response.data) {
+                    restoreVisible.value = false;
+                    await getMenuList();
+                    Modal.success({
+                        title: "恢复成功",
+                        content: `共重建 ${response.data.totalMenus} 个菜单、${response.data.totalApis} 个API，重挂 ${response.data.restoredRoleMenus} 条角色授权。建议重新登录以刷新路由。`
+                    });
+                }
+            } catch (error) {
+                console.error(error);
+            } finally {
+                restoring.value = false;
+            }
+        }
+    });
 };
 
 onMounted(() => {

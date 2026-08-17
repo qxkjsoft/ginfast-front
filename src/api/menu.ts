@@ -186,3 +186,36 @@ export const importMenuAPI = (data: FormData) => {
         }
     });
 };
+
+// 菜单备份结果
+export interface MenuBackupResult {
+    filename: string;   // 备份文件名
+    menuCount: number;  // 备份的菜单总数
+}
+
+// 菜单备份文件信息
+export interface MenuBackupFile {
+    filename: string;  // 文件名
+    size: number;      // 文件大小（字节）
+    modTime: string;   // 备份时间
+}
+
+// 菜单恢复结果
+export interface MenuRestoreResult extends ImportResult {
+    restoredRoleMenus: number; // 重新挂载的角色菜单授权数
+}
+
+// 备份菜单到服务器
+export const backupMenuAPI = () => {
+    return http.request<BaseResult<MenuBackupResult>>("post", baseUrlApi("sysMenu/backup"));
+};
+
+// 获取菜单备份文件列表
+export const getMenuBackupListAPI = () => {
+    return http.request<BaseResult<MenuBackupFile[]>>("get", baseUrlApi("sysMenu/backupList"));
+};
+
+// 从备份文件恢复菜单
+export const restoreMenuAPI = (data: { filename: string }) => {
+    return http.request<BaseResult<MenuRestoreResult>>("post", baseUrlApi("sysMenu/restore"), { data });
+};
