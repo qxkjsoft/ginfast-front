@@ -111,6 +111,9 @@ const uploadingCount = ref(0);
 
 // 从 modelValue 解析文件列表
 const parseFileList = (jsonStr: string): FileInfo[] => {
+    if (!jsonStr || typeof jsonStr !== 'string') {
+        return [];
+    }
     try {
         const data = JSON.parse(jsonStr);
         if (Array.isArray(data)) {

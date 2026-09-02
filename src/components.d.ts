@@ -8,6 +8,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AAlert: typeof import('@arco-design/web-vue')['Alert']
+    AAvatar: typeof import('@arco-design/web-vue')['Avatar']
     ABadge: typeof import('@arco-design/web-vue')['Badge']
     ABreadcrumb: typeof import('@arco-design/web-vue')['Breadcrumb']
     ABreadcrumbItem: typeof import('@arco-design/web-vue')['BreadcrumbItem']
@@ -15,6 +16,7 @@ declare module 'vue' {
     ACard: typeof import('@arco-design/web-vue')['Card']
     ACascader: typeof import('@arco-design/web-vue')['Cascader']
     ACheckbox: typeof import('@arco-design/web-vue')['Checkbox']
+    ACheckboxGroup: typeof import('@arco-design/web-vue')['CheckboxGroup']
     ACol: typeof import('@arco-design/web-vue')['Col']
     ACollapse: typeof import('@arco-design/web-vue')['Collapse']
     ACollapseItem: typeof import('@arco-design/web-vue')['CollapseItem']
@@ -49,7 +51,6 @@ declare module 'vue' {
     AMenuItem: typeof import('@arco-design/web-vue')['MenuItem']
     AModal: typeof import('@arco-design/web-vue')['Modal']
     AOption: typeof import('@arco-design/web-vue')['Option']
-    APagination: typeof import('@arco-design/web-vue')['Pagination']
     APopconfirm: typeof import('@arco-design/web-vue')['Popconfirm']
     APopover: typeof import('@arco-design/web-vue')['Popover']
     AProgress: typeof import('@arco-design/web-vue')['Progress']
@@ -71,6 +72,9 @@ declare module 'vue' {
     ATabs: typeof import('@arco-design/web-vue')['Tabs']
     ATag: typeof import('@arco-design/web-vue')['Tag']
     ATextarea: typeof import('@arco-design/web-vue')['Textarea']
+    ATimeline: typeof import('@arco-design/web-vue')['Timeline']
+    ATimelineItem: typeof import('@arco-design/web-vue')['TimelineItem']
+    ATimePicker: typeof import('@arco-design/web-vue')['TimePicker']
     ATooltip: typeof import('@arco-design/web-vue')['Tooltip']
     ATree: typeof import('@arco-design/web-vue')['Tree']
     ATreeSelect: typeof import('@arco-design/web-vue')['TreeSelect']

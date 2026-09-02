@@ -1,6 +1,7 @@
 import Axios, { type AxiosInstance, type AxiosRequestConfig, type CustomParamsSerializer } from "axios";
 import type { HttpError, RequestMethods, HttpResponse, HttpRequestConfig } from "./types.d";
-import { stringify } from "qs";
+import { serializeParams } from "./params";
+import { createRequestQueue, createSilentError } from "./request-queue";
 //import NProgress from "../progress";
 import { getAccessToken, getRefreshToken, formatToken } from "../auth";
 import { useUserStoreHook } from "@/store/modules/user";
@@ -19,7 +20,7 @@ const defaultConfig: AxiosRequestConfig = {
         "X-Requested-With": "XMLHttpRequest"
     },
     paramsSerializer: {
-        serialize: stringify as unknown as CustomParamsSerializer
+        serialize: serializeParams as unknown as CustomParamsSerializer
     }
 };
 
@@ -29,8 +30,8 @@ class Http {
         this.httpInterceptorsResponse();
     }
 
-    /** `token`过期后，暂存待执行的请求 */
-    private static requests: Array<(token: string) => void> = [];
+    /** `token`过期后，暂存待执行请求的排队队列（刷新失败时会全部拒绝，避免请求永久挂起） */
+    private static requestQueue = createRequestQueue();
 
     /** 防止重复刷新`token` */
     private static isRefreshing = false;
@@ -41,24 +42,13 @@ class Http {
     /** 保存当前`Axios`实例对象 */
     private static axiosInstance: AxiosInstance = Axios.create(defaultConfig);
 
-    /** 重连原始请求 */
-    private static retryOriginalRequest(config: HttpRequestConfig) {
-        return new Promise(resolve => {
-            Http.requests.push((token: string) => {
-                if (config.headers) {
-                    config.headers["Authorization"] = formatToken(token);
-                }
-                resolve(config);
-            });
-        });
-    }
-
     // 跳转登录页（带节流功能）
     private static redirectLoginPage = throttle(() => {
         // 刷新token失败，清除用户信息并跳转到登录页
         useUserStoreHook().logOut();
-        // 清空待执行的请求队列
-        Http.requests = [];
+        // 拒绝所有排队中的请求（reject 后由调用方按需提示），并标记刷新失败
+        Http.requestQueue.markFailed();
+        Http.requestQueue.rejectAll(createSilentError("登录状态已过期，请重新登录"));
         //Message.error("登录状态已过期，请重新登录");
         router.push({
             path: "/login",
@@ -100,22 +90,24 @@ class Http {
                             // 过期处理
                             if (!Http.isRefreshing) {
                                 Http.isRefreshing = true;
+                                // 复位历史失败标记：新一轮刷新不应被上一次失败永久拦截
+                                Http.requestQueue.reset();
                                 // token过期刷新
                                 useUserStoreHook()
                                     .handRefreshToken(refreshTokenData.refreshToken)
                                     .then((res: any) => {
-                                        const token = res.data.accessToken;
-                                        if (config.headers) {
-                                            config.headers["Authorization"] = formatToken(token);
-                                        }
-                                        Http.requests.forEach(cb => cb(token));
-                                        Http.requests = [];
+                                        Http.requestQueue.resolveAll(res.data.accessToken);
+                                    })
+                                    .catch(() => {
+                                        // 刷新失败：拒绝所有排队请求，防止其永久挂起
+                                        Http.requestQueue.markFailed();
+                                        Http.requestQueue.rejectAll(createSilentError("登录状态已过期，请重新登录"));
                                     })
                                     .finally(() => {
                                         Http.isRefreshing = false;
                                     });
                             }
-                            resolve(Http.retryOriginalRequest(config));
+                            resolve(Http.requestQueue.park(config));
                         } else {
                             // 未过期
                             if (config.headers && data?.accessToken) {
@@ -213,6 +205,11 @@ class Http {
                 })
                 .catch(async error => {
                     console.error("http.error:", error);
+                    // 登录态过期被静默拒绝的请求不弹全局提示，避免刷新失败时批量弹窗
+                    if (error?.silent) {
+                        reject(error);
+                        return;
+                    }
                     const { response } = error;
                     if (response && response.data instanceof Blob) {
                         try {
