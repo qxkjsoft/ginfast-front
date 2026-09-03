@@ -4,6 +4,12 @@
             <a-col :span="24">
                 <a-card title="安全设置">
                     <a-form :model="form" :rules="rules" :style="{ width: layoutMode.width }" :layout="layoutMode.layout" @submit="onSubmit">
+                        <a-form-item field="oldPassword" label="旧密码" :label-col-flex="isMobile ? '100px' : '80px'">
+                            <a-input-password v-model="form.oldPassword" placeholder="请输入旧密码" allow-clear />
+                            <template #extra>
+                                <div>修改密码时必填</div>
+                            </template>
+                        </a-form-item>
                         <a-form-item field="password" label="登录密码" :label-col-flex="isMobile ? '100px' : '80px'">
                             <a-input-password v-model="form.password" placeholder="请输入登录密码" allow-clear />
                             <template #extra>
@@ -41,6 +47,7 @@ const data = defineModel() as any;
 const { isMobile } = useDevicesSize();
 const form = ref({
     // id: "",
+    oldPassword: "",
     password: "",
     phone: "",
     email: ""
@@ -61,6 +68,17 @@ const layoutMode = computed(() => {
   return isMobile.value ? info.mobile : info.desktop;
 });
 const rules = {
+    oldPassword: [
+        {
+            validator: (value: string, cb: any) => {
+                if (form.value.password && !value) {
+                    cb("修改密码时需输入旧密码");
+                } else {
+                    cb();
+                }
+            }
+        }
+    ],
     phone: [
         {
             required: true,
@@ -74,6 +92,8 @@ const onSubmit = ({ errors }: ArcoDesign.ArcoSubmit) => {
     //proxy.$message.success("模拟修改成功");
     updateAccountAPI(form.value).then(() => {
         proxy.$message.success("修改成功");
+        form.value.oldPassword = "";
+        form.value.password = "";
         emit("refresh");
     });
 };
