@@ -17,8 +17,8 @@ export interface MenuItem {
     redirect: string;
     title: string;
     isFull: boolean;
-    hide: boolean;
-    disable: boolean;
+    hide: number; // 后端 int8：0 显示 / 1 隐藏
+    disable: number; // 后端 int8：0 正常 / 1 停用
     keepAlive: boolean;
     affix: boolean;
     link: string;
@@ -84,8 +84,8 @@ export const convertMenuItemsToRoutes = (menuItems: MenuItem[]): ConvertedRouteI
             redirect: item.redirect,
             meta: {
                 title: item.title,
-                hide: item.hide,
-                disable: item.disable,
+                hide: !!item.hide, // 后端 int8 0/1 强转布尔
+                disable: !!item.disable, // 后端 int8 0/1 强转布尔
                 keepAlive: item.keepAlive,
                 affix: item.affix,
                 link: item.link || "",

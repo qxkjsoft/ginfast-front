@@ -522,13 +522,13 @@ const performSearch = () => {
             const nameMatch = !nameFilter || (menu.title && menu.title.includes(nameFilter));
             const pathMatch = !pathFilter || (menu.path && menu.path.includes(pathFilter));
             const permissionMatch = !permissionFilter || (menu.permission && menu.permission.includes(permissionFilter));
-            // 注意：hide和disable在后端API返回的数据中是boolean类型，但在表单中是字符串类型，需要转换
+            // 注意：hide/disable在后端API返回的数据中均为 int8(0/1)，表单中是字符串，需要转换
             const hideMatch = hideFilter === null ||
-                (hideFilter === "false" && menu.hide === false) ||
-                (hideFilter === "true" && menu.hide === true);
+                (hideFilter === "false" && menu.hide === 0) ||
+                (hideFilter === "true" && menu.hide === 1);
             const disableMatch = disableFilter === null ||
-                (disableFilter === "false" && menu.disable === false) ||
-                (disableFilter === "true" && menu.disable === true);
+                (disableFilter === "false" && menu.disable === 0) ||
+                (disableFilter === "true" && menu.disable === 1);
             // 如果当前节点符合条件，添加到结果中，并继续处理子节点
             if (idMatch && nameMatch && pathMatch && permissionMatch && hideMatch && disableMatch) {
                 const filteredMenu = { ...menu };

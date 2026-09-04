@@ -379,8 +379,9 @@ const getDivision = async () => {
         arcoMessage("error", "获取部门列表失败");
         allDivisionList.value = [];
         displayDivisionList.value = [];
+    } finally {
+        loading.value = false;
     }
-    loading.value = false;
     setTimeout(() => {
         tableRef.value?.expandAll();
     }, 0);

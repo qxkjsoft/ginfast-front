@@ -2,6 +2,7 @@ import Axios, { type AxiosInstance, type AxiosRequestConfig, type CustomParamsSe
 import type { HttpError, RequestMethods, HttpResponse, HttpRequestConfig } from "./types.d";
 import { serializeParams } from "./params";
 import { createRequestQueue, createSilentError } from "./request-queue";
+import { isPublicApi } from "./public-api";
 //import NProgress from "../progress";
 import { getAccessToken, getRefreshToken, formatToken } from "../auth";
 import { useUserStoreHook } from "@/store/modules/user";
@@ -77,9 +78,8 @@ class Http {
                     return config;
                 }
 
-                /** 请求白名单，放置一些不需要`token`的接口（通过设置请求白名单，防止`token`过期后再请求造成的死循环问题） */
-                const whiteList = ["/refreshToken", "/login", "/captcha/id", "/captcha/image"];
-                return whiteList.some(url => config.url?.includes(url))
+                /** 请求白名单：公开接口不附带`token`、不参与过期刷新排队（防止`token`过期后再请求造成的死循环问题） */
+                return isPublicApi(config.url)
                     ? config
                     : new Promise(resolve => {
                         const data = getAccessToken();

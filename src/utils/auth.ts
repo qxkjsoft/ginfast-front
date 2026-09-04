@@ -21,6 +21,12 @@ export const AccessTokenKey = "gin-fast-access-token";
 export const RefreshTokenKey = "gin-fast-refresh-token";
 export const UserInfoKey = "gin-fast-user-info";
 
+/** cookie 安全属性：sameSite 显式声明为 Lax；secure 仅在 https 页面下开启（http 部署强加会被浏览器拒收，登录直接失效） */
+const cookieSecurityOptions = () => ({
+  sameSite: "Lax" as const,
+  secure: typeof window !== "undefined" && window.location.protocol === "https:"
+});
+
 export function hasRefreshToken(): boolean {
   return !!Cookies.get(RefreshTokenKey);
 }
@@ -55,7 +61,8 @@ export function setRefreshToken(refreshToken: string, refreshTokenExpires: numbe
   });
 
   Cookies.set(RefreshTokenKey, cookieString, {
-    expires: (refreshTokenExpires * 1000 - Date.now()) / 86400000
+    expires: (refreshTokenExpires * 1000 - Date.now()) / 86400000,
+    ...cookieSecurityOptions()
   });
 }
 
@@ -68,7 +75,8 @@ export function setAccessToken(accessToken: string, accessTokenExpires: number) 
     accessTokenExpires
   });
   Cookies.set(AccessTokenKey, cookieString, {
-    expires: (accessTokenExpires * 1000 - Date.now()) / 86400000
+    expires: (accessTokenExpires * 1000 - Date.now()) / 86400000,
+    ...cookieSecurityOptions()
   });
 }
 

@@ -76,8 +76,8 @@ export const routeConfigStore = () => {
      */
     function removeTabsList(path: string) {
         const index = tabsList.value.findIndex((item: Menu.MenuOptions) => item.path === path);
-        if (tabsList.value[index].meta.affix) return;
         if (index === -1) return;
+        if (tabsList.value[index].meta.affix) return;
         tabsList.value.splice(index, 1);
     }
     /**

@@ -90,6 +90,9 @@ router.beforeEach(async (to: any, _: any, next: any) => {
         }
     }
 
+    // 停用的路由不可访问：后端 getRouters 已在 SQL 层过滤 disable 菜单，这里兜底拦截前端已注册的停用路由
+    if (to.meta.disable) return next("/404");
+
     // 获取外链路由的处理函数
     // 所有的路由正常放行，只不过额外判断是否是外链，如果是，则打开新窗口跳转外链
     // 外链的页面依旧正常打开，只不过不会参与缓存与tabs显示，符合路由跳转的直觉

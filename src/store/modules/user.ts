@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import pinia from "@/store";
+import { useRouteConfigStore } from "@/store/modules/route-config";
 import { setAccessToken, setRefreshToken, removeAccessToken, removeRefreshToken, UserInfoKey } from "@/utils/auth";
 //import { type userType } from "@/store/types";
 import { getLocalStorage, setLocalStorage, removeLocalStorage } from "@/utils/app";
@@ -67,6 +68,9 @@ export const useUserStore = defineStore("user", () => {
         removeAccessToken();
         removeRefreshToken();
         removeLocalStorage(UserInfoKey);
+        // 清除动态路由、tabs、缓存路由：会话过期跳登录与手动登出统一走这里，
+        // 防止换账号重登后上一账号的动态路由仍注册可导航
+        useRouteConfigStore(pinia).resetRoute();
     };
     /** 刷新`token` */
     const handRefreshToken = async (data: string) => {

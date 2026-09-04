@@ -140,7 +140,6 @@ import { storeToRefs } from "pinia";
 import { useThemeConfig } from "@/store/modules/theme-config";
 import { useThemeMethods } from "@/hooks/useThemeMethods";
 import { useDevicesSize } from "@/hooks/useDevicesSize";
-import { useRouteConfigStore } from "@/store/modules/route-config";
 import { logout } from "@/api/user";
 const i18n = useI18n();
 const router = useRouter();
@@ -296,8 +295,7 @@ const logOut = () => {
                 });
                 await useUserStoreHook().logOut();
                 router.replace("/login");
-                // 清除路由数据
-                useRouteConfigStore().resetRoute();
+                // 路由数据已在 logOut 内统一清除（resetRoute）
                 return true;
             } catch {
                 return false;

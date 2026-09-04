@@ -10,14 +10,14 @@
                     </a-input>
                 </a-form-item>
                 <a-form-item field="username" :hide-asterisk="true">
-                    <a-input v-model="form.username" allow-clear placeholder="请输入账号">
+                    <a-input v-model="form.username" allow-clear :placeholder="usernamePlaceholder">
                         <template #prefix>
                             <icon-user />
                         </template>
                     </a-input>
                 </a-form-item>
                 <a-form-item field="password" :hide-asterisk="true">
-                    <a-input-password v-model="form.password" allow-clear placeholder="请输入密码">
+                    <a-input-password v-model="form.password" allow-clear :placeholder="passwordPlaceholder">
                         <template #prefix>
                             <icon-lock />
                         </template>
@@ -157,14 +157,19 @@ const refreshCaptcha = () => {
     });
 };
 
-// 监听系统配置变化，自动更新默认账号密码
+// 账号/密码框占位提示，演示模式下显示演示账号信息（账号自动填充，密码由用户自行输入）
+const usernamePlaceholder = ref("请输入账号");
+const passwordPlaceholder = ref("请输入密码");
+
+// 监听系统配置变化，自动填充默认账号；演示信息只更新 placeholder 提示，密码不自动填充
 watch(systemConfig, (newConfig) => {
     if (newConfig) {
         if (newConfig.defaultusername) {
             form.value.username = newConfig.defaultusername;
+            usernamePlaceholder.value = `演示账号：${newConfig.defaultusername}`;
         }
         if (newConfig.defaultpassword) {
-            form.value.password = newConfig.defaultpassword;
+            passwordPlaceholder.value = `演示密码：${newConfig.defaultpassword}`;
         }
     }
 }, { immediate: true });

@@ -232,8 +232,9 @@ const getRootList = async () => {
         console.error("获取地区列表失败:", error);
         arcoMessage("error", "获取地区列表失败");
         areaList.value = [];
+    } finally {
+        loading.value = false;
     }
-    loading.value = false;
 };
 
 // 懒加载子节点（Arco Table load-more callback 风格）

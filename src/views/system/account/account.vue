@@ -415,22 +415,26 @@ const pagination = ref({
 const accountList = ref();
 const getAccount = async () => {
     loading.value = true;
-    const params: any = {
-        pageNum: pagination.value.current,
-        pageSize: pagination.value.pageSize,
-        order: "id desc",
-        ...form.value
-    };
+    try {
+        const params: any = {
+            pageNum: pagination.value.current,
+            pageSize: pagination.value.pageSize,
+            order: "id desc",
+            ...form.value
+        };
 
-    // 如果有选中的部门，则添加部门ID参数用于过滤
-    if (selectedDeptIds.value.length > 0) {
-        params.deptIds = selectedDeptIds.value;
+        // 如果有选中的部门，则添加部门ID参数用于过滤
+        if (selectedDeptIds.value.length > 0) {
+            params.deptIds = selectedDeptIds.value;
+        }
+
+        let { data } = await getAccountListAPI(params);
+        accountList.value = data.list;
+        pagination.value.total = data.total;
+    } finally {
+        // 错误已在http拦截器中处理，这里复位loading防止表格永久转圈
+        loading.value = false;
     }
-
-    let { data } = await getAccountListAPI(params);
-    accountList.value = data.list;
-    pagination.value.total = data.total;
-    loading.value = false;
 };
 const selectedKeys = ref([]);
 const select = (list: []) => {
