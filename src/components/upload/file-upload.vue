@@ -19,11 +19,11 @@
                             <template #icon><icon-download /></template>
                             下载
                         </a-button>
-                        <a-button v-if="fileItem.status === 'error'" type="text" size="small" @click="handleRetry(index)">
+                        <a-button v-if="fileItem.status === 'error' && !disabled" type="text" size="small" @click="handleRetry(index)">
                             <template #icon><icon-refresh /></template>
                             重试
                         </a-button>
-                        <a-button type="text" size="small" status="danger" @click="handleRemove(index)">
+                        <a-button v-if="!disabled" type="text" size="small" status="danger" @click="handleRemove(index)">
                             <template #icon><icon-delete /></template>
                             删除
                         </a-button>
@@ -42,10 +42,10 @@
                 :limit="maxCount"
                 @progress="onProgress"
                 :custom-request="handleUpload"
-                :disabled="fileList.length >= maxCount"
+                :disabled="disabled || fileList.length >= maxCount"
             >
                 <template #upload-button>
-                    <a-button :disabled="fileList.length >= maxCount" type="outline">
+                    <a-button :disabled="disabled || fileList.length >= maxCount" type="outline">
                         <template #icon><icon-upload /></template>
                         {{ title }}
                     </a-button>
@@ -64,6 +64,7 @@
 import { ref, watch } from 'vue';
 import { IconUpload, IconFile, IconDelete, IconDownload, IconRefresh } from '@arco-design/web-vue/es/icon';
 import { uploadAffixAPI } from '@/api/file';
+import { handleUrl } from '@/utils/app';
 import { Message } from '@arco-design/web-vue';
 
 // 文件信息接口
@@ -97,6 +98,10 @@ const props = defineProps({
     maxCount: {
         type: Number,
         default: 10
+    },
+    disabled: {
+        type: Boolean,
+        default: false
     }
 });
 
@@ -289,12 +294,29 @@ const handleRetry = (index: number) => {
 };
 
 // 下载文件
-const handleDownload = (fileItem: FileInfo) => {
-    if (fileItem.url) {
+const handleDownload = async (fileItem: FileInfo) => {
+    if (!fileItem.url) return;
+    try {
+        const fileUrl = handleUrl(fileItem.url);
+        const response = await fetch(fileUrl);
+        if (!response.ok) {
+            throw new Error(`下载失败: ${response.status} ${response.statusText}`);
+        }
+        const blob = await response.blob();
         const link = document.createElement('a');
-        link.href = fileItem.url;
-        link.download = fileItem.name;
+        const blobUrl = URL.createObjectURL(blob);
+        link.href = blobUrl;
+        // blob 链接设置 download 属性才会触发下载而不是打开
+        link.setAttribute('download', fileItem.name);
+        link.style.display = 'none';
+        document.body.appendChild(link);
         link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(blobUrl);
+        Message.success('开始下载');
+    } catch (error) {
+        console.error('下载文件失败:', error);
+        Message.error('下载文件失败');
     }
 };
 
