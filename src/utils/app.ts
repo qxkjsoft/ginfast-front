@@ -52,7 +52,9 @@ export function handleUrl(url: string, baseUrl = '') {
     }
 
     if (!baseUrl) {
-        baseUrl = import.meta.env.VITE_APP_BASE_URL
+        // VITE_APP_BASE_URL 为空（API 走同源/代理）时，开发环境回退 VITE_PROXY_TARGET，
+        // 保证头像等后端静态资源在 dev 下仍指向后端而非 dev server（生产无此变量，走同源）
+        baseUrl = import.meta.env.VITE_APP_BASE_URL || import.meta.env.VITE_PROXY_TARGET || "";
     }
 
     // 规范化基础URL和路径

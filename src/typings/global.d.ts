@@ -48,4 +48,6 @@ interface ViteEnv {
   VITE_USER_NODE_ENV: "development" | "production" | "test";
   VITE_PUBLIC_PATH: string;
   VITE_APP_BASE_URL: string;
+  /** 开发代理目标（后端地址），仅 vite dev server 与 dev 资源回退使用 */
+  VITE_PROXY_TARGET?: string;
 }

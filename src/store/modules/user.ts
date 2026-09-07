@@ -93,22 +93,27 @@ export const useUserStore = defineStore("user", () => {
     };
     /** 获取并设置当前登录用户信息 */
     const getUserInfo = async () => {
-        const { data } = await getProfileAPI();
-        if (data?.id) {
-            account.value.id = data.id;
-            account.value.username = data.userName;
-            account.value.nickname = data.nickName;
-            account.value.avatar = handleUrl(data.avatar);
-            account.value.roles = data.roleIDs;
-            account.value.permissions = data.permissions;
-            account.value.tenantID = data.tenantID;
-            account.value.tenantCode = data.tenantCode;
-            account.value.tenantName = data.tenantName;
-            account.value.tenantDomain = data.tenantDomain;
-            account.value.defaultTenant = data.defaultTenant;
-            account.value.tenants = data.tenants;
-            setLocalStorage(UserInfoKey, data);
+        const res = await getProfileAPI();
+        // 只判断 HTTP 层不够：业务失败时 HTTP 仍为 200，需检查业务 code
+        if (res?.code !== 0 || !res.data?.id) {
+            // 业务失败时清理旧缓存，避免沿用上一账号信息；调用方（路由守卫/切换租户）均有 catch 兜底
+            removeLocalStorage(UserInfoKey);
+            throw new Error(res?.message || "获取用户信息失败");
         }
+        const data = res.data;
+        account.value.id = data.id;
+        account.value.username = data.userName;
+        account.value.nickname = data.nickName;
+        account.value.avatar = handleUrl(data.avatar);
+        account.value.roles = data.roleIDs;
+        account.value.permissions = data.permissions;
+        account.value.tenantID = data.tenantID;
+        account.value.tenantCode = data.tenantCode;
+        account.value.tenantName = data.tenantName;
+        account.value.tenantDomain = data.tenantDomain;
+        account.value.defaultTenant = data.defaultTenant;
+        account.value.tenants = data.tenants;
+        setLocalStorage(UserInfoKey, data);
         return data;
     };
     /** 切换租户 */

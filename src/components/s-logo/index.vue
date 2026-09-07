@@ -27,6 +27,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import defaultLogoUrl from '@/assets/sys/default.svg'
 
 interface Props {
   // 图片URL
@@ -46,7 +47,8 @@ const props = withDefaults(defineProps<Props>(), {
   width: 32,
   height: 32,
   alt: '系统logo',
-  defaultImageUrl: '/src/assets/sys/default.svg'
+  // 经构建处理后的资源地址，避免源码路径在产物中 404
+  defaultImageUrl: defaultLogoUrl
 })
 
 // 图片加载状态

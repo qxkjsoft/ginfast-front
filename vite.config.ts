@@ -20,9 +20,11 @@ export default defineConfig(({ mode }) => {
             // host: "0.0.0.0",
             open: false,
             // 为开发服务器配置自定义代理规则-用于开发时的代理
+            // 目标地址来自 VITE_PROXY_TARGET（开发环境 VITE_APP_BASE_URL 置空，
+            // 请求走相对路径 /api 由该代理转发，不依赖后端 CORS）
             proxy: {
                 "/api": {
-                    target: env.VITE_APP_BASE_URL,
+                    target: env.VITE_PROXY_TARGET || "http://127.0.0.1:8080",
                     changeOrigin: true
                     //rewrite: path => path.replace(/^\/api/, "")
                 }

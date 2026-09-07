@@ -144,9 +144,7 @@ const sysConfigStore = () => {
 };
 
 export const useSysConfigStore = defineStore("sys-config", sysConfigStore, {
-    persist: persistedstateConfig("sys-config", [
-        "systemConfig",
-        "safeConfig",
-        "captchaConfig"
-    ])
+    // systemConfig 不持久化：应用启动时经 getConfig() 重新拉取，
+    // 且其 defaultusername/defaultpassword（演示账号，仅 demo 模式下发）不应落 localStorage
+    persist: persistedstateConfig("sys-config", ["safeConfig", "captchaConfig"])
 });

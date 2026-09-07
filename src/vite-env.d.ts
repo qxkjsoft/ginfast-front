@@ -23,4 +23,3 @@ declare module "vue-router";
 declare module "pinia";
 declare module "postcss-preset-env";
 declare module "qrcode";
-declare module "vue-virtual-scroller";

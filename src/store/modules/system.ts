@@ -14,7 +14,8 @@ const systemStore = () => {
   // 设置字典数据
   async function setDictData() {
     const { data } = await getAllDictsAPI();
-    dict.value = data.list || [];
+    // 业务失败时 data 可能为 null，避免 TypeError
+    dict.value = data?.list || [];
   }
 
   return { dict, setDictData };

@@ -59,11 +59,11 @@ export const getSysJobsList = (params: SysJobsListParams) => {
 };
 
 export const createSysJobs = (data: Omit<SysJobsData, 'id'>) => {
-    return http.request<SysJobsData>("post", baseUrlApi("sysJobs/add"), { data });
+    return http.request<SysJobsResult>("post", baseUrlApi("sysJobs/add"), { data });
 };
 
 export const updateSysJobs= (data: Partial<SysJobsData>) => {
-    return http.request<SysJobsData>("put", baseUrlApi(`sysJobs/edit`), { data });
+    return http.request<SysJobsResult>("put", baseUrlApi(`sysJobs/edit`), { data });
 };
 
 export const deleteSysJobs = (id: string) => {

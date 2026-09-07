@@ -58,25 +58,6 @@ export const getFirstandLastDay = (YearandMonty?: string): Array<string> => {
 };
 
 /**
- * 根据当前日期前推指定日期
- * @param { number } days 需要前推的天数
- * @param { string } type 返回的时间格式
- * @return {Array[]} 是否为空对象 [前推天数的日期，当前日期]
- */
-export const getDatesForwardDate = (days = 0, type = "YYYY-MM-DD"): Array<string> => {
-  const today = new Date();
-  const firstDay: any = new Date(today);
-  firstDay.setDate(firstDay.getDate() - days); // 向前推指定天，得到前指定天数的第一天
-
-  const lastDay: any = new Date(today);
-  lastDay.setDate(lastDay.getDate() - 1); // 昨天是前指定天数的最后一天
-
-  const firstDayFormatted = getTimestamp(firstDay, type);
-  const lastDayFormatted = getTimestamp(lastDay, type);
-  return [firstDayFormatted, lastDayFormatted];
-};
-
-/**
  * 获取当前日期是第几周
  * @param dateTime 当前传入的日期值
  * @description 示例：getWeek(new Date()); 返回25，说明今年第25周

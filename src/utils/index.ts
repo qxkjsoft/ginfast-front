@@ -13,6 +13,9 @@ export function deepClone(data: any) {
   } else {
     return data;
   }
+  // 记录已拷贝的引用，循环引用时复用同一副本，避免无限入栈
+  const copied = new WeakMap();
+  copied.set(data, cloned);
   stack.push({
     original: data,
     copy: cloned
@@ -27,7 +30,12 @@ export function deepClone(data: any) {
         let value = original[key];
 
         if (typeof value === "object" && value !== null) {
+          if (copied.has(value)) {
+            copy[key] = copied.get(value);
+            continue;
+          }
           copy[key] = Array.isArray(value) ? [] : {};
+          copied.set(value, copy[key]);
 
           stack.push({
             original: value,
@@ -78,50 +86,6 @@ export const getTimestamp = (timestamp: string | number | null, type: string) =>
     return `${Year}-${Moth}-${Day}`;
   }
   return `${Year}-${Moth}-${Day} ${Hour}:${Minute}:${Seconds}`;
-};
-
-/**
- * 根据当前日期前推指定日期
- * @param { number } days 需要前推的天数
- * @return {Array[]} 是否为空对象 [前推天数的日期，当前日期]
- */
-export const getDatesForwardDate = (days = 0) => {
-  const today = new Date();
-  const firstDay: any = new Date(today);
-  firstDay.setDate(firstDay.getDate() - days); // 向前推指定天，得到前指定天数的第一天
-
-  const lastDay: any = new Date(today);
-  lastDay.setDate(lastDay.getDate() - 1); // 昨天是前指定天数的最后一天
-
-  const firstDayFormatted = getTimestamp(firstDay, "YYYY-MM-DD");
-  const lastDayFormatted = getTimestamp(lastDay, "YYYY-MM-DD");
-  return [firstDayFormatted, lastDayFormatted];
-};
-
-/**
- * 给formData循环添加参数，过滤null、undefined、空字符串、NaN
- * 示例：let data = appendFormData(your-object);
- * @param { object } obj 参数对象
- * @return 返回formData对象
- */
-export const appendFormData = (obj: any) => {
-  let formData = new FormData();
-  function deepAppendFormData(formData: any, data: any, parentKey = "") {
-    if (Array.isArray(data) || (typeof data === "object" && data !== null)) {
-      // 如果数据是数组或对象，序列化为 JSON 字符串
-      formData.append(parentKey, JSON.stringify(data));
-    } else if (data !== null && data !== undefined && !Number.isNaN(data) && data !== "") {
-      // 如果数据是基本类型，直接添加
-      formData.append(parentKey, data);
-    }
-  }
-  for (let key in obj) {
-    if (obj.hasOwnProperty(key)) {
-      deepAppendFormData(formData, obj[key], key);
-    }
-  }
-  deepAppendFormData(formData, obj);
-  return formData;
 };
 
 /**

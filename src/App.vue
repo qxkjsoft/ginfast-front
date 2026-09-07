@@ -8,6 +8,7 @@
 import { useThemeMethods } from "@/hooks/useThemeMethods";
 import { useSysConfigStore } from "@/store/modules/sys-config";
 import { watch } from "vue";
+import defaultFaviconUrl from "@/assets/sys/default.ico";
 
 // 初始化主题
 const onTheme = () => {
@@ -62,7 +63,8 @@ const setFavicon = (iconUrl: string) => {
 
 // 设置默认图标的辅助方法
 const setDefaultFavicon = () => {
-    const defaultIconUrl = 'src/assets/sys/default.ico';
+    // 经构建处理后的资源地址，避免源码相对路径在产物中 404
+    const defaultIconUrl = defaultFaviconUrl;
     const links = document.querySelectorAll("link[rel='icon']");
     links.forEach(link => {
         link.remove();
