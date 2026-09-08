@@ -28,6 +28,11 @@ export interface CaptchaConfig {
     length: number;
 }
 
+// 多租户配置参数
+export interface TenantConfig {
+    enabled: boolean;
+}
+
 
 
 // 配置响应数据
@@ -35,6 +40,7 @@ export interface ConfigResponseData {
     system: SystemConfig;
     captcha: CaptchaConfig;
     safe: SafeConfig;
+    tenant?: TenantConfig;
 }
 
 // 配置请求参数

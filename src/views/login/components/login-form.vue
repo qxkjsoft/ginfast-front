@@ -2,7 +2,7 @@
     <div>
         <div class="login_form_box">
             <a-form :rules="rules" :model="form" layout="vertical" @submit="onSubmit">
-                <a-form-item field="tenantCode" :hide-asterisk="true">
+                <a-form-item v-if="tenantEnabled" field="tenantCode" :hide-asterisk="true">
                     <a-input v-model="form.tenantCode" allow-clear placeholder="租户编码（不填则为账号默认租户）">
                         <template #prefix>
                             <icon-home />
@@ -59,7 +59,7 @@ import { useSysConfigStore } from "@/store/modules/sys-config";
 import { storeToRefs } from "pinia";
 // 获取系统配置
 const sysConfigStore = useSysConfigStore();
-const { systemConfig } = storeToRefs(sysConfigStore);
+const { systemConfig, tenantEnabled } = storeToRefs(sysConfigStore);
 // 定义表单数据类型
 interface LoginForm {
     tenantCode: string;
@@ -109,6 +109,10 @@ const rules = ref({
 // 提交表单
 const onSubmit = async ({ errors }: { errors: Record<string, any> | undefined }) => {
     if (errors) return;
+    // 多租户关闭时不提交租户编码
+    if (!tenantEnabled.value) {
+        form.value.tenantCode = "";
+    }
     await onLogin();
 };
 

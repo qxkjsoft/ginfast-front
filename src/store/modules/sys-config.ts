@@ -7,6 +7,7 @@ import type {
     SystemConfig,
     SafeConfig,
     CaptchaConfig,
+    TenantConfig,
     ConfigRequestData
 } from "@/api/sysconfig";
 import { handleUrl } from "@/utils/app"
@@ -42,8 +43,14 @@ const sysConfigStore = () => {
         length: 0
     });
 
+    // 多租户配置数据（不持久化，每次启动以后端实时配置为准；老后端未返回该段时默认开启）
+    const tenantConfig = ref<TenantConfig>({ enabled: true });
+
     // 配置加载状态
     const loading = ref(false);
+
+    // 多租户是否开启
+    const tenantEnabled = computed(() => tenantConfig.value.enabled);
 
     // 处理后的系统Logo URL
     const systemLogo = computed(() => {
@@ -65,6 +72,7 @@ const sysConfigStore = () => {
                 systemConfig.value = data.system || systemConfig.value;
                 safeConfig.value = data.safe || safeConfig.value;
                 captchaConfig.value = data.captcha || captchaConfig.value;
+                tenantConfig.value = data.tenant || tenantConfig.value;
             }
 
             return data;
@@ -128,12 +136,18 @@ const sysConfigStore = () => {
             open: false,
             length: 0
         };
+
+        tenantConfig.value = {
+            enabled: true
+        };
     }
 
     return {
         systemConfig,
         safeConfig,
         captchaConfig,
+        tenantConfig,
+        tenantEnabled,
         loading,
         systemLogo,
         systemIcon,

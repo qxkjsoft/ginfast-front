@@ -111,6 +111,9 @@ import { VueCropper } from 'vue-cropper'
 import 'vue-cropper/dist/index.css'
 import { handleUrl } from "@/utils/app";
 import { useUserStoreHook } from "@/store/modules/user";
+import { useSysConfigStore } from "@/store/modules/sys-config";
+
+const sysConfigStore = useSysConfigStore();
 
 const route = useRoute();
 const proxy = useGlobalProperties();
@@ -316,8 +319,8 @@ const getUserInfo = async () => {
             }
         });
         //console.log("detail",detail.value)
-        // 当 defaultTenant 非空时，添加租户相关字段
-        if (userInfo.value.defaultTenant) {
+        // 当 defaultTenant 非空且多租户开启时，添加租户相关字段
+        if (userInfo.value.defaultTenant && sysConfigStore.tenantEnabled) {
             detail.value.push({
                 key: "defaultTenant",
                 label: "默认租户：",

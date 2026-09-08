@@ -149,16 +149,20 @@ const { language, darkMode } = storeToRefs(themeStore);
 //const userStore = useUserInfoStore();
 //const { account } = storeToRefs(userStore);
 import { useUserStoreHook } from "@/store/modules/user";
+import { useSysConfigStore } from "@/store/modules/sys-config";
 const account = useUserStoreHook().account;
+
+// 多租户开关（关闭时隐藏租户切换相关入口）
+const tenantEnabled = computed(() => useSysConfigStore().tenantEnabled);
 
 // 判断是否显示切换租户按钮
 const showTenantSwitch = computed(() => {
-    return account.tenants && account.tenants.some((t: any) => t.id !== account.tenantID);
+    return tenantEnabled.value && account.tenants && account.tenants.some((t: any) => t.id !== account.tenantID);
 });
 
 // 判断是否显示全局租户按钮
 const showGlobalTenant = computed(() => {
-    return (account.defaultTenant === null || account.defaultTenant === undefined) && account.tenantID > 0;
+    return tenantEnabled.value && (account.defaultTenant === null || account.defaultTenant === undefined) && account.tenantID > 0;
 });
 
 // 可切换的租户列表

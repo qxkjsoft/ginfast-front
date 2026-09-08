@@ -1,7 +1,7 @@
 <template>
     <a-layout-footer class="footer">
         <div class="footer_title" @click="onFooter">{{ systemCopyright }} {{ systemRecordNo }}</div>
-        <a-popover position="tl">
+        <a-popover v-if="tenantEnabled && tenantID > 0" position="tl">
             <div v-if="tenantID > 0" class="footer_tenant">{{ `[当前租户:${tenantName}]`  }}</div>
             <template #content>
                 <p>租户ID: {{ tenantID }}</p>
@@ -26,7 +26,7 @@ const { account } = storeToRefs(userStore);
 
 // 获取系统配置
 const sysConfigStore = useSysConfigStore();
-const { systemConfig } = storeToRefs(sysConfigStore);
+const { systemConfig, tenantEnabled } = storeToRefs(sysConfigStore);
 
 // 从系统配置中获取版权信息
 const systemCopyright = computed(() => {
